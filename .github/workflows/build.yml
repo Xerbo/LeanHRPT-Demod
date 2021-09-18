@@ -59,10 +59,8 @@ jobs:
             mkdir LeanHRPT-Demod.AppDir/usr/lib &&
             mkdir LeanHRPT-Demod.AppDir/usr/plugins &&
             cp AppRun                            LeanHRPT-Demod.AppDir/ &&
-            cp LeanHRPT-Demod.desktop           LeanHRPT-Demod.AppDir/ &&
+            cp LeanHRPT-Demod.desktop            LeanHRPT-Demod.AppDir/ &&
             cp logo128.png                       LeanHRPT-Demod.AppDir/ &&
-            cp presets.ini                       LeanHRPT-Demod.AppDir/ &&
-            cp calibration.ini                   LeanHRPT-Demod.AppDir/ &&
             cp -r $TEMP_PATH/plugins/platforms/  LeanHRPT-Demod.AppDir/usr/plugins/ &&
             cp $TEMP_PATH/lib/libQt5Gui.so.5     LeanHRPT-Demod.AppDir/usr/lib/ &&
             cp $TEMP_PATH/lib/libQt5Widgets.so.5 LeanHRPT-Demod.AppDir/usr/lib/ &&
@@ -73,7 +71,7 @@ jobs:
             cp $TEMP_PATH/lib/libicui18n.so.56   LeanHRPT-Demod.AppDir/usr/lib/ &&
             cp $TEMP_PATH/lib/libicudata.so.56   LeanHRPT-Demod.AppDir/usr/lib/ &&
             cp $TEMP_PATH/lib/libcorrect.so      LeanHRPT-Demod.AppDir/usr/lib/ &&
-            cp build/LeanHRPT-Demod             LeanHRPT-Demod.AppDir/usr/bin/ &&
+            cp build/LeanHRPT-Demod              LeanHRPT-Demod.AppDir/usr/bin/ &&
             ./appimagetool-x86_64.AppImage LeanHRPT-Demod.AppDir'
 
     - uses: actions/upload-artifact@v2
@@ -134,9 +132,7 @@ jobs:
             mkdir LeanHRPT-Demod/plugins/styles &&
             mkdir LeanHRPT-Demod/platforms &&
             cp logo128.png                                             LeanHRPT-Demod/ &&
-            cp presets.ini                                             LeanHRPT-Demod/ &&
-            cp calibration.ini                                         LeanHRPT-Demod/ &&
-            cp build/LeanHRPT-Demod.exe                               LeanHRPT-Demod/ &&
+            cp build/LeanHRPT-Demod.exe                                LeanHRPT-Demod/ &&
             cp $WIN_TEMP_PATH/bin/Qt5Core.dll                          LeanHRPT-Demod/ &&
             cp $WIN_TEMP_PATH/bin/Qt5Gui.dll                           LeanHRPT-Demod/ &&
             cp $WIN_TEMP_PATH/bin/Qt5Widgets.dll                       LeanHRPT-Demod/ &&

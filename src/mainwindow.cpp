@@ -69,10 +69,10 @@ void MainWindow::on_startButton_clicked() {
         ui->startButton->setText("Stop");
         if (ui->fileType->currentText() == "wav") {
             std::shared_ptr<FileReader> file = FileReader::choose_type("wav", inputFilename.toStdString());
-            demod = new PMDemodulator(file->sample_rate(), std::move(file));
+            demod = new PMDemodulator(file->sample_rate(), std::move(file), outputFilename.toStdString());
         } else {
             std::shared_ptr<FileReader> file = FileReader::choose_type(ui->fileFormat->currentText().toStdString(), inputFilename.toStdString());
-            demod = new PMDemodulator(ui->sampleRate->value()*1e6, std::move(file));
+            demod = new PMDemodulator(ui->sampleRate->value()*1e6, std::move(file), outputFilename.toStdString());
         }
 
         timer->start(1000.0f/30.0f);

@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.0.0)
-project(LeanHRPT-Demod CXX)
+project(LeanHRPT-Demod)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -7,7 +7,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-file(GLOB_RECURSE CXX_SOURCE_FILES src/*.cpp)
+file(GLOB_RECURSE CXX_SOURCE_FILES src/*.cpp src/*.c)
 add_executable(LeanHRPT-Demod ${CXX_SOURCE_FILES})
 
 set_property(TARGET LeanHRPT-Demod PROPERTY CXX_EXTENSIONS OFF)
@@ -27,7 +27,7 @@ if (WAR_CRIMES)
     target_link_directories(LeanHRPT-Demod PRIVATE /tmp/winbuild/lib)
 endif()
 
-target_link_libraries(LeanHRPT-Demod PRIVATE correct)
+#target_link_libraries(LeanHRPT-Demod PRIVATE correct)
 target_link_libraries(LeanHRPT-Demod PRIVATE sndfile)
 
 if (USE_ADDRESSS_SANITIZER)

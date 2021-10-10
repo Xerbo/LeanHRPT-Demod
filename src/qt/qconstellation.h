@@ -55,7 +55,11 @@ class QConstellation : public QWidget {
             QPainter painter(this);
             painter.fillRect(0, 0, width(), height(), QColor(0, 0, 0));
 
-            painter.setPen(QColor(255, 255, 70));
+            QPen pen;
+            pen.setWidthF(width()/100.0f);
+            pen.setColor(QColor(255, 255, 70));
+            pen.setCapStyle(Qt::RoundCap);
+            painter.setPen(pen);
             for (std::complex<float> &symbol : symbols) {
                 painter.drawPoint(
                     (symbol.real()+1.0f) * width()/2,

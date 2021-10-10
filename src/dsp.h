@@ -27,7 +27,7 @@
 #include "dsp/costas_loop.h"
 #include "dsp/clock_recovery.h"
 #include "dsp/binary_slicer.h"
-#include "util/pipe.h"
+#include "util/pipe.hh"
 
 #include <fstream>
 #ifdef _WIN32
@@ -38,7 +38,8 @@
 
 class PMDemodulator {
     public:
-        PMDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> source);
+        PMDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> source, std::string ofname);
+        ~PMDemodulator();
         std::vector<std::complex<float>> symbols;
         bool running = true;
     private:
@@ -50,7 +51,9 @@ class PMDemodulator {
         CostasLoop costas;
         ClockRecovery clock;
         BinarySlicer slicer;
-        std::ofstream of;
+
+        std::filebuf *outfile;
+        std::ostream *outstream;
 
         Pipe<std::complex<float>> file_pipe;
         Pipe<std::complex<float>> pll_pipe;

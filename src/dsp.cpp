@@ -24,7 +24,7 @@
 const size_t BUFFER_SIZE = 8192;
 const float SYM_RATE = 665.4e3;
 
-PMDemodulator::PMDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> source)
+PMDemodulator::PMDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> source, std::string ofname)
     : symbols(BUFFER_SIZE),
       file(std::move(source)),
       pll(loop(M_PIf/150.0f)),
@@ -32,12 +32,15 @@ PMDemodulator::PMDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> source
       rrc(make_rrc(1.0, SAMP_RATE, SYM_RATE, 0.6, 51)),
       costas(2, loop(0.005f)),
       clock(SAMP_RATE/SYM_RATE),
-      of("/tmp/output69.bin"),
       file_pipe(BUFFER_SIZE*10), 
-      pll_pipe(BUFFER_SIZE*10), 
+      pll_pipe(BUFFER_SIZE*10),
       ft_pipe(BUFFER_SIZE*10), 
       rrc_pipe(BUFFER_SIZE*10), 
       costas_pipe(BUFFER_SIZE*10) {
+
+    outfile = new std::filebuf;
+    outfile->open(ofname, std::ios::out | std::ios::binary);
+    outstream = new std::ostream(outfile);
 
     a = new std::thread([&] {
         std::vector<std::complex<float>> in(BUFFER_SIZE);
@@ -96,14 +99,19 @@ PMDemodulator::PMDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> source
 
     f = new std::thread([&] {
         std::vector<std::complex<float>> in(BUFFER_SIZE);
-        //std::vector<std::complex<float>> out(BUFFER_SIZE);
         std::vector<uint8_t> data(BUFFER_SIZE);
         while (running) {
             if (costas_pipe.pop(in.data(), BUFFER_SIZE) != 0) {
                 size_t n = clock.work(in.data(), symbols.data(), BUFFER_SIZE);
                 n = slicer.work(symbols.data(), data.data(), n);
-                of.write((char *)data.data(), n);
+                outstream->write((char *)data.data(), n);
             }
         }
     });
+}
+
+PMDemodulator::~PMDemodulator() {
+    outfile->close();
+    delete outfile;
+    delete outstream;
 }

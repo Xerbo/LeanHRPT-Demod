@@ -16,36 +16,30 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef DSP_FIR_IMPL_H
+#define DSP_FIR_IMPL_H
 
-#include <QMainWindow>
-#include <QTimer>
-#include "ui_mainwindow.h"
-#include "dsp.h"
+#include <complex>
+#include <vector>
+#include <algorithm>
 
-QT_BEGIN_NAMESPACE
-namespace Ui { class MainWindow; }
-QT_END_NAMESPACE
-
-class MainWindow : public QMainWindow {
-    Q_OBJECT
+class FIRKernel {
     public:
-        MainWindow(QWidget *parent = nullptr);
-        ~MainWindow();
-    private:
-        Ui::MainWindow *ui;
-        void closeEvent(QCloseEvent *event);
+        FIRKernel(const std::vector<float> &taps) {
+            set_taps(taps);
+        }
+        void set_taps(const std::vector<float> &taps) {
+            d_taps = taps;
+            std::reverse(d_taps.begin(), d_taps.end());
+        }
+        size_t ntaps() {
+            return d_taps.size();
+        }
 
-        PMDemodulator *demod = nullptr;
-        QTimer *timer;
-        QString inputFilename;
-        QString outputFilename;
-    private slots:
-        void on_fileType_textActivated(QString text);
-        void on_startButton_clicked();
-        void on_inputFile_clicked();
-        void on_outputFile_clicked();
+        std::complex<float> filter(const std::complex<float> *in);
+        void filter(const std::complex<float> *in, std::complex<float> *out, size_t n);
+    private:
+        std::vector<float> d_taps;
 };
 
-#endif // MAINWINDOW_H
+#endif

@@ -16,36 +16,31 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef DSP_FIR_FILTER_H
+#define DSP_FIR_FILTER_H
 
-#include <QMainWindow>
-#include <QTimer>
-#include "ui_mainwindow.h"
-#include "dsp.h"
+#include "fir_kernel.h"
+#include <vector>
+#include <iostream>
+#include <cmath>
+#include <complex>
 
-QT_BEGIN_NAMESPACE
-namespace Ui { class MainWindow; }
-QT_END_NAMESPACE
-
-class MainWindow : public QMainWindow {
-    Q_OBJECT
+class FIRFilter {
     public:
-        MainWindow(QWidget *parent = nullptr);
-        ~MainWindow();
-    private:
-        Ui::MainWindow *ui;
-        void closeEvent(QCloseEvent *event);
+        FIRFilter(const std::vector<float> &taps) : kernel(taps) {
+            ring_buffer.resize(taps.size());
+        }
 
-        PMDemodulator *demod = nullptr;
-        QTimer *timer;
-        QString inputFilename;
-        QString outputFilename;
-    private slots:
-        void on_fileType_textActivated(QString text);
-        void on_startButton_clicked();
-        void on_inputFile_clicked();
-        void on_outputFile_clicked();
+        size_t work(const std::complex<float> *in, std::complex<float> *out, size_t n) {
+            ring_buffer.insert(ring_buffer.end(), in, &in[n]);
+            kernel.filter(ring_buffer.data(), out, n);
+            ring_buffer.erase(ring_buffer.begin(), ring_buffer.end() - kernel.ntaps());
+
+            return n;
+        }
+    private:
+        std::vector<std::complex<float>> ring_buffer;
+        FIRKernel kernel;
 };
 
-#endif // MAINWINDOW_H
+#endif

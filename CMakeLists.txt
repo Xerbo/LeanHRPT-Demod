@@ -7,7 +7,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-file(GLOB_RECURSE CXX_SOURCE_FILES src/*.cpp src/viterbi/*.cpp)
+file(GLOB_RECURSE CXX_SOURCE_FILES src/*.cpp)
 add_executable(LeanHRPT-Demod ${CXX_SOURCE_FILES})
 
 set_property(TARGET LeanHRPT-Demod PROPERTY CXX_EXTENSIONS OFF)
@@ -15,7 +15,7 @@ set_property(TARGET LeanHRPT-Demod PROPERTY CXX_STANDARD 11)
 
 target_include_directories(LeanHRPT-Demod PUBLIC src)
 
-target_compile_options(LeanHRPT-Demod PRIVATE -Wall -Wextra -Wpedantic -g)
+target_compile_options(LeanHRPT-Demod PRIVATE -Wall -Wextra -Wpedantic -ffast-math)
 
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets REQUIRED)
@@ -28,6 +28,7 @@ if (WAR_CRIMES)
 endif()
 
 target_link_libraries(LeanHRPT-Demod PRIVATE correct)
+target_link_libraries(LeanHRPT-Demod PRIVATE sndfile)
 
 if (USE_ADDRESSS_SANITIZER)
     target_compile_options(LeanHRPT-Demod PRIVATE -fsanitize=address -fno-omit-frame-pointer)

@@ -16,36 +16,31 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef DSP_BINARY_SLICER_H
+#define DSP_BINARY_SLICER_H
 
-#include <QMainWindow>
-#include <QTimer>
-#include "ui_mainwindow.h"
-#include "dsp.h"
+#include <complex>
 
-QT_BEGIN_NAMESPACE
-namespace Ui { class MainWindow; }
-QT_END_NAMESPACE
-
-class MainWindow : public QMainWindow {
-    Q_OBJECT
+class BinarySlicer {
     public:
-        MainWindow(QWidget *parent = nullptr);
-        ~MainWindow();
-    private:
-        Ui::MainWindow *ui;
-        void closeEvent(QCloseEvent *event);
+        size_t work(const std::complex<float> *in, uint8_t *out, size_t n) {
+            size_t j = 0;
 
-        PMDemodulator *demod = nullptr;
-        QTimer *timer;
-        QString inputFilename;
-        QString outputFilename;
-    private slots:
-        void on_fileType_textActivated(QString text);
-        void on_startButton_clicked();
-        void on_inputFile_clicked();
-        void on_outputFile_clicked();
+            for (size_t i = 0; i < n; i++) {
+                buffer = buffer << 1 | (in[i].real() > 0.0f);
+                bit++;
+
+                if (bit == 8) {
+                    out[j++] = buffer;
+                    bit = 0;
+                }
+            }
+
+            return j;
+        }
+    private:
+        uint8_t buffer = 0x00;
+        size_t bit = 0;
 };
 
-#endif // MAINWINDOW_H
+#endif

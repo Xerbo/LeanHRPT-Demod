@@ -16,36 +16,29 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef DSP_DC_BLOCKER_H
+#define DSP_DC_BLOCKER_H
 
-#include <QMainWindow>
-#include <QTimer>
-#include "ui_mainwindow.h"
-#include "dsp.h"
+#include <complex>
 
-QT_BEGIN_NAMESPACE
-namespace Ui { class MainWindow; }
-QT_END_NAMESPACE
-
-class MainWindow : public QMainWindow {
-    Q_OBJECT
+// Remove the DC offset from a signal
+// NOTE: This is not a true DC blocker, as it uses an exponential moving average
+// https://en.wikipedia.org/wiki/Moving_average#Exponential_moving_average
+class FastDCBlocker {
     public:
-        MainWindow(QWidget *parent = nullptr);
-        ~MainWindow();
-    private:
-        Ui::MainWindow *ui;
-        void closeEvent(QCloseEvent *event);
+        FastDCBlocker(float alpha) : d_alpha(alpha) { }
 
-        PMDemodulator *demod = nullptr;
-        QTimer *timer;
-        QString inputFilename;
-        QString outputFilename;
-    private slots:
-        void on_fileType_textActivated(QString text);
-        void on_startButton_clicked();
-        void on_inputFile_clicked();
-        void on_outputFile_clicked();
+        size_t work(const std::complex<float> *in, std::complex<float> *out, size_t n) {
+            for (size_t i = 0; i < n; i++) {
+                accumulator = d_alpha*in[i] + (1.0f-d_alpha)*accumulator;
+                out[i] = in[i] - accumulator;
+            }
+
+            return n;
+        }
+    private:
+        const float d_alpha;
+        std::complex<float> accumulator;
 };
 
-#endif // MAINWINDOW_H
+#endif

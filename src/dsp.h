@@ -30,7 +30,11 @@
 #include "util/pipe.h"
 
 #include <fstream>
+#ifdef _WIN32
+#include "mingw.thread.h"
+#else
 #include <thread>
+#endif
 
 class PMDemodulator {
     public:

@@ -169,11 +169,12 @@ jobs:
             make install'
 
     - name: Install libsndfile
-      run: 'wget https://github.com/erikd/libsndfile/releases/download/v1.0.29/libsndfile-1.0.29-win64.zip &&
-            unzip libsndfile-1.0.29-win64.zip &&
-            cp "libsndfile-1.0.29-win64/bin/sndfile.dll"   $WIN_TEMP_PATH/bin/sndfile.dll &&
-            cp "libsndfile-1.0.29-win64/include/sndfile.h" $WIN_TEMP_PATH/include/sndfile.h &&
-            cp "libsndfile-1.0.29-win64/lib/sndfile.lib"   $WIN_TEMP_PATH/lib/sndfile.lib'
+      run: 'wget https://github.com/libsndfile/libsndfile/releases/download/1.0.31/libsndfile-1.0.31-win64.zip &&
+            unzip libsndfile-1.0.31-win64.zip &&
+            cp "libsndfile-1.0.31-win64/bin/sndfile.dll"    $WIN_TEMP_PATH/bin/sndfile.dll &&
+            cp "libsndfile-1.0.31-win64/include/sndfile.h"  $WIN_TEMP_PATH/include/sndfile.h &&
+            cp "libsndfile-1.0.31-win64/include/sndfile.hh" $WIN_TEMP_PATH/include/sndfile.hh &&
+            cp "libsndfile-1.0.31-win64/lib/sndfile.lib"    $WIN_TEMP_PATH/lib/sndfile.lib'
 
     - name: Compile LeanHRPT
       run: 'mkdir build &&

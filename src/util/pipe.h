@@ -30,7 +30,7 @@ class Pipe {
     public:
         Pipe(size_t size) : d_max_size(size) {
 #ifdef _WIN32
-            if (_pipe(handles, size*sizeof(T), "b") != -1) {
+            if (_pipe(handles, size*sizeof(T), 'b') != -1) {
 #else
             if (pipe(handles) == -1) {
 #endif

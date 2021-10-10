@@ -25,7 +25,8 @@ const size_t BUFFER_SIZE = 8192;
 const float SYM_RATE = 665.4e3;
 
 PMDemodulator::PMDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> source)
-    : file(std::move(source)),
+    : symbols(BUFFER_SIZE),
+      file(std::move(source)),
       pll(loop(M_PIf/150.0f)),
       ft(2.0f*M_PIf * -SYM_RATE/SAMP_RATE),
       rrc(make_rrc(1.0, SAMP_RATE, SYM_RATE, 0.6, 51)),
@@ -36,8 +37,7 @@ PMDemodulator::PMDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> source
       pll_pipe(BUFFER_SIZE*10), 
       ft_pipe(BUFFER_SIZE*10), 
       rrc_pipe(BUFFER_SIZE*10), 
-      costas_pipe(BUFFER_SIZE*10),
-      symbols(BUFFER_SIZE) {
+      costas_pipe(BUFFER_SIZE*10) {
 
     a = new std::thread([&] {
         std::vector<std::complex<float>> in(BUFFER_SIZE);

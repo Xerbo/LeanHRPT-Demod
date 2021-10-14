@@ -19,10 +19,11 @@
 #ifndef DSP_AGC_H
 #define DSP_AGC_H
 
+#include "block.h"
 #include <complex>
 
 // Automatic Gain Control, normalizes the magnitude of a signal
-class AGC {
+class AGC : public Block<complex, complex> {
     public:
         AGC(float rate = 0.001f, float reference = 1.0f, float gain = 1.0f, float max_gain = 65536.0f)
             : d_rate(rate),

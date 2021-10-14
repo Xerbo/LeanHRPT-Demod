@@ -17,101 +17,58 @@
  */
 
 #include "dsp.h"
-
 #include "util/fir_taps.h"
+
 #include <iostream>
 
-const size_t BUFFER_SIZE = 8192;
-const float SYM_RATE = 665.4e3;
-
 PMDemodulator::PMDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> source, std::string ofname)
-    : symbols(BUFFER_SIZE),
-      file(std::move(source)),
+    : file(std::move(source)),
       pll(loop(M_PIf/150.0f)),
-      ft(2.0f*M_PIf * -SYM_RATE/SAMP_RATE),
-      rrc(make_rrc(1.0, SAMP_RATE, SYM_RATE, 0.6, 51)),
+      ft(2.0f*M_PIf * -665.4e3/SAMP_RATE),
+      rrc(make_rrc(1.0, SAMP_RATE, 665.4e3, 0.6, 51)),
       costas(2, loop(0.005f)),
-      clock(SAMP_RATE/SYM_RATE),
-      file_pipe(BUFFER_SIZE*10), 
-      pll_pipe(BUFFER_SIZE*10),
-      ft_pipe(BUFFER_SIZE*10), 
-      rrc_pipe(BUFFER_SIZE*10), 
-      costas_pipe(BUFFER_SIZE*10) {
+      clock(SAMP_RATE/665.4e3, 0.5f, 0.1f, false),
+      out(ofname) {
 
-    outfile = new std::filebuf;
-    outfile->open(ofname, std::ios::out | std::ios::binary);
-    outstream = new std::ostream(outfile);
+    symbols.resize(BUFFER_SIZE);
+    agc.in_pipe = file->out_pipe;
+    pll.in_pipe = agc.out_pipe;
+    ft.in_pipe = pll.out_pipe;
+    rrc.in_pipe = ft.out_pipe;
+    costas.in_pipe = rrc.out_pipe;
+    clock.in_pipe = costas.out_pipe;
+    slicer.in_pipe = clock.out_pipe;
+    out.in_pipe = slicer.out_pipe;
 
-    a = new std::thread([&] {
-        std::vector<std::complex<float>> in(BUFFER_SIZE);
-        std::vector<std::complex<float>> out(BUFFER_SIZE);
-        while (running) {
-            running = file->read_samples(in.data(), BUFFER_SIZE);
-            agc.work(in.data(), out.data(), BUFFER_SIZE);
-            file_pipe.push(out.data(), BUFFER_SIZE);
-        }
-    });
-
-    b = new std::thread([&] {
-        std::vector<std::complex<float>> in(BUFFER_SIZE);
-        std::vector<std::complex<float>> out(BUFFER_SIZE);
-        while (running) {
-            size_t n = file_pipe.pop(in.data(), BUFFER_SIZE);
-            if (n != 0) {
-                pll.work(in.data(), out.data(), BUFFER_SIZE);
-                pll_pipe.push(out.data(), BUFFER_SIZE);
-            }
-        }
-    });
-
-    c = new std::thread([&] {
-        std::vector<std::complex<float>> in(BUFFER_SIZE);
-        std::vector<std::complex<float>> out(BUFFER_SIZE);
-        while (running) {
-            if (pll_pipe.pop(in.data(), BUFFER_SIZE) != 0) {
-                ft.work(in.data(), out.data(), BUFFER_SIZE);
-                ft_pipe.push(out.data(), BUFFER_SIZE);
-            }
-        }
-    });
-
-    d = new std::thread([&] {
-        std::vector<std::complex<float>> in(BUFFER_SIZE);
-        std::vector<std::complex<float>> out(BUFFER_SIZE);
-        while (running) {
-            if (ft_pipe.pop(in.data(), BUFFER_SIZE) != 0) {
-                rrc.work(in.data(), out.data(), BUFFER_SIZE);
-                rrc_pipe.push(out.data(), BUFFER_SIZE);
-            }
-        }
-    });
-
-    e = new std::thread([&] {
-        std::vector<std::complex<float>> in(BUFFER_SIZE);
-        std::vector<std::complex<float>> out(BUFFER_SIZE);
-        while (running) {
-            if (rrc_pipe.pop(in.data(), BUFFER_SIZE) != 0) {
-                costas.work(in.data(), out.data(), BUFFER_SIZE);
-                costas_pipe.push(out.data(), BUFFER_SIZE);
-            }
-        }
-    });
-
-    f = new std::thread([&] {
-        std::vector<std::complex<float>> in(BUFFER_SIZE);
-        std::vector<uint8_t> data(BUFFER_SIZE);
-        while (running) {
-            if (costas_pipe.pop(in.data(), BUFFER_SIZE) != 0) {
-                size_t n = clock.work(in.data(), symbols.data(), BUFFER_SIZE);
-                n = slicer.work(symbols.data(), data.data(), n);
-                outstream->write((char *)data.data(), n);
-            }
-        }
-    });
+    file->start();
+    agc.start();
+    pll.start();
+    ft.start();
+    rrc.start();
+    costas.start();
+    clock.start();
+    slicer.start();
+    out.start();
 }
 
-PMDemodulator::~PMDemodulator() {
-    outfile->close();
-    delete outfile;
-    delete outstream;
+QPSKDemodulator::QPSKDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> source, std::string ofname)
+    : file(std::move(source)),
+      rrc(make_rrc(1.0, SAMP_RATE, 2.3333e6, 0.6, 51)),
+      costas(4, loop(0.005f)),
+      clock(SAMP_RATE/2.3333e6),
+      out(ofname) {
+
+    symbols.resize(BUFFER_SIZE);
+    agc.in_pipe = file->out_pipe;
+    rrc.in_pipe = agc.out_pipe;
+    costas.in_pipe = rrc.out_pipe;
+    clock.in_pipe = costas.out_pipe;
+    out.in_pipe = clock.out_pipe;
+
+    file->start();
+    agc.start();
+    rrc.start();
+    costas.start();
+    clock.start();
+    out.start();
 }

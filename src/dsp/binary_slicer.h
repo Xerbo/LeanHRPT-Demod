@@ -19,9 +19,10 @@
 #ifndef DSP_BINARY_SLICER_H
 #define DSP_BINARY_SLICER_H
 
+#include "block.h"
 #include <complex>
 
-class BinarySlicer {
+class BinarySlicer : public Block<complex, uint8_t> {
     public:
         size_t work(const std::complex<float> *in, uint8_t *out, size_t n) {
             size_t j = 0;

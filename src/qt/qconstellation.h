@@ -30,17 +30,25 @@
 // A basic constellation widget
 class QConstellation : public QWidget {
     public:
-        explicit QConstellation([[maybe_unused]] QWidget *parent)
-            : symbols(NUM_SYMBOLS) { }
+        explicit QConstellation([[maybe_unused]] QWidget *parent) { }
 
         void push_sample(std::complex<float> symbol) {
             symbols[n++] = symbol;
-            if (n == NUM_SYMBOLS) n = 0;
+            if (n == symbols.size()) n = 0;
         }
+
+        void set_lines(bool x, bool y) {
+            xline = x;
+            yline = y;
+        }
+        void num_points(size_t x) { symbols.resize(x); }
+        size_t num_points() { return symbols.size(); }
     private:
         SNREstimator snr_est;
         std::vector<std::complex<float>> symbols;
         size_t n = 0;
+        bool xline = false;
+        bool yline = false;
 
         virtual void resizeEvent(QResizeEvent *event) {
             event->accept();
@@ -68,9 +76,10 @@ class QConstellation : public QWidget {
             }
 
             painter.setPen(QColor(70, 70, 70));
-            double snr = snr_est.get_snr(symbols.data(), NUM_SYMBOLS);
+            double snr = snr_est.get_snr(symbols.data(), symbols.size());
             painter.drawText(5, height()-105, 100, 100, Qt::AlignBottom, QString("SNR: %1 dB").arg(QString::number(snr, 'f', 2)));
-            painter.drawLine(width()/2, 0, width()/2, height());
+            if (yline) painter.drawLine(width()/2, 0, width()/2, height());
+            if (xline) painter.drawLine(0, height()/2, width(), height()/2);
         }
 };
 

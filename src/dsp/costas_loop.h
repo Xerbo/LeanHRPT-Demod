@@ -20,6 +20,7 @@
 #define DSP_COSTAS_LOOP_H
 
 #include "util/math.h"
+#include "block.h"
 #include <cmath>
 #include <complex>
 
@@ -33,7 +34,7 @@ static inline float phase_detector_bpsk(std::complex<float> sample) {
 }
 
 // Locks onto a carrier with a PLL and outputs the input signal mixed with the carrier
-class CostasLoop {
+class CostasLoop : public Block<complex, complex> {
     public:
         CostasLoop(size_t order, float alpha, float beta, float max_freq = M_PIf)
             : d_order(order),

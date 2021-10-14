@@ -39,6 +39,8 @@ public:
     QPushButton *inputFile;
     QLabel *fileTypeLabel;
     QComboBox *fileType;
+    QLabel *downlinkLabel;
+    QComboBox *downlink;
     QLabel *fileFormatLabel;
     QComboBox *fileFormat;
     QLabel *sampleRateLabel;
@@ -96,10 +98,24 @@ public:
 
         formLayout->setWidget(1, QFormLayout::FieldRole, fileType);
 
+        downlinkLabel = new QLabel(settingsBox);
+        downlinkLabel->setObjectName(QString::fromUtf8("downlinkLabel"));
+
+        formLayout->setWidget(2, QFormLayout::LabelRole, downlinkLabel);
+
+        downlink = new QComboBox(settingsBox);
+        downlink->addItem(QString());
+        downlink->addItem(QString());
+        downlink->setObjectName(QString::fromUtf8("downlink"));
+        sizePolicy.setHeightForWidth(downlink->sizePolicy().hasHeightForWidth());
+        downlink->setSizePolicy(sizePolicy);
+
+        formLayout->setWidget(2, QFormLayout::FieldRole, downlink);
+
         fileFormatLabel = new QLabel(settingsBox);
         fileFormatLabel->setObjectName(QString::fromUtf8("fileFormatLabel"));
 
-        formLayout->setWidget(2, QFormLayout::LabelRole, fileFormatLabel);
+        formLayout->setWidget(3, QFormLayout::LabelRole, fileFormatLabel);
 
         fileFormat = new QComboBox(settingsBox);
         fileFormat->addItem(QString());
@@ -112,12 +128,12 @@ public:
         sizePolicy.setHeightForWidth(fileFormat->sizePolicy().hasHeightForWidth());
         fileFormat->setSizePolicy(sizePolicy);
 
-        formLayout->setWidget(2, QFormLayout::FieldRole, fileFormat);
+        formLayout->setWidget(3, QFormLayout::FieldRole, fileFormat);
 
         sampleRateLabel = new QLabel(settingsBox);
         sampleRateLabel->setObjectName(QString::fromUtf8("sampleRateLabel"));
 
-        formLayout->setWidget(3, QFormLayout::LabelRole, sampleRateLabel);
+        formLayout->setWidget(4, QFormLayout::LabelRole, sampleRateLabel);
 
         sampleRate = new QDoubleSpinBox(settingsBox);
         sampleRate->setObjectName(QString::fromUtf8("sampleRate"));
@@ -128,29 +144,29 @@ public:
         sampleRate->setMaximum(10.000000000000000);
         sampleRate->setValue(3.000000000000000);
 
-        formLayout->setWidget(3, QFormLayout::FieldRole, sampleRate);
+        formLayout->setWidget(4, QFormLayout::FieldRole, sampleRate);
 
         outputFileLabel = new QLabel(settingsBox);
         outputFileLabel->setObjectName(QString::fromUtf8("outputFileLabel"));
 
-        formLayout->setWidget(4, QFormLayout::LabelRole, outputFileLabel);
+        formLayout->setWidget(5, QFormLayout::LabelRole, outputFileLabel);
 
         outputFile = new QPushButton(settingsBox);
         outputFile->setObjectName(QString::fromUtf8("outputFile"));
         sizePolicy.setHeightForWidth(outputFile->sizePolicy().hasHeightForWidth());
         outputFile->setSizePolicy(sizePolicy);
 
-        formLayout->setWidget(4, QFormLayout::FieldRole, outputFile);
+        formLayout->setWidget(5, QFormLayout::FieldRole, outputFile);
 
         startButton = new QPushButton(settingsBox);
         startButton->setObjectName(QString::fromUtf8("startButton"));
         startButton->setEnabled(false);
 
-        formLayout->setWidget(6, QFormLayout::SpanningRole, startButton);
+        formLayout->setWidget(7, QFormLayout::SpanningRole, startButton);
 
         verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
-        formLayout->setItem(5, QFormLayout::LabelRole, verticalSpacer);
+        formLayout->setItem(6, QFormLayout::FieldRole, verticalSpacer);
 
 
         horizontalLayout->addWidget(settingsBox);
@@ -188,6 +204,10 @@ public:
         fileTypeLabel->setText(QCoreApplication::translate("MainWindow", "File Type", nullptr));
         fileType->setItemText(0, QCoreApplication::translate("MainWindow", "wav", nullptr));
         fileType->setItemText(1, QCoreApplication::translate("MainWindow", "raw", nullptr));
+
+        downlinkLabel->setText(QCoreApplication::translate("MainWindow", "Downlink", nullptr));
+        downlink->setItemText(0, QCoreApplication::translate("MainWindow", "NOAA/Meteor HRPT", nullptr));
+        downlink->setItemText(1, QCoreApplication::translate("MainWindow", "MetOp HRPT", nullptr));
 
         fileFormatLabel->setText(QCoreApplication::translate("MainWindow", "File Format", nullptr));
         fileFormat->setItemText(0, QCoreApplication::translate("MainWindow", "char", nullptr));

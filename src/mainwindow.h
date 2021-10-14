@@ -37,7 +37,7 @@ class MainWindow : public QMainWindow {
         Ui::MainWindow *ui;
         void closeEvent(QCloseEvent *event);
 
-        PMDemodulator *demod = nullptr;
+        Demodulator *demod = nullptr;
         QTimer *timer;
         QString inputFilename;
         QString outputFilename;

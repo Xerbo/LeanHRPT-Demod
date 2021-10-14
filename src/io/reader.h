@@ -21,12 +21,18 @@
 
 #include <complex>
 #include <memory>
+#include "dsp/block.h"
 
-class FileReader {
+class FileReader : public Block<Empty, complex> {
     public:
-        virtual bool read_samples(std::complex<float> *ptr, size_t n)=0;
+        virtual size_t read_samples(std::complex<float> *ptr, size_t n)=0;
         virtual int sample_rate()=0;
         static std::shared_ptr<FileReader> choose_type(std::string type, std::string filename);
+
+    private:
+        size_t work(complex *out, size_t n) {
+            return read_samples(out, n);
+        }
 };
 
 #endif

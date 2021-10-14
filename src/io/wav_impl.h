@@ -39,7 +39,7 @@ class WAVFileReader: public FileReader {
                 throw std::invalid_argument("WAVFileReader: sample rate not high enough");
             }
         }
-        bool read_samples(std::complex<float> *ptr, size_t n) {
+        size_t read_samples(std::complex<float> *ptr, size_t n) {
             buffer.reserve(n*2);
             size_t read = file.readf(buffer.data(), n);
 
@@ -47,7 +47,7 @@ class WAVFileReader: public FileReader {
                 ptr[i] = std::complex<float>(buffer[i*2], buffer[i*2 + 1]);
             }
 
-            return read == n;
+            return read;
         }
         int sample_rate() {
             return file.samplerate();

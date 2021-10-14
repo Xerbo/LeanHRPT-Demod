@@ -19,6 +19,7 @@
 #ifndef DSP_CARRIER_PLL_H
 #define DSP_CARRIER_PLL_H
 
+#include "block.h"
 #include "util/sse.h"
 #include "util/math.h"
 #include <cmath>
@@ -29,7 +30,7 @@
 #define M_TWOPI (2 * M_PI)  
 
 // Locks onto a carrier with a PLL and outputs the input signal mixed with the carrier
-class CarrierPLL {
+class CarrierPLL : public Block<complex, complex> {
     public:
         CarrierPLL(float alpha, float beta, float max_freq = M_PIf)
             : d_alpha(alpha),

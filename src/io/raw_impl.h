@@ -30,14 +30,15 @@
 template<typename T>
 class RawFileReader: public FileReader {
     public:
-        RawFileReader(std::string filename) : file(filename) {
+        RawFileReader(std::string filename) : stream(&file) {
+            file.open(filename, std::ios::in | std::ios::binary);
             if (!file.is_open()) {
                 throw std::invalid_argument("RawFileReader: could not open file");
             }
         }
-        bool read_samples(std::complex<float> *ptr, size_t n) {
+        size_t read_samples(std::complex<float> *ptr, size_t n) {
             buffer.reserve(n*2);
-            file.read((char *)buffer.data(), n*2*sizeof(T));
+            stream.read((char *)buffer.data(), n*2*sizeof(T));
 
             float a = 1.0f;
             float b = 0.0f;
@@ -54,14 +55,15 @@ class RawFileReader: public FileReader {
                 ptr[i] = std::complex<float>((float)buffer[i*2]*a + b, (float)buffer[i*2+1]*a + b);
             }
 
-            return !file.eof();
+            return stream.gcount()/2/sizeof(T);
         }
         int sample_rate() {
             return -1;
         }
     private:
         std::vector<T> buffer;
-        std::ifstream file;
+        std::filebuf file;
+        std::istream stream;
 };
 
 #endif

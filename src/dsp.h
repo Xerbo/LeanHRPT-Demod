@@ -28,6 +28,7 @@
 #include "dsp/clock_recovery.h"
 #include "dsp/binary_slicer.h"
 #include "util/pipe.hh"
+#include "io/writer.h"
 
 #include <fstream>
 #ifdef _WIN32
@@ -36,12 +37,15 @@
 #include <thread>
 #endif
 
-class PMDemodulator {
+class Demodulator {
+    public:
+        bool running = true;
+        std::vector<std::complex<float>> symbols;
+};
+
+class PMDemodulator : public Demodulator {
     public:
         PMDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> source, std::string ofname);
-        ~PMDemodulator();
-        std::vector<std::complex<float>> symbols;
-        bool running = true;
     private:
         std::shared_ptr<FileReader> file;
         AGC agc;
@@ -51,22 +55,19 @@ class PMDemodulator {
         CostasLoop costas;
         ClockRecovery clock;
         BinarySlicer slicer;
+        FileWriter<uint8_t> out;
+};
 
-        std::filebuf *outfile;
-        std::ostream *outstream;
-
-        Pipe<std::complex<float>> file_pipe;
-        Pipe<std::complex<float>> pll_pipe;
-        Pipe<std::complex<float>> ft_pipe;
-        Pipe<std::complex<float>> rrc_pipe;
-        Pipe<std::complex<float>> costas_pipe;
-
-        std::thread *a;
-        std::thread *b;
-        std::thread *c;
-        std::thread *d;
-        std::thread *e;
-        std::thread *f;
+class QPSKDemodulator : public Demodulator {
+    public:
+        QPSKDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> source, std::string ofname);
+    private:
+        std::shared_ptr<FileReader> file;
+        AGC agc;
+        FIRFilter rrc;
+        CostasLoop costas;
+        ClockRecovery clock;
+        FileWriter<complex> out;
 };
 
 #endif

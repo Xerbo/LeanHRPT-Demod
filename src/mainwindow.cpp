@@ -32,7 +32,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
             demod->running = false;
             timer->stop();
         }
-        for (size_t i = 0; i < 1024; i++) {
+        for (size_t i = 0; i < ui->constellation->num_points()/2; i++) {
             ui->constellation->push_sample(demod->symbols[i]);
         }
         ui->constellation->repaint();
@@ -66,16 +66,29 @@ void MainWindow::on_fileType_textActivated(QString text) {
 
 void MainWindow::on_startButton_clicked() {
     if (ui->startButton->text() == "Start") {
-        ui->startButton->setText("Stop");
+        std::shared_ptr<FileReader> file;
+        float samp_rate;
+
         if (ui->fileType->currentText() == "wav") {
-            std::shared_ptr<FileReader> file = FileReader::choose_type("wav", inputFilename.toStdString());
-            demod = new PMDemodulator(file->sample_rate(), std::move(file), outputFilename.toStdString());
+            file = FileReader::choose_type("wav", inputFilename.toStdString());
+            samp_rate = file->sample_rate();
         } else {
-            std::shared_ptr<FileReader> file = FileReader::choose_type(ui->fileFormat->currentText().toStdString(), inputFilename.toStdString());
-            demod = new PMDemodulator(ui->sampleRate->value()*1e6, std::move(file), outputFilename.toStdString());
+            file = FileReader::choose_type(ui->fileFormat->currentText().toStdString(), inputFilename.toStdString());
+            samp_rate = ui->sampleRate->value()*1e6;
+        }
+
+        if (ui->downlink->currentText() == "MetOp HRPT") {
+            demod = new QPSKDemodulator(samp_rate, std::move(file), ui->outputFile->text().toStdString());
+            ui->constellation->set_lines(true, true);
+            ui->constellation->num_points(4096);
+        } else {
+            demod = new PMDemodulator(samp_rate, std::move(file), ui->outputFile->text().toStdString());
+            ui->constellation->set_lines(false, true);
+            ui->constellation->num_points(2048);
         }
 
         timer->start(1000.0f/30.0f);
+        ui->startButton->setText("Stop");
     } else {
         QMessageBox confirm;
         confirm.setText("Are you sure you want to cancel?");
@@ -86,9 +99,9 @@ void MainWindow::on_startButton_clicked() {
             return;
         }
 
-        ui->startButton->setText("Start");
         demod->running = false;
         timer->stop();
+        ui->startButton->setText("Start");
     }
 }
 
@@ -100,7 +113,11 @@ void MainWindow::on_inputFile_clicked() {
     ui->startButton->setEnabled(!outputFilename.isEmpty() && !inputFilename.isEmpty());
 }
 void MainWindow::on_outputFile_clicked() {
-    outputFilename = QFileDialog::getSaveFileName(this, "Select Output File", "", "Binary (*.bin)");
+    if (ui->downlink->currentText() == "MetOp HRPT") {
+        outputFilename = QFileDialog::getSaveFileName(this, "Select Output File", "", "VCDUs (*.vcdu)");
+    } else {
+        outputFilename = QFileDialog::getSaveFileName(this, "Select Output File", "", "Binary (*.bin)");
+    }
     if (outputFilename.isEmpty()) return;
 
     ui->outputFile->setText(outputFilename);

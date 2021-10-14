@@ -27,7 +27,7 @@ if (WAR_CRIMES)
     target_link_directories(LeanHRPT-Demod PRIVATE /tmp/winbuild/lib)
 endif()
 
-#target_link_libraries(LeanHRPT-Demod PRIVATE correct)
+target_link_libraries(LeanHRPT-Demod PRIVATE correct)
 target_link_libraries(LeanHRPT-Demod PRIVATE sndfile)
 
 if (USE_ADDRESSS_SANITIZER)

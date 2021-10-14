@@ -19,13 +19,14 @@
 #ifndef DSP_FIR_FILTER_H
 #define DSP_FIR_FILTER_H
 
+#include "block.h"
 #include "fir_kernel.h"
 #include <vector>
 #include <iostream>
 #include <cmath>
 #include <complex>
 
-class FIRFilter {
+class FIRFilter : public Block<complex, complex> {
     public:
         FIRFilter(const std::vector<float> &taps) : kernel(taps) {
             ring_buffer.resize(taps.size());

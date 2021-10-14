@@ -20,6 +20,7 @@
 #define DSP_SYMBOL_SYNC_H
 
 #include "fir_intrepolator.h"
+#include "block.h"
 
 #include <complex>
 #include <cstring>
@@ -33,15 +34,16 @@
 //        SymbolSync(float sps, std::pair<float, float> loop, float max_dev) { };
 //};
 
-class ClockRecovery {
+class ClockRecovery : public Block<complex, complex> {
     public:
-        ClockRecovery(float omega, float mu = 0.5f, float gain_mu = 0.1f) 
+        ClockRecovery(float omega, float mu = 0.5f, float gain_mu = 0.1f, bool qpsk = true) 
             : d_omega(omega),
               d_mu(mu),
               d_gain_mu(gain_mu),
+              d_qpsk(qpsk),
               d_history(3) { }
 
-        int work(const std::complex<float> *in, std::complex<float> *output, int length) {
+        size_t work(const std::complex<float> *in, std::complex<float> *output, size_t length) {
             // Manage the history
             size_t totalLength = sampleHistory + length;
             if (ring_buffer.size() < totalLength) {
@@ -62,6 +64,7 @@ class ClockRecovery {
         float d_omega;
         float d_mu = 0.5;
         const float d_gain_mu = 0.175;
+        bool d_qpsk;
 
         FIRInterpolator interp;
         std::vector<std::complex<float>> d_history;
@@ -84,10 +87,14 @@ class ClockRecovery {
                 d_history.pop_back();
                 d_history.insert(d_history.begin(), out[outputIndex]);
 
-                // Mueller and Muller TED
-                //float ted_error = slicer(d_history[1].real())*d_history[0].real() - slicer(d_history[0].real())*d_history[1].real();
-                // Early-late TED
-                float ted_error = (slicer(d_history[2].real()) - slicer(d_history[0].real())) * d_history[1].real();
+                // Zero crossing TED
+                float ted_error;
+                if (d_qpsk) {
+                    ted_error = (slicer(d_history[2].real()) - slicer(d_history[0].real())) * d_history[1].real() +
+                                (slicer(d_history[2].imag()) - slicer(d_history[0].imag())) * d_history[1].imag();
+                } else {
+                    ted_error = (slicer(d_history[2].real()) - slicer(d_history[0].real())) * d_history[1].real();
+                }
 
                 // Adjust Mu (PI filter)
                 d_mu = d_mu + d_omega + d_gain_mu*ted_error;

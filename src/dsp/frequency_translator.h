@@ -19,12 +19,13 @@
 #ifndef DSP_FREQUENCY_TRANSLATOR_H
 #define DSP_FREQUENCY_TRANSLATOR_H
 
+#include "block.h"
 #include "util/math.h"
 #include <complex>
 #include <cmath>
 
 // Translates the quadrate/imaginary branch into the complex domain
-class FrequencyTranslator {
+class FrequencyTranslator : public Block<complex, complex> {
     public:
         // Frequency is in radians per sample
         FrequencyTranslator(float shift) : d_shift(shift) { }

@@ -21,13 +21,11 @@
 #include <algorithm>
 #include <cmath>
 
-template<typename T>
-inline T clamp(T v, T lo, T hi) {
+float clamp(float v, float lo, float hi) {
     return std::max(lo, std::min(hi, v));
 }
 
-template<typename T>
-inline T clamp(T v, T hi) {
+float clamp(float v, float hi) {
     return clamp(v, -hi, hi);
 }
 

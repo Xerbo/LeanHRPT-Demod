@@ -26,12 +26,10 @@
 
 #include <utility>
 
-template<typename T>
-inline T clamp(T v, T lo, T hi);
-template<typename T>
-inline T clamp(T v, T hi);
+float clamp(float v, float lo, float hi);
+float clamp(float v, float hi);
 
-// Adapted from https://github.com/gnuradio/gnuradio/blob/master/gr-blocks/lib/control_loop.cc#L36-L41
+// https://www.trondeau.com/blog/2011/8/13/control-loop-gain-values.html
 std::pair<float, float> loop(float bandwidth, float damping = 0.707f);
 
 // https://en.wikipedia.org/wiki/Bhaskara_I's_sine_approximation_formula

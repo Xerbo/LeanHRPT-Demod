@@ -33,12 +33,12 @@ struct Empty {
     int dummy;
 };
 
-#include <iostream>
-
 template<typename A, typename B>
 class Block {
     public:
-        Block(size_t size = BUFFER_SIZE*10) {
+        Block(size_t request = BUFFER_SIZE, size_t size = BUFFER_SIZE*10) 
+            : in(request),
+              out(BUFFER_SIZE) {
             if (!std::is_same<B, Empty>::value) {
                 out_pipe = std::make_shared<Pipe<B>>(size);
             }
@@ -48,11 +48,9 @@ class Block {
             if (!std::is_same<A, Empty>::value & !std::is_same<B, Empty>::value) {
                 // Input and output
                 thread = std::make_shared<std::thread>([this]() {
-                    std::vector<A> in(BUFFER_SIZE);
-                    std::vector<B> out(BUFFER_SIZE);
                     while (running) {
-                        if (in_pipe->pop(in.data(), BUFFER_SIZE) != 0) {
-                            size_t n = work(in.data(), out.data(), BUFFER_SIZE);
+                        if (in_pipe->pop(in.data(), in.size()) != 0) {
+                            size_t n = work(in.data(), out.data(), in.size());
                             out_pipe->push(out.data(), n);
                         }
                     }
@@ -60,19 +58,17 @@ class Block {
             } else if (!std::is_same<B, Empty>::value){
                 // Output only
                 thread = std::make_shared<std::thread>([this]() {
-                    std::vector<B> out(BUFFER_SIZE);
                     while (running) {
-                        size_t n = work(out.data(), BUFFER_SIZE);
+                        size_t n = work(out.data(), out.size());
                         out_pipe->push(out.data(), n);
                     }
                 });
             } else if (!std::is_same<A, Empty>::value) {
                 // Input only
                 thread = std::make_shared<std::thread>([this]() {
-                    std::vector<A> in(BUFFER_SIZE);
                     while (running) {
-                        if (in_pipe->pop(in.data(), BUFFER_SIZE) != 0) {
-                            work(in.data(), BUFFER_SIZE);
+                        if (in_pipe->pop(in.data(), in.size()) != 0) {
+                            work(in.data(), in.size());
                         }
                     }
                 });
@@ -84,15 +80,17 @@ class Block {
         // This is bad, dont do this
         std::shared_ptr<Pipe<B>> out_pipe;
         std::shared_ptr<Pipe<A>> in_pipe;
+        std::vector<A> in;
+        std::vector<B> out;
 
         bool running = true;
     private:
         std::shared_ptr<std::thread> thread;
 
         // Virtual work functions
-        virtual size_t work([[maybe_unused]] const A *in, [[maybe_unused]] B *out, [[maybe_unused]] size_t n) { throw std::runtime_error("override damn it"); };
-        virtual size_t work([[maybe_unused]] B *out, [[maybe_unused]] size_t n)                               { throw std::runtime_error("override damn it"); };
-        virtual void work([[maybe_unused]] const A *in, [[maybe_unused]] size_t n)                            { throw std::runtime_error("override damn it"); };
+        virtual size_t work([[maybe_unused]] const A *in, [[maybe_unused]] B *out, [[maybe_unused]] size_t n) { throw std::runtime_error("No matching function with signature size_t(const A* in, B* out, size_t n"); };
+        virtual size_t work([[maybe_unused]] B *out, [[maybe_unused]] size_t n)                               { throw std::runtime_error("No matching function with signature size_t(B* out, size_n"); };
+        virtual void work([[maybe_unused]] const A *in, [[maybe_unused]] size_t n)                            { throw std::runtime_error("No matching function with signature void(const A* in, size_t n"); };
 };
 
 #endif

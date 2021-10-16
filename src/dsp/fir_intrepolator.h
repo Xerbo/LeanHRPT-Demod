@@ -27,6 +27,7 @@ class FIRInterpolator {
         ~FIRInterpolator();
 
         std::complex<float> interpolate(const std::complex<float> *input, float mu);
+        size_t ntaps();
     private:
         std::vector<FIRKernel *> filters;
 };

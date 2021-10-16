@@ -40,12 +40,15 @@
 class Demodulator {
     public:
         bool running = true;
-        std::vector<std::complex<float>> symbols;
+        virtual std::vector<complex> &symbols()=0;
 };
 
 class PMDemodulator : public Demodulator {
     public:
         PMDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> source, std::string ofname);
+        std::vector<complex> &symbols() {
+            return slicer.in;
+        }
     private:
         std::shared_ptr<FileReader> file;
         AGC agc;
@@ -53,7 +56,7 @@ class PMDemodulator : public Demodulator {
         FrequencyTranslator ft;
         FIRFilter rrc;
         CostasLoop costas;
-        ClockRecovery clock;
+        SymbolSync clock;
         BinarySlicer slicer;
         FileWriter<uint8_t> out;
 };
@@ -61,12 +64,15 @@ class PMDemodulator : public Demodulator {
 class QPSKDemodulator : public Demodulator {
     public:
         QPSKDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> source, std::string ofname);
+        std::vector<complex> &symbols() {
+            return out.in;
+        }
     private:
         std::shared_ptr<FileReader> file;
         AGC agc;
         FIRFilter rrc;
         CostasLoop costas;
-        ClockRecovery clock;
+        SymbolSync clock;
         FileWriter<complex> out;
 };
 

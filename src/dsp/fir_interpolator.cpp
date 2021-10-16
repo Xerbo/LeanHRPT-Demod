@@ -43,3 +43,7 @@ std::complex<float> FIRInterpolator::interpolate(const std::complex<float> *inpu
 
     return filters[imu]->filter(input);
 }
+
+size_t FIRInterpolator::ntaps() {
+    return NTAPS;
+}

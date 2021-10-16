@@ -25,23 +25,19 @@
 #include <complex>
 #include <cstring>
 #include <vector>
-#include <iostream>
 
 #define MIN_SAMPLE_HISTORY 3
+#define HISTORY_SIZE 3
 
-//class SymbolSync {
-//    public:
-//        SymbolSync(float sps, std::pair<float, float> loop, float max_dev) { };
-//};
-
-class ClockRecovery : public Block<complex, complex> {
+class SymbolSync : public Block<complex, complex> {
     public:
-        ClockRecovery(float omega, float mu = 0.5f, float gain_mu = 0.1f, bool qpsk = true) 
-            : d_omega(omega),
-              d_mu(mu),
-              d_gain_mu(gain_mu),
-              d_qpsk(qpsk),
-              d_history(3) { }
+        SymbolSync(float sps, std::pair<float, float> loop, float max_dev = 0.0f)
+            : d_sps(sps),
+              d_target_sps(sps),
+              d_alpha(loop.first),
+              d_beta(loop.second),
+              d_limit(max_dev),
+              d_history(HISTORY_SIZE) { };
 
         size_t work(const std::complex<float> *in, std::complex<float> *output, size_t length) {
             // Manage the history
@@ -61,57 +57,53 @@ class ClockRecovery : public Block<complex, complex> {
             return symbols;
         }
     private:
-        float d_omega;
-        float d_mu = 0.5;
-        const float d_gain_mu = 0.175;
-        bool d_qpsk;
+        float d_sps;
+        const float d_target_sps;
+        float d_mu = 0.5f;
+        const float d_alpha; // gainMu (phase)
+        const float d_beta; // gainOmega (frequency)
+        const float d_limit; // omegaRelativeLimit
 
-        FIRInterpolator interp;
+        FIRInterpolator d_interp;
         std::vector<std::complex<float>> d_history;
-        std::vector<std::complex<float>> ring_buffer;
-        size_t sampleHistory = MIN_SAMPLE_HISTORY;
-        size_t consumed = 0;
 
-        float slicer(float symbol) {
-            return symbol > 0 ? 1.0f : 0.0f;
-        }
+        size_t internal_work(const std::complex<float> *in, std::complex<float> *out, size_t n) {
+            size_t ii = 0; // Input index
+            size_t oo = 0; // Output index
+            n -= d_interp.ntaps();
 
-        int internal_work(const std::complex<float> *in, std::complex<float> *out, size_t inputLen) {
-            size_t inputIndex = 0;
-            size_t outputIndex = 0;
-            size_t numberInput = inputLen - 8;
+            while (ii < n) {
+                // Get the next symbol and add it to the history
+                out[oo] = d_interp.interpolate(&in[ii], d_mu);
+                d_history.erase(d_history.begin()); // Delete the first element
+                d_history.push_back(out[oo]); // Add to back
 
-            while (inputIndex < numberInput) {
-                // Get the next symbol and manage history
-                out[outputIndex] = interp.interpolate(&in[inputIndex], d_mu);
-                d_history.pop_back();
-                d_history.insert(d_history.begin(), out[outputIndex]);
+                // Early-late TED
+                float ted_error = (slicer(d_history[0].real()) - slicer(d_history[2].real())) * d_history[1].real();
 
-                // Zero crossing TED
-                float ted_error;
-                if (d_qpsk) {
-                    ted_error = (slicer(d_history[2].real()) - slicer(d_history[0].real())) * d_history[1].real() +
-                                (slicer(d_history[2].imag()) - slicer(d_history[0].imag())) * d_history[1].imag();
-                } else {
-                    ted_error = (slicer(d_history[2].real()) - slicer(d_history[0].real())) * d_history[1].real();
-                }
+                // Adjust sps (frequency)
+                d_sps = d_sps + d_beta*ted_error;
+                d_sps = d_target_sps + clamp(d_sps - d_target_sps, d_limit);
 
-                // Adjust Mu (PI filter)
-                d_mu = d_mu + d_omega + d_gain_mu*ted_error;
-                inputIndex += (size_t)floor(d_mu); // Shift input index
+                // Adjust Mu (phase)
+                d_mu = d_mu + d_sps + d_alpha*ted_error;
+                ii += (size_t)floor(d_mu); // Shift input index
                 d_mu -= floor(d_mu); // Wrap to [0,1]
 
-                outputIndex++;
+                oo++;
             }
 
-            consumed = inputIndex;
-
-            if (consumed > inputLen) {
-                std::cerr << "Consumed more samples than input." << std::endl;
-            }
-
-            return outputIndex;
+            consumed = ii;
+            return oo;
         }
+
+        float slicer(float symbol) {
+            return symbol > 0.0f ? 1.0f : 0.0f;
+        }
+
+        std::vector<std::complex<float>> ring_buffer;
+        int sampleHistory;
+        int consumed;
 };
 
 #endif

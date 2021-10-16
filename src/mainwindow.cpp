@@ -32,8 +32,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
             demod->running = false;
             timer->stop();
         }
+        std::vector<complex> &symbols = demod->symbols();
         for (size_t i = 0; i < ui->constellation->num_points()/2; i++) {
-            ui->constellation->push_sample(demod->symbols[i]);
+            ui->constellation->push_sample(symbols[i]);
         }
         ui->constellation->repaint();
     });

@@ -27,10 +27,9 @@ PMDemodulator::PMDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> source
       ft(2.0f*M_PIf * -665.4e3/SAMP_RATE),
       rrc(make_rrc(1.0, SAMP_RATE, 665.4e3, 0.6, 51)),
       costas(2, loop(0.005f)),
-      clock(SAMP_RATE/665.4e3, 0.5f, 0.1f, false),
+      clock(SAMP_RATE/665.4e3, loop(0.01f)),
       out(ofname) {
 
-    symbols.resize(BUFFER_SIZE);
     agc.in_pipe = file->out_pipe;
     pll.in_pipe = agc.out_pipe;
     ft.in_pipe = pll.out_pipe;
@@ -55,10 +54,9 @@ QPSKDemodulator::QPSKDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> so
     : file(std::move(source)),
       rrc(make_rrc(1.0, SAMP_RATE, 2.3333e6, 0.6, 51)),
       costas(4, loop(0.005f)),
-      clock(SAMP_RATE/2.3333e6),
+      clock(SAMP_RATE/2.3333e6, loop(0.01f)),
       out(ofname) {
 
-    symbols.resize(BUFFER_SIZE);
     agc.in_pipe = file->out_pipe;
     rrc.in_pipe = agc.out_pipe;
     costas.in_pipe = rrc.out_pipe;

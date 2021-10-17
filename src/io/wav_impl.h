@@ -47,6 +47,7 @@ class WAVFileReader: public FileReader {
                 ptr[i] = std::complex<float>(buffer[i*2], buffer[i*2 + 1]);
             }
 
+            neof = (read == n);
             return read;
         }
         int sample_rate() {

@@ -41,6 +41,8 @@ class Demodulator {
     public:
         bool running = true;
         virtual std::vector<complex> &symbols()=0;
+        virtual bool is_running()=0;
+        virtual void stop()=0;
 };
 
 class PMDemodulator : public Demodulator {
@@ -49,6 +51,10 @@ class PMDemodulator : public Demodulator {
         std::vector<complex> &symbols() {
             return slicer.in;
         }
+        bool is_running() {
+            return file->neof;
+        }
+        void stop();
     private:
         std::shared_ptr<FileReader> file;
         AGC agc;
@@ -67,6 +73,10 @@ class QPSKDemodulator : public Demodulator {
         std::vector<complex> &symbols() {
             return out.in;
         }
+        bool is_running() {
+            return file->neof;
+        }
+        void stop();
     private:
         std::shared_ptr<FileReader> file;
         AGC agc;

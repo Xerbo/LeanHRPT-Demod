@@ -27,9 +27,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     timer = new QTimer(this);
     QTimer::connect(timer, &QTimer::timeout, this, [this]() {
-        if (demod != nullptr && demod->running == false) {
+        if (demod != nullptr && !demod->is_running()) {
             ui->startButton->setText("Start");
-            demod->running = false;
+            demod->stop();
             timer->stop();
         }
         std::vector<complex> &symbols = demod->symbols();
@@ -45,7 +45,7 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
-    if (demod != nullptr && demod->running == true) {
+    if (demod != nullptr && demod->is_running()) {
         QMessageBox confirm;
         confirm.setText("Are you sure you want to exit? There is currently a file being demodulated.");
         confirm.setStandardButtons(QMessageBox::Cancel | QMessageBox::Ok);
@@ -55,7 +55,7 @@ void MainWindow::closeEvent(QCloseEvent *event) {
             event->ignore();
             return;
         } else {
-            demod->running = false;
+            demod->stop();
         }
     }
 }
@@ -100,7 +100,7 @@ void MainWindow::on_startButton_clicked() {
             return;
         }
 
-        demod->running = false;
+        demod->stop();
         timer->stop();
         ui->startButton->setText("Start");
     }

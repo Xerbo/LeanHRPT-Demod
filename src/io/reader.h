@@ -28,6 +28,7 @@ class FileReader : public Block<Empty, complex> {
         virtual size_t read_samples(std::complex<float> *ptr, size_t n)=0;
         virtual int sample_rate()=0;
         static std::shared_ptr<FileReader> choose_type(std::string type, std::string filename);
+        bool neof = true;
 
     private:
         size_t work(complex *out, size_t n) {

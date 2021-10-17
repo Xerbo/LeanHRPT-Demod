@@ -39,6 +39,15 @@ PMDemodulator::PMDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> source
     slicer.in_pipe = clock.out_pipe;
     out.in_pipe = slicer.out_pipe;
 
+    agc.set_runvar(file->neof);
+    pll.set_runvar(file->neof);
+    ft.set_runvar(file->neof);
+    rrc.set_runvar(file->neof);
+    costas.set_runvar(file->neof);
+    clock.set_runvar(file->neof);
+    slicer.set_runvar(file->neof);
+    out.set_runvar(file->neof);
+
     file->start();
     agc.start();
     pll.start();
@@ -48,6 +57,18 @@ PMDemodulator::PMDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> source
     clock.start();
     slicer.start();
     out.start();
+}
+
+void PMDemodulator::stop() {
+    file->set_running(false);
+    agc.set_running(false);
+    pll.set_running(false);
+    ft.set_running(false);
+    rrc.set_running(false);
+    costas.set_running(false);
+    clock.set_running(false);
+    slicer.set_running(false);
+    out.set_running(false);
 }
 
 QPSKDemodulator::QPSKDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> source, std::string ofname)
@@ -63,10 +84,25 @@ QPSKDemodulator::QPSKDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> so
     clock.in_pipe = costas.out_pipe;
     out.in_pipe = clock.out_pipe;
 
+    agc.set_runvar(file->neof);
+    rrc.set_runvar(file->neof);
+    costas.set_runvar(file->neof);
+    clock.set_runvar(file->neof);
+    out.set_runvar(file->neof);
+
     file->start();
     agc.start();
     rrc.start();
     costas.start();
     clock.start();
     out.start();
+}
+
+void QPSKDemodulator::stop() {
+    file->set_running(false);
+    agc.set_running(false);
+    rrc.set_running(false);
+    costas.set_running(false);
+    clock.set_running(false);
+    out.set_running(false);
 }

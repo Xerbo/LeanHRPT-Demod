@@ -50,7 +50,7 @@ class SymbolSync : public Block<complex, complex> {
 
             size_t symbols = internal_work(ring_buffer.data(), output, totalLength);
 
-            sampleHistory = std::max(totalLength - consumed, (size_t)MIN_SAMPLE_HISTORY);
+            sampleHistory = std::max((int)totalLength - (int)consumed, MIN_SAMPLE_HISTORY);
 
             memmove(&ring_buffer[0], &ring_buffer[totalLength - sampleHistory], (sampleHistory) * sizeof(std::complex<float>));
 
@@ -70,9 +70,10 @@ class SymbolSync : public Block<complex, complex> {
         size_t internal_work(const std::complex<float> *in, std::complex<float> *out, size_t n) {
             size_t ii = 0; // Input index
             size_t oo = 0; // Output index
-            n -= d_interp.ntaps();
+            //n -= d_interp.ntaps();
+            size_t n2 = n - d_interp.ntaps() - 16;
 
-            while (ii < n) {
+            while (ii < n2) {
                 // Get the next symbol and add it to the history
                 out[oo] = d_interp.interpolate(&in[ii], d_mu);
                 d_history.erase(d_history.begin()); // Delete the first element
@@ -94,6 +95,9 @@ class SymbolSync : public Block<complex, complex> {
             }
 
             consumed = ii;
+            if (consumed > n) {
+                std::cerr << "Consumed more samples than input." << std::endl;
+            }
             return oo;
         }
 
@@ -102,8 +106,8 @@ class SymbolSync : public Block<complex, complex> {
         }
 
         std::vector<std::complex<float>> ring_buffer;
-        int sampleHistory;
-        int consumed;
+        size_t sampleHistory = MIN_SAMPLE_HISTORY;
+        size_t consumed;
 };
 
 #endif

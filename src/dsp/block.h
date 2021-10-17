@@ -22,9 +22,15 @@
 const size_t BUFFER_SIZE = 8192;
 
 #include "util/pipe.hh"
-#include <thread>
 #include <stdexcept>
 #include <vector>
+
+#include <fstream>
+#ifdef _WIN32
+#include "mingw.thread.h"
+#else
+#include <thread>
+#endif
 
 using complex = std::complex<float>;
 

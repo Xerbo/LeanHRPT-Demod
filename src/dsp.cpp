@@ -39,6 +39,7 @@ PMDemodulator::PMDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> source
     slicer.in_pipe = clock.out_pipe;
     out.in_pipe = slicer.out_pipe;
 
+    file->set_runvar(file->neof);
     agc.set_runvar(file->neof);
     pll.set_runvar(file->neof);
     ft.set_runvar(file->neof);
@@ -82,12 +83,17 @@ QPSKDemodulator::QPSKDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> so
     rrc.in_pipe = agc.out_pipe;
     costas.in_pipe = rrc.out_pipe;
     clock.in_pipe = costas.out_pipe;
-    out.in_pipe = clock.out_pipe;
+    viterbi.in_pipe = clock.out_pipe;
+    deframer.in_pipe = viterbi.out_pipe;
+    out.in_pipe = deframer.out_pipe;
 
+    file->set_runvar(file->neof);
     agc.set_runvar(file->neof);
     rrc.set_runvar(file->neof);
     costas.set_runvar(file->neof);
     clock.set_runvar(file->neof);
+    viterbi.set_runvar(file->neof);
+    deframer.set_runvar(file->neof);
     out.set_runvar(file->neof);
 
     file->start();
@@ -95,6 +101,8 @@ QPSKDemodulator::QPSKDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> so
     rrc.start();
     costas.start();
     clock.start();
+    viterbi.start();
+    deframer.start();
     out.start();
 }
 
@@ -104,5 +112,7 @@ void QPSKDemodulator::stop() {
     rrc.set_running(false);
     costas.set_running(false);
     clock.set_running(false);
+    viterbi.set_running(false);
+    deframer.set_running(false);
     out.set_running(false);
 }

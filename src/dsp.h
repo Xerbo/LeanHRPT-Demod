@@ -29,13 +29,7 @@
 #include "dsp/binary_slicer.h"
 #include "util/pipe.hh"
 #include "io/writer.h"
-
-#include <fstream>
-#ifdef _WIN32
-#include "mingw.thread.h"
-#else
-#include <thread>
-#endif
+#include "digital/blocks.h"
 
 class Demodulator {
     public:
@@ -71,7 +65,7 @@ class QPSKDemodulator : public Demodulator {
     public:
         QPSKDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> source, std::string ofname);
         std::vector<complex> &symbols() {
-            return out.in;
+            return viterbi.in;
         }
         bool is_running() {
             return file->neof;
@@ -83,7 +77,9 @@ class QPSKDemodulator : public Demodulator {
         FIRFilter rrc;
         CostasLoop costas;
         SymbolSync clock;
-        FileWriter<complex> out;
+        MetopViterbi viterbi;
+        VCDUExtractor deframer;
+        FileWriter<uint8_t> out;
 };
 
 #endif

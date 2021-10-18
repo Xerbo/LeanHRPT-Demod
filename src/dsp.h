@@ -82,4 +82,22 @@ class QPSKDemodulator : public Demodulator {
         FileWriter<uint8_t> out;
 };
 
+
+class MetopJuicer : public Demodulator {
+    public:
+        MetopJuicer(std::shared_ptr<FileReader> source, std::string ofname);
+        std::vector<complex> &symbols() {
+            return viterbi.in;
+        }
+        bool is_running() {
+            return file->neof;
+        }
+        void stop();
+    private:
+        std::shared_ptr<FileReader> file;
+        MetopViterbi viterbi;
+        VCDUExtractor deframer;
+        FileWriter<uint8_t> out;
+};
+
 #endif

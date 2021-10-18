@@ -78,8 +78,12 @@ void MainWindow::on_startButton_clicked() {
             samp_rate = ui->sampleRate->value()*1e6;
         }
 
-        if (ui->downlink->currentText() == "MetOp HRPT") {
+        if (ui->downlink->currentText() == "MetOp HRPT (baseband)") {
             demod = new QPSKDemodulator(samp_rate, std::move(file), ui->outputFile->text().toStdString());
+            ui->constellation->set_lines(true, true);
+            ui->constellation->num_points(4096);
+        } else if (ui->downlink->currentText() == "MetOp HRPT (symbols)") {
+            demod = new MetopJuicer(std::move(file), ui->outputFile->text().toStdString());
             ui->constellation->set_lines(true, true);
             ui->constellation->num_points(4096);
         } else {

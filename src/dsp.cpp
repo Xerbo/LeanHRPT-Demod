@@ -116,3 +116,29 @@ void QPSKDemodulator::stop() {
     deframer.set_running(false);
     out.set_running(false);
 }
+
+MetopJuicer::MetopJuicer(std::shared_ptr<FileReader> source, std::string ofname)
+    : file(std::move(source)),
+      out(ofname) {
+
+    viterbi.in_pipe = file->out_pipe;
+    deframer.in_pipe = viterbi.out_pipe;
+    out.in_pipe = deframer.out_pipe;
+
+    file->set_runvar(file->neof);
+    viterbi.set_runvar(file->neof);
+    deframer.set_runvar(file->neof);
+    out.set_runvar(file->neof);
+
+    file->start();
+    viterbi.start();
+    deframer.start();
+    out.start();
+}
+
+void MetopJuicer::stop() {
+    file->set_running(false);
+    viterbi.set_running(false);
+    deframer.set_running(false);
+    out.set_running(false);
+}

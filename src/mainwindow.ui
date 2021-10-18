@@ -94,7 +94,12 @@
          </item>
          <item>
           <property name="text">
-           <string>MetOp HRPT</string>
+           <string>MetOp HRPT (baseband)</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>MetOp HRPT (symbols)</string>
           </property>
          </item>
         </widget>

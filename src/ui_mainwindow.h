@@ -106,6 +106,7 @@ public:
         downlink = new QComboBox(settingsBox);
         downlink->addItem(QString());
         downlink->addItem(QString());
+        downlink->addItem(QString());
         downlink->setObjectName(QString::fromUtf8("downlink"));
         sizePolicy.setHeightForWidth(downlink->sizePolicy().hasHeightForWidth());
         downlink->setSizePolicy(sizePolicy);
@@ -207,7 +208,8 @@ public:
 
         downlinkLabel->setText(QCoreApplication::translate("MainWindow", "Downlink", nullptr));
         downlink->setItemText(0, QCoreApplication::translate("MainWindow", "NOAA/Meteor HRPT", nullptr));
-        downlink->setItemText(1, QCoreApplication::translate("MainWindow", "MetOp HRPT", nullptr));
+        downlink->setItemText(1, QCoreApplication::translate("MainWindow", "MetOp HRPT (baseband)", nullptr));
+        downlink->setItemText(2, QCoreApplication::translate("MainWindow", "MetOp HRPT (symbols)", nullptr));
 
         fileFormatLabel->setText(QCoreApplication::translate("MainWindow", "File Format", nullptr));
         fileFormat->setItemText(0, QCoreApplication::translate("MainWindow", "char", nullptr));

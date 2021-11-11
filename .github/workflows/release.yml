@@ -117,7 +117,7 @@ jobs:
             cp $TEMP_PATH/lib/libcorrect.so      LeanHRPT-Demod.AppDir/usr/lib/ &&
             cp build/LeanHRPT-Demod              LeanHRPT-Demod.AppDir/usr/bin/ &&
             find -name "*.so*" -exec strip {} \; &&
-            strip LeanHRPT-Demod &&
+            strip LeanHRPT-Demod.AppDir/usr/bin/LeanHRPT-Demod &&
             ./appimagetool-x86_64.AppImage --comp xz LeanHRPT-Demod.AppDir'
 
     - name: Upload AppImage

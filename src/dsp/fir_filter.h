@@ -22,7 +22,6 @@
 #include "block.h"
 #include "fir_kernel.h"
 #include <vector>
-#include <iostream>
 #include <cmath>
 #include <complex>
 

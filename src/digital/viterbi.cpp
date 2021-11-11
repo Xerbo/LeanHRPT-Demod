@@ -21,7 +21,6 @@
 #include "viterbi.h"
 
 #include <cstring>
-#include <iostream>
 
 // Uncomment this if you want debug information
 //#define DEBUG

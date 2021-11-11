@@ -34,9 +34,12 @@
 class Demodulator {
     public:
         bool running = true;
+        std::shared_ptr<FileReader> file;
         virtual std::vector<complex> &symbols()=0;
+        virtual std::vector<complex> &freq()=0;
         virtual bool is_running()=0;
         virtual void stop()=0;
+        virtual ~Demodulator() { }
 };
 
 class PMDemodulator : public Demodulator {
@@ -45,12 +48,14 @@ class PMDemodulator : public Demodulator {
         std::vector<complex> &symbols() {
             return slicer.in;
         }
+        std::vector<complex> &freq() {
+            return agc.in;
+        }
         bool is_running() {
             return file->neof;
         }
         void stop();
     private:
-        std::shared_ptr<FileReader> file;
         AGC agc;
         CarrierPLL pll;
         FrequencyTranslator ft;
@@ -67,34 +72,18 @@ class QPSKDemodulator : public Demodulator {
         std::vector<complex> &symbols() {
             return viterbi.in;
         }
+        std::vector<complex> &freq() {
+            return agc.in;
+        }
         bool is_running() {
             return file->neof;
         }
         void stop();
     private:
-        std::shared_ptr<FileReader> file;
         AGC agc;
         FIRFilter rrc;
         CostasLoop costas;
         SymbolSync clock;
-        MetopViterbi viterbi;
-        VCDUExtractor deframer;
-        FileWriter<uint8_t> out;
-};
-
-
-class MetopJuicer : public Demodulator {
-    public:
-        MetopJuicer(std::shared_ptr<FileReader> source, std::string ofname);
-        std::vector<complex> &symbols() {
-            return viterbi.in;
-        }
-        bool is_running() {
-            return file->neof;
-        }
-        void stop();
-    private:
-        std::shared_ptr<FileReader> file;
         MetopViterbi viterbi;
         VCDUExtractor deframer;
         FileWriter<uint8_t> out;

@@ -16,29 +16,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef IO_READER_H
-#define IO_READER_H
+#include "fftdialog.h"
+#include "qt/ui_fftdialog.h"
 
-#include <complex>
-#include <memory>
-#include "dsp/block.h"
-#include <SoapySDR/Types.hpp>
+FFTDialog::FFTDialog(QWidget *parent)
+    : QDialog(parent),
+      fft(2048),
+      fft_data(2048) {
+    ui = new Ui::FFTDialog;
+    ui->setupUi(this);
+}
 
-class FileReader : public Block<Empty, complex> {
-    public:
-        virtual size_t read_samples(std::complex<float> *ptr, size_t n)=0;
-        virtual double rate() { return -1; };
-
-        virtual void set_gain([[maybe_unused]] double gain) { };
-        virtual SoapySDR::Range gain_range() { }
-
-        static std::shared_ptr<FileReader> choose_type(std::string type, std::string filename);
-        bool neof = true;
-
-    private:
-        size_t work(complex *out, size_t n) {
-            return read_samples(out, n);
-        }
-};
-
-#endif
+FFTDialog::~FFTDialog() {
+    delete ui;
+}

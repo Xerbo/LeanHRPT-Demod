@@ -25,6 +25,7 @@
 #include <complex>
 #include <cstring>
 #include <vector>
+#include <iostream>
 
 #define MIN_SAMPLE_HISTORY 3
 #define HISTORY_SIZE 3

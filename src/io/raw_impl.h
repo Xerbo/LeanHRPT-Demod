@@ -58,9 +58,6 @@ class RawFileReader: public FileReader {
             neof = !stream.eof();
             return stream.gcount()/2/sizeof(T);
         }
-        int sample_rate() {
-            return -1;
-        }
     private:
         std::vector<T> buffer;
         std::filebuf file;

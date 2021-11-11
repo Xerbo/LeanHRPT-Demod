@@ -50,7 +50,7 @@ class WAVFileReader: public FileReader {
             neof = (read == n);
             return read;
         }
-        int sample_rate() {
+        double rate() {
             return file.samplerate();
         }
     private:

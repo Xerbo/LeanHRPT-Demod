@@ -21,8 +21,16 @@
 
 #include <QMainWindow>
 #include <QTimer>
-#include "ui_mainwindow.h"
+#include <QDesktopServices>
+#include <QMessageBox>
+
+#include "qt/ui_mainwindow.h"
 #include "dsp.h"
+#include "fftdialog.h"
+
+#define ABOUT_TEXT "<h2>LeanHRPT Decode</h2>\
+An easy to use HRPT demodulator<br/>\
+Licensed under GPL-3.0."
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -35,17 +43,33 @@ class MainWindow : public QMainWindow {
         ~MainWindow();
     private:
         Ui::MainWindow *ui;
+        FFTDialog *fft;
         void closeEvent(QCloseEvent *event);
 
         Demodulator *demod = nullptr;
         QTimer *timer;
-        QString inputFilename;
+        QString wavFilename;
+        QString rawFilename;
         QString outputFilename;
     private slots:
-        void on_fileType_textActivated(QString text);
         void on_startButton_clicked();
-        void on_inputFile_clicked();
+
+        void on_wavInput_clicked();
+        void on_rawInput_clicked();
         void on_outputFile_clicked();
+
+        void on_source_currentTextChanged(const QString &text);
+        void on_gain_valueChanged(int value);
+
+        // menuFile
+        void on_actionQuit_triggered() { QApplication::quit(); }
+        // menuWindows
+        void on_actionFFT_triggered() { fft->show(); }
+        // menuHelp
+        void on_actionDocumentation_triggered()  { QDesktopServices::openUrl(QUrl("https://github.com/Xerbo/LeanHRPT-Decode/wiki")); };
+        void on_actionIssue_Tracker_triggered()  { QDesktopServices::openUrl(QUrl("https://github.com/Xerbo/LeanHRPT-Decode/issues")); };
+        void on_actionAbout_LeanHRPT_triggered() { QMessageBox::about(this, "About LeanHRPT", QString("%1\nVersion: %2").arg(ABOUT_TEXT).arg(VERSION)); };
+        void on_actionAbout_Qt_triggered()       { QMessageBox::aboutQt(this, "About Qt"); };
 };
 
 #endif // MAINWINDOW_H

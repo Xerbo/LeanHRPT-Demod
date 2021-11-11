@@ -19,16 +19,15 @@
 #include "dsp.h"
 #include "util/fir_taps.h"
 
-#include <iostream>
-
 PMDemodulator::PMDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> source, std::string ofname)
-    : file(std::move(source)),
-      pll(loop(M_PIf/150.0f)),
+    : pll(loop(M_PIf/150.0f)),
       ft(2.0f*M_PIf * -665.4e3/SAMP_RATE),
       rrc(make_rrc(1.0, SAMP_RATE, 665.4e3, 0.6, 51)),
       costas(2, loop(0.005f)),
       clock(SAMP_RATE/665.4e3, loop(0.01f)),
       out(ofname) {
+
+    file = std::move(source);
 
     agc.in_pipe = file->out_pipe;
     pll.in_pipe = agc.out_pipe;
@@ -73,11 +72,12 @@ void PMDemodulator::stop() {
 }
 
 QPSKDemodulator::QPSKDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> source, std::string ofname)
-    : file(std::move(source)),
-      rrc(make_rrc(1.0, SAMP_RATE, 2.3333e6, 0.6, 51)),
+    : rrc(make_rrc(1.0, SAMP_RATE, 2.3333e6, 0.6, 51)),
       costas(4, loop(0.005f)),
       clock(SAMP_RATE/2.3333e6, loop(0.01f)),
       out(ofname) {
+
+    file = std::move(source);
 
     agc.in_pipe = file->out_pipe;
     rrc.in_pipe = agc.out_pipe;
@@ -112,32 +112,6 @@ void QPSKDemodulator::stop() {
     rrc.set_running(false);
     costas.set_running(false);
     clock.set_running(false);
-    viterbi.set_running(false);
-    deframer.set_running(false);
-    out.set_running(false);
-}
-
-MetopJuicer::MetopJuicer(std::shared_ptr<FileReader> source, std::string ofname)
-    : file(std::move(source)),
-      out(ofname) {
-
-    viterbi.in_pipe = file->out_pipe;
-    deframer.in_pipe = viterbi.out_pipe;
-    out.in_pipe = deframer.out_pipe;
-
-    file->set_runvar(file->neof);
-    viterbi.set_runvar(file->neof);
-    deframer.set_runvar(file->neof);
-    out.set_runvar(file->neof);
-
-    file->start();
-    viterbi.start();
-    deframer.start();
-    out.start();
-}
-
-void MetopJuicer::stop() {
-    file->set_running(false);
     viterbi.set_running(false);
     deframer.set_running(false);
     out.set_running(false);

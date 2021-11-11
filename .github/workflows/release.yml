@@ -64,7 +64,7 @@ jobs:
         fetch-depth: 0
 
     - name: Install apt dependencies
-      run: 'sudo apt-get update && sudo apt-get install -y cmake make git g++ python3 python3-pip mesa-common-dev libglu1-mesa-dev libsndfile-dev'
+      run: 'sudo apt-get update && sudo apt-get install -y cmake make git g++ python3 python3-pip mesa-common-dev libglu1-mesa-dev libsndfile-dev libfftw3-dev'
 
     - name: Install pip dependencies
       run: 'pip3 install -U pip && pip3 install aqtinstall'
@@ -104,6 +104,8 @@ jobs:
             cp LeanHRPT-Demod.desktop            LeanHRPT-Demod.AppDir/ &&
             cp logo128.png                       LeanHRPT-Demod.AppDir/ &&
             cp -r $TEMP_PATH/plugins/platforms/  LeanHRPT-Demod.AppDir/usr/plugins/ &&
+            cp /lib/x86_64-linux-gnu/libfftw3f.so.3  LeanHRPT-Demod.AppDir/usr/lib/
+            cp /lib/x86_64-linux-gnu/libsndfile.so.1 LeanHRPT-Demod.AppDir/usr/lib/
             cp $TEMP_PATH/lib/libQt5Gui.so.5     LeanHRPT-Demod.AppDir/usr/lib/ &&
             cp $TEMP_PATH/lib/libQt5Widgets.so.5 LeanHRPT-Demod.AppDir/usr/lib/ &&
             cp $TEMP_PATH/lib/libQt5Core.so.5    LeanHRPT-Demod.AppDir/usr/lib/ &&
@@ -114,7 +116,9 @@ jobs:
             cp $TEMP_PATH/lib/libicudata.so.56   LeanHRPT-Demod.AppDir/usr/lib/ &&
             cp $TEMP_PATH/lib/libcorrect.so      LeanHRPT-Demod.AppDir/usr/lib/ &&
             cp build/LeanHRPT-Demod              LeanHRPT-Demod.AppDir/usr/bin/ &&
-            ./appimagetool-x86_64.AppImage LeanHRPT-Demod.AppDir'
+            find -name "*.so*" -exec strip {} \;
+            strip LeanHRPT-Demod
+            ./appimagetool-x86_64.AppImage --comp xz LeanHRPT-Demod.AppDir'
 
     - name: Upload AppImage
       uses: actions/upload-release-asset@v1
@@ -200,6 +204,8 @@ jobs:
             cp /usr/lib/gcc/x86_64-w64-mingw32/9.3-win32/libgomp-1.dll LeanHRPT-Demod/ &&
             cp $WIN_TEMP_PATH/plugins/styles/qwindowsvistastyle.dll    LeanHRPT-Demod/plugins/styles/ &&
             cp $WIN_TEMP_PATH/plugins/platforms/qwindows.dll           LeanHRPT-Demod/platforms/ &&
+            find -name "*.dll" -exec x86_64-w64-mingw32-strip {} \;
+            find -name "*.exe" -exec x86_64-w64-mingw32-strip {} \;
             zip -r LeanHRPT-Demod.zip LeanHRPT-Demod/'
 
     - name: Upload zip

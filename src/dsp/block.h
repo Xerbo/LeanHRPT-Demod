@@ -26,11 +26,7 @@ const size_t BUFFER_SIZE = 8192;
 #include <vector>
 
 #include <fstream>
-#ifdef _WIN32
-#include "mingw.thread.h"
-#else
 #include <thread>
-#endif
 
 using complex = std::complex<float>;
 
@@ -89,6 +85,16 @@ class Block {
         void set_running(bool run) {
             _running = run;
             running = _running;
+
+            // This is a very bad hack to forcefully stop the block when cancelled
+            if (run == false) {
+                if (!std::is_same<A, Empty>::value) {
+                    std::vector<A> tmp(BUFFER_SIZE*2);
+                    in_pipe->push(tmp.data(), tmp.size());
+                }
+
+                thread->join();
+            }
         }
 
         // This is bad, dont do this

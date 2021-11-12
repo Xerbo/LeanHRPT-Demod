@@ -133,10 +133,14 @@ jobs:
             cp "libsndfile-1.0.31-win64/lib/sndfile.lib"    $WIN_TEMP_PATH/lib/sndfile.lib'
 
     - name: Install fftw3
-      run: 'wget https://fftw.org/pub/fftw/fftw-3.3.5-dll64.zip &&
-            unzip fftw-3.3.5-dll64.zip &&
-            cp *.dll $WIN_TEMP_PATH/lib &&
-            cp *.h $WIN_TEMP_PATH/include'
+      run: 'wget https://fftw.org/fftw-3.3.10.tar.gz &&
+            tar -zxf fftw-3.3.10.tar.gz &&
+            cd fftw-3.3.10 &&
+            mkdir build &&
+            cd build &&
+            cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=../cmake/mingw-w64-x86_64.cmake -DCMAKE_INSTALL_PREFIX=$WIN_TEMP_PATH .. &&
+            make -j4 &&
+            make install'
 
     - name: Install SoapySDR
       run: 'wget https://downloads.myriadrf.org/builds/PothosSDR/PothosSDR-2021.07.25-vc16-x64.exe &&
@@ -169,6 +173,8 @@ jobs:
             cp /usr/lib/gcc/x86_64-w64-mingw32/9.3-win32/libgomp-1.dll LeanHRPT-Demod/ &&
             cp $WIN_TEMP_PATH/plugins/styles/qwindowsvistastyle.dll    LeanHRPT-Demod/plugins/styles/ &&
             cp $WIN_TEMP_PATH/plugins/platforms/qwindows.dll           LeanHRPT-Demod/platforms/ &&
+            find LeanHRPT-Demod/ -name "*.dll" -exec x86_64-w64-mingw32-strip {} \; &&
+            find LeanHRPT-Demod/ -name "*.exe" -exec x86_64-w64-mingw32-strip {} \; &&
             zip -r LeanHRPT-Demod.zip LeanHRPT-Demod/'
 
     - uses: actions/upload-artifact@v2

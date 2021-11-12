@@ -33,11 +33,7 @@ endif()
 
 target_link_libraries(LeanHRPT-Demod PRIVATE correct)
 target_link_libraries(LeanHRPT-Demod PRIVATE sndfile)
-if(WIN32 AND WAR_CRIMES)
-target_link_libraries(LeanHRPT-Demod /tmp/winbuild/lib/libfftw3f-3.dll)
-ELSE()
 target_link_libraries(LeanHRPT-Demod PRIVATE fftw3f)
-ENDIF()
 target_link_libraries(LeanHRPT-Demod PRIVATE SoapySDR)
 
 if (USE_ADDRESSS_SANITIZER)

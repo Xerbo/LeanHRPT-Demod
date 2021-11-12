@@ -186,7 +186,7 @@ jobs:
             cd fftw-3.3.10 &&
             mkdir build &&
             cd build &&
-            cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=../cmake/mingw-w64-x86_64.cmake -DCMAKE_INSTALL_PREFIX=$WIN_TEMP_PATH .. &&
+            cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=../cmake/mingw-w64-x86_64.cmake -DCMAKE_INSTALL_PREFIX=$WIN_TEMP_PATH -DENABLE_FLOAT=ON -DBUILD_TESTS=OFF -DDISABLE_FORTRAN=ON .. &&
             make -j4 &&
             make install'
 
@@ -218,6 +218,7 @@ jobs:
             cp $WIN_TEMP_PATH/bin/libstdc++-6.dll                      LeanHRPT-Demod/ &&
             cp $WIN_TEMP_PATH/bin/libwinpthread-1.dll                  LeanHRPT-Demod/ &&
             cp $WIN_TEMP_PATH/bin/sndfile.dll                          LeanHRPT-Demod/ &&
+            cp $WIN_TEMP_PATH/bin/libfftw3f.dll                        LeanHRPT-Demod/ &&
             cp /usr/lib/gcc/x86_64-w64-mingw32/9.3-win32/libgomp-1.dll LeanHRPT-Demod/ &&
             cp $WIN_TEMP_PATH/plugins/styles/qwindowsvistastyle.dll    LeanHRPT-Demod/plugins/styles/ &&
             cp $WIN_TEMP_PATH/plugins/platforms/qwindows.dll           LeanHRPT-Demod/platforms/ &&

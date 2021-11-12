@@ -132,6 +132,19 @@ jobs:
             cp "libsndfile-1.0.31-win64/include/sndfile.hh" $WIN_TEMP_PATH/include/sndfile.hh &&
             cp "libsndfile-1.0.31-win64/lib/sndfile.lib"    $WIN_TEMP_PATH/lib/sndfile.lib'
 
+    - name: Install fftw3
+      run: 'wget https://fftw.org/pub/fftw/fftw-3.3.5-dll64.zip &&
+            unzip fftw-3.3.5-dll64.zip &&
+            cp *.dll $WIN_TEMP_PATH/lib &&
+            cp *.h $WIN_TEMP_PATH/include'
+
+    - name: Install SoapySDR
+      run: 'wget https://downloads.myriadrf.org/builds/PothosSDR/PothosSDR-2021.07.25-vc16-x64.exe &&
+            7z x PothosSDR-2021.07.25-vc16-x64.exe -o"$WIN_TEMP_PATH" -aos'
+
+    - name: Patch <thread>
+      run: 'sudo patch /usr/lib/gcc/x86_64-w64-mingw32/9.3-posix/include/c++/thread thread.patch'
+
     - name: Compile LeanHRPT
       run: 'mkdir build &&
             cd build &&

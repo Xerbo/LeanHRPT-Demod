@@ -19,14 +19,21 @@
 #ifndef DSP_BLOCK_H
 #define DSP_BLOCK_H
 
-const size_t BUFFER_SIZE = 8192;
-
 #include "util/pipe.hh"
+
 #include <stdexcept>
 #include <vector>
-
 #include <fstream>
+#include <complex>
+#include <cstddef>
+
+#ifdef _WIN32
+#include "mingw.thread.h"
+#else
 #include <thread>
+#endif
+
+const size_t BUFFER_SIZE = 8192;
 
 using complex = std::complex<float>;
 

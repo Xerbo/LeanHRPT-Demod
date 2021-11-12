@@ -142,7 +142,7 @@ void MainWindow::on_source_currentTextChanged(const QString &text) {
             }
         }
 
-        ui->startButton->setEnabled(true);
+        ui->startButton->setEnabled(!outputFilename.isEmpty());
     }
 }
 

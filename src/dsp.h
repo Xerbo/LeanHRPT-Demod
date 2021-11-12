@@ -20,6 +20,7 @@
 #define DSP_H
 
 #include "io/reader.h"
+#include "dsp/dc_blocker.h"
 #include "dsp/carrier_pll.h"
 #include "dsp/frequency_translator.h"
 #include "dsp/fir_filter.h"
@@ -56,6 +57,7 @@ class PMDemodulator : public Demodulator {
         }
         void stop();
     private:
+        FastDCBlocker dc;
         AGC agc;
         CarrierPLL pll;
         FrequencyTranslator ft;
@@ -80,6 +82,7 @@ class QPSKDemodulator : public Demodulator {
         }
         void stop();
     private:
+        FastDCBlocker dc;
         AGC agc;
         FIRFilter rrc;
         CostasLoop costas;

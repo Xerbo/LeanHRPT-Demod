@@ -25,7 +25,7 @@
 // Remove the DC offset from a signal
 // NOTE: This is not a true DC blocker, as it uses an exponential moving average
 // https://en.wikipedia.org/wiki/Moving_average#Exponential_moving_average
-class FastDCBlocker : Block<complex, complex> {
+class FastDCBlocker : public Block<complex, complex> {
     public:
         FastDCBlocker(float alpha) : d_alpha(alpha) { }
 

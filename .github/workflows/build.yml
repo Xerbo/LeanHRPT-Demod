@@ -137,9 +137,15 @@ jobs:
             cp "C:/5.15.2/msvc2019_64/bin/Qt5Widgets.dll"                    LeanHRPT-Demod/;
             cp "C:/Program Files (x86)/Correct/lib/correct.dll"              LeanHRPT-Demod/;
             cp "C:/Program Files (x86)/fftw/bin/fftw3f.dll"                  LeanHRPT-Demod/;
+            cp "C:/Program Files/PothosSDR/bin/SoapySDR.dll"                 LeanHRPT-Demod/;
+            cp "C:/Program Files/PothosSDR/bin/airspy.dll"                   LeanHRPT-Demod/;
+            cp "C:/Program Files/PothosSDR/bin/rtlsdr.dll"                   LeanHRPT-Demod/;
+            cp "C:/Program Files/PothosSDR/bin/hackrf.dll"                   LeanHRPT-Demod/;
             cp "C:/5.15.2/msvc2019_64/plugins/styles/qwindowsvistastyle.dll" LeanHRPT-Demod/plugins/styles/;
             cp "C:/5.15.2/msvc2019_64/plugins/platforms/qwindows.dll"        LeanHRPT-Demod/platforms/;
-            tar -acf LeanHRPT-Demod.zip LeanHRPT-Demod'
+            find LeanHRPT-Demod/ -name "*.dll" -exec x86_64-w64-mingw32-strip {} \;;
+            find LeanHRPT-Demod/ -name "*.exe" -exec x86_64-w64-mingw32-strip {} \;;
+            7z a LeanHRPT-Demod.zip LeanHRPT-Demod'
 
     - uses: actions/upload-artifact@v2
       with:

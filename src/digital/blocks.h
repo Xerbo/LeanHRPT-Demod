@@ -26,6 +26,7 @@
 #include "derand.h"
 #include "reedsolomon.h"
 #include "viterbi.h"
+#include "diff.h"
 
 class MetopViterbi : public Block<complex, uint8_t> {
     public:
@@ -44,6 +45,63 @@ class MetopViterbi : public Block<complex, uint8_t> {
     private:
         Viterbi vit;
         std::vector<std::complex<int8_t>> symbols;
+};
+
+class FengyunViterbi : public Block<complex, uint8_t> {
+    public:
+        FengyunViterbi() : iVit(0.45f, 5, true), qVit(0.45f, 5, true) { }
+
+        size_t work(const complex *in, uint8_t *out, size_t n) {
+            iSymbols.reserve(n/2);
+            qSymbols.reserve(n/2);
+            iData.reserve(n/2); // Way larger than needed
+            qData.reserve(n/2); // Way larger than needed
+
+            // Deinterleave I and Q (badly)
+            for (int i = 0; i < n/2-2; i++) {
+                iSymbols[i] = std::complex<int8_t>(
+                    clamp(in[i*2     + offset].imag()*127.0f, 127.0f),
+                    clamp(in[i*2 + 1 + offset].imag()*127.0f, 127.0f)
+                );
+                qSymbols[i] = std::complex<int8_t>(
+                    clamp(in[i*2     + offset].real()*127.0f, 127.0f), 
+                    clamp(in[i*2 + 1 + offset].real()*127.0f, 127.0f)
+                );
+            }
+
+            size_t iBytes, qBytes;
+            #pragma omp parallel sections num_threads(2)
+            {
+                #pragma omp section
+                {
+                    iBytes = iVit.work(iSymbols.data(), iData.data(), n/2);
+                }
+                #pragma omp section
+                {
+                    qBytes = qVit.work(qSymbols.data(), qData.data(), n/2);
+                }
+            }
+
+            if (iBytes && qBytes) {
+                diff.work(qData.data(), iData.data(), iBytes, out);
+                return iBytes+qBytes;
+            } else {
+                offset = !offset;
+            }
+
+            return 0;
+        }
+    private:
+        Viterbi iVit;
+        Viterbi qVit;
+        FengyunDiff diff;
+
+        std::vector<std::complex<int8_t>> iSymbols;
+        std::vector<std::complex<int8_t>> qSymbols;
+        std::vector<uint8_t> iData;
+        std::vector<uint8_t> qData;
+
+        bool offset = false;
 };
 
 class VCDUExtractor : public Block<uint8_t, uint8_t> {

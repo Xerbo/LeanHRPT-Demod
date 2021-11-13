@@ -89,10 +89,14 @@ void MainWindow::on_startButton_clicked() {
         }
 
         if (ui->downlink->currentText() == "MetOp HRPT") {
-            demod = new QPSKDemodulator(samp_rate, std::move(file), ui->outputFile->text().toStdString());
+            demod = new MetopDemodulator(samp_rate, std::move(file), ui->outputFile->text().toStdString());
             ui->constellation->set_lines(true, true);
             ui->constellation->num_points(4096);
-        } else {
+        } else if (ui->downlink->currentText() == "FengYun HRPT") {
+            demod = new FengyunDemodulator(samp_rate, std::move(file), ui->outputFile->text().toStdString());
+            ui->constellation->set_lines(true, true);
+            ui->constellation->num_points(4096);
+        } else{
             demod = new PMDemodulator(samp_rate, std::move(file), ui->outputFile->text().toStdString());
             ui->constellation->set_lines(false, true);
             ui->constellation->num_points(2048);
@@ -161,7 +165,7 @@ void MainWindow::on_wavInput_clicked() {
     ui->startButton->setEnabled(!outputFilename.isEmpty() && !wavFilename.isEmpty());
 }
 void MainWindow::on_rawInput_clicked() {
-    QString _inputFilename = QFileDialog::getOpenFileName(this, "Select Input File", "", "Baseband (*.wav)");
+    QString _inputFilename = QFileDialog::getOpenFileName(this, "Select Input File", "", "Baseband (*.bin *.raw)");
     if (_inputFilename.isEmpty()) return;
 
     rawFilename = _inputFilename;

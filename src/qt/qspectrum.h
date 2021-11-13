@@ -65,7 +65,11 @@ class QSpectrum : public QWidget {
             std::vector<QPoint> points(width());
             for (size_t i = 0; i < points.size(); i++) {
                 size_t x = (double)i * (double)fft.size()/(double)width();
-                points[i] = QPoint(i, height() - (fft[x]-d_min) * height()/(d_max-d_min));
+                float max = -1000.0f;
+                for (size_t j = 0; j < std::max(1, 2048/width()); j++) {
+                    max = std::max(fft[x + j], max);
+                }
+                points[i] = QPoint(i, height() - (max-d_min) * height()/(d_max-d_min));
             }
 
             painter.setPen(QColor(255,255,255));

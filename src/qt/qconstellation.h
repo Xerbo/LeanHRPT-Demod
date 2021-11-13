@@ -70,8 +70,8 @@ class QConstellation : public QWidget {
             painter.setPen(pen);
             for (std::complex<float> &symbol : symbols) {
                 painter.drawPoint(
-                    (symbol.real()+1.0f) * width()/2,
-                    (symbol.imag()+1.0f) * height()/2
+                    (symbol.real()*0.707+1.0f) * width()/2,
+                    (symbol.imag()*0.707+1.0f) * height()/2
                 );
             }
 

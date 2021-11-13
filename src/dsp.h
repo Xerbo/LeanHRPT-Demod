@@ -50,7 +50,7 @@ class PMDemodulator : public Demodulator {
             return slicer.in;
         }
         std::vector<complex> &freq() {
-            return agc.in;
+            return pll.in;
         }
         bool is_running() {
             return file->neof;
@@ -58,19 +58,19 @@ class PMDemodulator : public Demodulator {
         void stop();
     private:
         FastDCBlocker dc;
-        AGC agc;
         CarrierPLL pll;
         FrequencyTranslator ft;
         FIRFilter rrc;
+        AGC agc;
         CostasLoop costas;
         SymbolSync clock;
         BinarySlicer slicer;
         FileWriter<uint8_t> out;
 };
 
-class QPSKDemodulator : public Demodulator {
+class MetopDemodulator : public Demodulator {
     public:
-        QPSKDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> source, std::string ofname);
+        MetopDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> source, std::string ofname);
         std::vector<complex> &symbols() {
             return viterbi.in;
         }
@@ -88,6 +88,30 @@ class QPSKDemodulator : public Demodulator {
         CostasLoop costas;
         SymbolSync clock;
         MetopViterbi viterbi;
+        VCDUExtractor deframer;
+        FileWriter<uint8_t> out;
+};
+
+class FengyunDemodulator : public Demodulator {
+    public:
+        FengyunDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> source, std::string ofname);
+        std::vector<complex> &symbols() {
+            return viterbi.in;
+        }
+        std::vector<complex> &freq() {
+            return agc.in;
+        }
+        bool is_running() {
+            return file->neof;
+        }
+        void stop();
+    private:
+        FastDCBlocker dc;
+        AGC agc;
+        FIRFilter rrc;
+        CostasLoop costas;
+        SymbolSync clock;
+        FengyunViterbi viterbi;
         VCDUExtractor deframer;
         FileWriter<uint8_t> out;
 };

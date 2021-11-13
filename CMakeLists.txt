@@ -40,6 +40,8 @@ if (MSVC)
     target_include_directories(LeanHRPT-Demod PRIVATE "C:/Program Files (x86)/Correct/include/")
     target_link_directories(LeanHRPT-Demod PRIVATE "C:/Program Files (x86)/fftw/lib/")
     target_include_directories(LeanHRPT-Demod PRIVATE "C:/Program Files (x86)/fftw/include/")
+    target_link_directories(LeanHRPT-Demod PRIVATE "C:/Program Files/libsndfile/lib/")
+    target_include_directories(LeanHRPT-Demod PRIVATE "C:/Program Files/libsndfile/include/")
 ENDIF()
 
 target_link_libraries(LeanHRPT-Demod PRIVATE correct)

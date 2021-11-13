@@ -165,7 +165,7 @@ jobs:
       run: 'curl -LO https://github.com/libsndfile/libsndfile/releases/download/1.0.31/libsndfile-1.0.31-win64.zip;
             unzip libsndfile-1.0.31-win64.zip;
             mkdir "C:/Program Files/libsndfile";
-            cp -r libsndfile-1.0.31-win64/* "C:/Program Files/libsndfile'
+            cp -r libsndfile-1.0.31-win64/* "C:/Program Files/libsndfile"'
 
     - name: Install PothosSDR
       run: 'curl -O https://downloads.myriadrf.org/builds/PothosSDR/PothosSDR-2020.01.26-vc14-x64.exe;

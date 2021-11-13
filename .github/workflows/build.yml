@@ -9,7 +9,6 @@ on:
 env:
   BUILD_TYPE: Release
   TEMP_PATH: /tmp/build
-  WIN_TEMP_PATH: /tmp/winbuild
 
 jobs:
   build_linux:
@@ -84,7 +83,7 @@ jobs:
         path: ./LeanHRPT_Demod-x86_64.AppImage
 
   build_windows:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
     - name: Checkout code
@@ -92,93 +91,57 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Install apt dependencies
-      run: 'sudo apt-get update && sudo apt-get install -y cmake make git python3 python3-pip mingw-w64 zip'
-
-    - name: Install pip dependencies
-      run: 'pip3 install -U pip && pip3 install aqtinstall'
-
-    - name: Create build path
-      run: 'mkdir $TEMP_PATH && mkdir $WIN_TEMP_PATH'
+    - name: Install aqtinstall
+      run: 'pip install aqtinstall'
 
     - name: Install Qt
-      run: 'aqt install 5.14.2 linux desktop &&
-            aqt install 5.14.2 windows desktop win64_mingw73 || true &&
-            cp -r 5.14.2/gcc_64/* $TEMP_PATH &&
-            cp -r 5.14.2/mingw73_64/* $WIN_TEMP_PATH'
+      run: 'aqt install-qt -O C:/ windows desktop 5.15.2 win64_msvc2019_64'
 
-    - name: Patch Qt
-      run: 'rm $WIN_TEMP_PATH/bin/moc.exe &&
-            ln -s $TEMP_PATH/bin/moc $WIN_TEMP_PATH/bin/moc.exe &&
-            rm $WIN_TEMP_PATH/bin/rcc.exe &&
-            ln -s $TEMP_PATH/bin/rcc $WIN_TEMP_PATH/bin/rcc.exe &&
-            rm $WIN_TEMP_PATH/bin/uic.exe &&
-            ln -s $TEMP_PATH/bin/uic $WIN_TEMP_PATH/bin/uic.exe'
-    
     - name: Install libcorrect
-      run: 'git clone https://github.com/quiet/libcorrect &&
-            cd libcorrect &&
-            mkdir build &&
-            cd build &&
-            cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=../cmake/mingw-w64-x86_64.cmake -DCMAKE_INSTALL_PREFIX=$WIN_TEMP_PATH -DHAVE_SSE=1 .. &&
-            make -j4 &&
-            make install'
+      run: 'git clone https://github.com/quiet/libcorrect;
+            cd libcorrect;
+            mkdir build;
+            cd build;
+            cmake -DHAVE_SSE=1 ..;
+            cmake --build . --target install --config Release'
 
-    - name: Install libsndfile
-      run: 'wget https://github.com/libsndfile/libsndfile/releases/download/1.0.31/libsndfile-1.0.31-win64.zip &&
-            unzip libsndfile-1.0.31-win64.zip &&
-            cp "libsndfile-1.0.31-win64/bin/sndfile.dll"    $WIN_TEMP_PATH/bin/sndfile.dll &&
-            cp "libsndfile-1.0.31-win64/include/sndfile.h"  $WIN_TEMP_PATH/include/sndfile.h &&
-            cp "libsndfile-1.0.31-win64/include/sndfile.hh" $WIN_TEMP_PATH/include/sndfile.hh &&
-            cp "libsndfile-1.0.31-win64/lib/sndfile.lib"    $WIN_TEMP_PATH/lib/sndfile.lib'
+    - name: Install fftw
+      run: 'curl -O https://fftw.org/fftw-3.3.10.tar.gz;
+            tar -xzf fftw-3.3.10.tar.gz;
+            cd fftw-3.3.10;
+            mkdir build;
+            cd build;
+            cmake -DENABLE_FLOAT=ON -DBUILD_TESTS=OFF ..;
+            cmake --build . --target install --config Release'
 
-    - name: Install fftw3
-      run: 'wget https://fftw.org/fftw-3.3.10.tar.gz &&
-            tar -zxf fftw-3.3.10.tar.gz &&
-            cd fftw-3.3.10 &&
-            mkdir build &&
-            cd build &&
-            cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=../cmake/mingw-w64-x86_64.cmake -DCMAKE_INSTALL_PREFIX=$WIN_TEMP_PATH -DENABLE_FLOAT=ON -DBUILD_TESTS=OFF -DDISABLE_FORTRAN=ON .. &&
-            make -j4 &&
-            make install'
-
-    - name: Install SoapySDR
-      run: 'wget https://downloads.myriadrf.org/builds/PothosSDR/PothosSDR-2021.07.25-vc16-x64.exe &&
-            7z x PothosSDR-2021.07.25-vc16-x64.exe -o"$WIN_TEMP_PATH" -aos'
-
-    - name: Patch <thread>
-      run: 'sudo patch /usr/lib/gcc/x86_64-w64-mingw32/9.3-posix/include/c++/thread thread.patch'
+    - name: Install PothosSDR
+      run: 'curl -O https://downloads.myriadrf.org/builds/PothosSDR/PothosSDR-2021.07.25-vc16-x64.exe;
+            7z x PothosSDR-2021.07.25-vc16-x64.exe -o"C:/Program Files/PothosSDR/"'
 
     - name: Compile LeanHRPT
-      run: 'mkdir build &&
-            cd build &&
-            cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_TOOLCHAIN_FILE=../cmake/mingw-w64-x86_64.cmake -DCMAKE_INSTALL_PREFIX=$WIN_TEMP_PATH -DWAR_CRIMES=1 .. &&
-            make -j4'
+      run: 'mkdir build;
+            cd build;
+            cmake -DCMAKE_PREFIX_PATH="C:/5.15.2/msvc2019_64/" ..;
+            cmake --build . --config Release'
 
     - name: Package
-      run: 'mkdir LeanHRPT-Demod &&
-            mkdir LeanHRPT-Demod/plugins &&
-            mkdir LeanHRPT-Demod/plugins/styles &&
-            mkdir LeanHRPT-Demod/platforms &&
-            cp logo128.png                                             LeanHRPT-Demod/ &&
-            cp build/LeanHRPT-Demod.exe                                LeanHRPT-Demod/ &&
-            cp $WIN_TEMP_PATH/bin/Qt5Core.dll                          LeanHRPT-Demod/ &&
-            cp $WIN_TEMP_PATH/bin/Qt5Gui.dll                           LeanHRPT-Demod/ &&
-            cp $WIN_TEMP_PATH/bin/Qt5Widgets.dll                       LeanHRPT-Demod/ &&
-            cp $WIN_TEMP_PATH/lib/libcorrect.dll                       LeanHRPT-Demod/ &&
-            cp $WIN_TEMP_PATH/bin/libgcc_s_seh-1.dll                   LeanHRPT-Demod/ &&
-            cp $WIN_TEMP_PATH/bin/libstdc++-6.dll                      LeanHRPT-Demod/ &&
-            cp $WIN_TEMP_PATH/bin/libwinpthread-1.dll                  LeanHRPT-Demod/ &&
-            cp $WIN_TEMP_PATH/bin/sndfile.dll                          LeanHRPT-Demod/ &&
-            cp $WIN_TEMP_PATH/bin/libfftw3f.dll                        LeanHRPT-Demod/ &&
-            cp /usr/lib/gcc/x86_64-w64-mingw32/9.3-win32/libgomp-1.dll LeanHRPT-Demod/ &&
-            cp $WIN_TEMP_PATH/plugins/styles/qwindowsvistastyle.dll    LeanHRPT-Demod/plugins/styles/ &&
-            cp $WIN_TEMP_PATH/plugins/platforms/qwindows.dll           LeanHRPT-Demod/platforms/ &&
-            find LeanHRPT-Demod/ -name "*.dll" -exec x86_64-w64-mingw32-strip {} \; &&
-            find LeanHRPT-Demod/ -name "*.exe" -exec x86_64-w64-mingw32-strip {} \; &&
-            zip -r LeanHRPT-Demod.zip LeanHRPT-Demod/'
+      shell: bash
+      run: 'mkdir LeanHRPT-Demod;
+            mkdir LeanHRPT-Demod/plugins;
+            mkdir LeanHRPT-Demod/plugins/styles;
+            mkdir LeanHRPT-Demod/platforms;
+            cp build/Release/LeanHRPT-Demod.exe                              LeanHRPT-Demod/;
+            cp logo128.png                                                   LeanHRPT-Demod/;
+            cp "C:/5.15.2/msvc2019_64/bin/Qt5Core.dll"                       LeanHRPT-Demod/;
+            cp "C:/5.15.2/msvc2019_64/bin/Qt5Gui.dll"                        LeanHRPT-Demod/;
+            cp "C:/5.15.2/msvc2019_64/bin/Qt5Widgets.dll"                    LeanHRPT-Demod/;
+            cp "C:/Program Files (x86)/Correct/lib/correct.dll"              LeanHRPT-Demod/;
+            cp "C:/Program Files (x86)/fftw/bin/fftw3f.dll"                  LeanHRPT-Demod/;
+            cp "C:/5.15.2/msvc2019_64/plugins/styles/qwindowsvistastyle.dll" LeanHRPT-Demod/plugins/styles/;
+            cp "C:/5.15.2/msvc2019_64/plugins/platforms/qwindows.dll"        LeanHRPT-Demod/platforms/;
+            tar -acf LeanHRPT-Demod.zip LeanHRPT-Demod'
 
     - uses: actions/upload-artifact@v2
       with:
-        name: LeanHRPT_Demod-x86_64-w64
+        name: LeanHRPT-Demod.zip
         path: ./LeanHRPT-Demod.zip

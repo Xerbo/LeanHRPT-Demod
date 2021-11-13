@@ -8,10 +8,10 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
 file(GLOB_RECURSE CXX_SOURCE_FILES src/*.cpp src/*.c)
-    IF (WIN32)
-add_executable(LeanHRPT-Demod WIN32 ${CXX_SOURCE_FILES})
+IF (WIN32)
+    add_executable(LeanHRPT-Demod WIN32 ${CXX_SOURCE_FILES})
 ELSE()
-add_executable(LeanHRPT-Demod ${CXX_SOURCE_FILES})
+    add_executable(LeanHRPT-Demod ${CXX_SOURCE_FILES})
 ENDIF()
 
 set_property(TARGET LeanHRPT-Demod PROPERTY CXX_EXTENSIONS OFF)

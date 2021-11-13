@@ -20,6 +20,7 @@
 #define LEANHRPT_VITERBI_VITERBI_H
 
 #include <complex>
+#include <vector>
 extern "C" {
 #include <correct-sse.h>
 }
@@ -65,6 +66,13 @@ class Viterbi {
 
         size_t d_invalid_buffers;
         ViterbiState d_state;
+
+        std::vector<std::complex<uint8_t>> input_symbols;
+        std::vector<std::complex<uint8_t>> input_symbols_rotated;
+
+        std::vector<uint8_t> depunctured_symbols;
+        std::vector<uint8_t> decoded_data;
+        std::vector<uint8_t> encoded_data;
 };
 
 #endif

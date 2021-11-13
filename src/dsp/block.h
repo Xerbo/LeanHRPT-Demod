@@ -26,12 +26,7 @@
 #include <fstream>
 #include <complex>
 #include <cstddef>
-
-#ifdef _WIN32
-#include "mingw.thread.h"
-#else
 #include <thread>
-#endif
 
 const size_t BUFFER_SIZE = 8192;
 

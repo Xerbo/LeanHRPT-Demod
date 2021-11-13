@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.0.0)
+cmake_minimum_required (VERSION 3.13)
 project(LeanHRPT-Demod)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -8,7 +8,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
 file(GLOB_RECURSE CXX_SOURCE_FILES src/*.cpp src/*.c)
-IF (WIN32)
+    IF (WIN32)
 add_executable(LeanHRPT-Demod WIN32 ${CXX_SOURCE_FILES})
 ELSE()
 add_executable(LeanHRPT-Demod ${CXX_SOURCE_FILES})
@@ -19,7 +19,9 @@ set_property(TARGET LeanHRPT-Demod PROPERTY CXX_STANDARD 11)
 
 target_include_directories(LeanHRPT-Demod PUBLIC src)
 
-target_compile_options(LeanHRPT-Demod PRIVATE -Wall -Wextra -Wpedantic -ffast-math)
+if (NOT MSVC)
+    target_compile_options(LeanHRPT-Demod PRIVATE -Wall -Wextra -Wpedantic -ffast-math -g)
+ENDIF()
 
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets REQUIRED)
@@ -30,6 +32,15 @@ if (WAR_CRIMES)
     target_link_directories(LeanHRPT-Demod PRIVATE /tmp/build/lib)
     target_link_directories(LeanHRPT-Demod PRIVATE /tmp/winbuild/lib)
 endif()
+
+if (MSVC)
+    target_link_directories(LeanHRPT-Demod PRIVATE "C:/Program Files/PothosSDR/lib/")
+    target_include_directories(LeanHRPT-Demod PRIVATE "C:/Program Files/PothosSDR/include/")
+    target_link_directories(LeanHRPT-Demod PRIVATE "C:/Program Files (x86)/Correct/lib/")
+    target_include_directories(LeanHRPT-Demod PRIVATE "C:/Program Files (x86)/Correct/include/")
+    target_link_directories(LeanHRPT-Demod PRIVATE "C:/Program Files (x86)/fftw/lib/")
+    target_include_directories(LeanHRPT-Demod PRIVATE "C:/Program Files (x86)/fftw/include/")
+ENDIF()
 
 target_link_libraries(LeanHRPT-Demod PRIVATE correct)
 target_link_libraries(LeanHRPT-Demod PRIVATE sndfile)

@@ -99,16 +99,16 @@ inline bool getBit(T data, int bit) {
 
 // Calculate BER
 float Viterbi::ber_calc(std::complex<uint8_t> *insymbols, size_t len) {
-    uint8_t depunctured_symbols[len * 3];
-    uint8_t decoded_data[len]; // Far bigger than it needs to be
-    uint8_t encoded_data[len * 3];
+    depunctured_symbols.reserve(len * 3);
+    decoded_data.reserve(len); // Far bigger than it needs to be
+    encoded_data.reserve(len * 3);
 
     // Depuncture and decode
-    depuncture(insymbols, depunctured_symbols, len);
-    correct_convolutional_sse_decode_soft(d_conv_ber_test, depunctured_symbols, len*3, decoded_data);
+    depuncture(insymbols, depunctured_symbols.data(), len);
+    correct_convolutional_sse_decode_soft(d_conv_ber_test, depunctured_symbols.data(), len*3, decoded_data.data());
 
     // Reencode
-    correct_convolutional_sse_encode(d_conv_ber_test, decoded_data, (len*1.5)/8, encoded_data);
+    correct_convolutional_sse_encode(d_conv_ber_test, decoded_data.data(), (len*1.5)/8, encoded_data.data());
 
     // Calculate the number of differences between the input and reencoded data
     size_t errors = 0, bits = 0;
@@ -160,8 +160,8 @@ uint8_t Viterbi::prob_calc(int8_t in) {
 
 // Main work function
 size_t Viterbi::work(std::complex<int8_t> *in_syms, uint8_t *out, size_t len) {
-    std::complex<uint8_t> input_symbols[len];
-    std::complex<uint8_t> input_symbols_rotated[len];
+    input_symbols.reserve(len);
+    input_symbols_rotated.reserve(len);
 
     for (size_t i = 0; i < len; i++) {
         input_symbols[i] = std::complex<uint8_t>(
@@ -178,10 +178,10 @@ size_t Viterbi::work(std::complex<int8_t> *in_syms, uint8_t *out, size_t len) {
         case Syncing:{
             float bestber = 1;
             for (int rotation = 0; rotation < (d_fengyun_mode ? 1 : 2); rotation++) {
-                rotate_phase(rotation == 1, BER_TEST_SYMS, input_symbols, input_symbols_rotated);
+                rotate_phase(rotation == 1, BER_TEST_SYMS, input_symbols.data(), input_symbols_rotated.data());
 
                 for (int shift = 0; shift < 2; shift++) {
-                    float ber = ber_calc(input_symbols_rotated + shift, BER_TEST_SYMS);
+                    float ber = ber_calc(input_symbols_rotated.data() + shift, BER_TEST_SYMS);
                     if (ber < bestber) {
                         d_phase = rotation;
                         d_shift = shift;
@@ -201,8 +201,8 @@ size_t Viterbi::work(std::complex<int8_t> *in_syms, uint8_t *out, size_t len) {
             break;
         }
         case Synced: {
-            rotate_phase(d_phase == 1, BER_TEST_SYMS, input_symbols, input_symbols_rotated);
-            float ber = ber_calc(input_symbols_rotated + d_shift, BER_TEST_SYMS);
+            rotate_phase(d_phase == 1, BER_TEST_SYMS, input_symbols.data(), input_symbols_rotated.data());
+            float ber = ber_calc(input_symbols_rotated.data() + d_shift, BER_TEST_SYMS);
 
             if (ber > d_ber_threshold) {
                 #ifdef DEBUG
@@ -230,11 +230,11 @@ size_t Viterbi::work(std::complex<int8_t> *in_syms, uint8_t *out, size_t len) {
         return 0;
 
     // Actually decode the data
-    uint8_t depunctured_symbols[len * 3];
+    depunctured_symbols.reserve(len * 3);
 
-    rotate_phase(d_phase == 1, len, input_symbols, input_symbols_rotated);
-    depuncture(input_symbols_rotated + d_shift, depunctured_symbols, len - d_shift);
-    correct_convolutional_sse_decode_soft(d_conv, depunctured_symbols, len*3, out);
+    rotate_phase(d_phase == 1, len, input_symbols.data(), input_symbols_rotated.data());
+    depuncture(input_symbols_rotated.data() + d_shift, depunctured_symbols.data(), len - d_shift);
+    correct_convolutional_sse_decode_soft(d_conv, depunctured_symbols.data(), len*3, out);
 
     return (len*1.5)/8;
 }

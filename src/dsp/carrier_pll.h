@@ -51,7 +51,7 @@ class CarrierPLL : public Block<complex, complex> {
                 out[i] = in[i] * std::complex<float>(std::cos(d_phase), -std::sin(d_phase));
 
                 // Calculate phase error (wrapping if necessary)
-                float phase = isnanf(phases[i]) ? std::arg(in[i]) : phases[i];
+                float phase = std::isnan(phases[i]) ? std::arg(in[i]) : phases[i];
                 float error = std::remainder(phase - d_phase, M_PIf*2.0f);
 
                 // Adjust frequency based on the phase error (clamping if necessary)

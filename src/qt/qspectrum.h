@@ -30,7 +30,7 @@ class QSpectrum : public QWidget {
         QSpectrum([[maybe_unused]] QWidget *parent) { }
 
         void load_data(const float *data, size_t n) {
-            if (!finitef(data[1024])) return;
+            if (!std::isfinite(data[1024])) return;
             fft.resize(n);
 
             for (size_t i = 0; i < n; i++) {

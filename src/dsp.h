@@ -25,12 +25,17 @@
 #include "dsp/frequency_translator.h"
 #include "dsp/fir_filter.h"
 #include "dsp/agc.h"
-#include "dsp/costas_loop.h"
 #include "dsp/clock_recovery.h"
 #include "dsp/binary_slicer.h"
 #include "util/pipe.hh"
 #include "io/writer.h"
 #include "digital/blocks.h"
+
+#ifdef EXPERIMENTAL
+#include "dsp/simd_costas.h"
+#else
+#include "dsp/costas_loop.h"
+#endif
 
 class Demodulator {
     public:
@@ -62,7 +67,11 @@ class PMDemodulator : public Demodulator {
         FrequencyTranslator ft;
         FIRFilter rrc;
         AGC agc;
+#ifdef EXPERIMENTAL
+        CostasLoopSSE costas;
+#else
         CostasLoop costas;
+#endif
         SymbolSync clock;
         BinarySlicer slicer;
         FileWriter<uint8_t> out;
@@ -85,7 +94,11 @@ class MetopDemodulator : public Demodulator {
         FastDCBlocker dc;
         AGC agc;
         FIRFilter rrc;
+#ifdef EXPERIMENTAL
+        CostasLoopSSE costas;
+#else
         CostasLoop costas;
+#endif
         SymbolSync clock;
         MetopViterbi viterbi;
         VCDUExtractor deframer;
@@ -109,7 +122,11 @@ class FengyunDemodulator : public Demodulator {
         FastDCBlocker dc;
         AGC agc;
         FIRFilter rrc;
+#ifdef EXPERIMENTAL
+        CostasLoopSSE costas;
+#else
         CostasLoop costas;
+#endif
         SymbolSync clock;
         FengyunViterbi viterbi;
         VCDUExtractor deframer;

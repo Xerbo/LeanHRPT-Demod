@@ -19,6 +19,8 @@
 #ifndef DSP_CUBIC_INTREPOLATOR_H
 #define DSP_CUBIC_INTREPOLATOR_H
 
+#include <complex>
+
 // Interpolator based off a cubic Bézier curve, should be a drop in replacment for FIRInterpolator
 class CubicInterpolator {
     public:

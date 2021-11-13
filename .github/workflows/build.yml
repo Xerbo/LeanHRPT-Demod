@@ -121,8 +121,8 @@ jobs:
             cp -r libsndfile-1.0.31-win64/* "C:/Program Files/libsndfile"'
 
     - name: Install PothosSDR
-      run: 'curl -O https://downloads.myriadrf.org/builds/PothosSDR/PothosSDR-2020.01.26-vc14-x64.exe;
-            7z x PothosSDR-2020.01.26-vc14-x64.exe -o"C:/Program Files/PothosSDR/"'
+      run: 'curl -O https://downloads.myriadrf.org/builds/PothosSDR/PothosSDR-2021.07.25-vc16-x64.exe;
+            7z x PothosSDR-2021.07.25-vc16-x64.exe -o"C:/Program Files/PothosSDR/"'
 
     - name: Compile LeanHRPT
       run: 'mkdir build;
@@ -133,24 +133,33 @@ jobs:
     - name: Package
       shell: bash
       run: 'mkdir LeanHRPT-Demod;
-            mkdir LeanHRPT-Demod/bin;
             mkdir LeanHRPT-Demod/lib;
             mkdir LeanHRPT-Demod/lib/SoapySDR;
-            mkdir LeanHRPT-Demod/plugins;
-            mkdir LeanHRPT-Demod/plugins/styles;
-            mkdir LeanHRPT-Demod/platforms;
-            cp build/Release/LeanHRPT-Demod.exe                              LeanHRPT-Demod/;
-            cp logo128.png                                                   LeanHRPT-Demod/;
-            cp "C:/5.15.2/msvc2019_64/bin/Qt5Core.dll"                       LeanHRPT-Demod/;
-            cp "C:/5.15.2/msvc2019_64/bin/Qt5Gui.dll"                        LeanHRPT-Demod/;
-            cp "C:/5.15.2/msvc2019_64/bin/Qt5Widgets.dll"                    LeanHRPT-Demod/;
-            cp "C:/Program Files (x86)/Correct/lib/correct.dll"              LeanHRPT-Demod/;
-            cp "C:/Program Files (x86)/fftw/bin/fftw3f.dll"                  LeanHRPT-Demod/;
-            cp "C:/Program Files/PothosSDR/bin/SoapySDR.dll"                 LeanHRPT-Demod/bin;
-            cp -r "C:/Program Files/PothosSDR/lib/SoapySDR/modules0.8"       LeanHRPT-Demod/lib/SoapySDR;
-            cp "C:/Program Files/libsndfile/bin/sndfile.dll"                 LeanHRPT-Demod/;
-            cp "C:/5.15.2/msvc2019_64/plugins/styles/qwindowsvistastyle.dll" LeanHRPT-Demod/plugins/styles/;
-            cp "C:/5.15.2/msvc2019_64/plugins/platforms/qwindows.dll"        LeanHRPT-Demod/platforms/;
+            mkdir LeanHRPT-Demod/bin;
+            mkdir LeanHRPT-Demod/bin/plugins;
+            mkdir LeanHRPT-Demod/bin/plugins/styles;
+            mkdir LeanHRPT-Demod/bin/platforms;
+            cp build/Release/LeanHRPT-Demod.exe                              LeanHRPT-Demod/bin/;
+            cp logo128.png                                                   LeanHRPT-Demod/bin/;
+            cp "C:/5.15.2/msvc2019_64/bin/Qt5Core.dll"                       LeanHRPT-Demod/bin/;
+            cp "C:/5.15.2/msvc2019_64/bin/Qt5Gui.dll"                        LeanHRPT-Demod/bin/;
+            cp "C:/5.15.2/msvc2019_64/bin/Qt5Widgets.dll"                    LeanHRPT-Demod/bin/;
+            cp "C:/Program Files (x86)/Correct/lib/correct.dll"              LeanHRPT-Demod/bin/;
+            cp "C:/Program Files (x86)/fftw/bin/fftw3f.dll"                  LeanHRPT-Demod/bin/;
+            cp "C:/Program Files/libsndfile/bin/sndfile.dll"                 LeanHRPT-Demod/bin/;
+            cp "C:/5.15.2/msvc2019_64/plugins/styles/qwindowsvistastyle.dll" LeanHRPT-Demod/bin/plugins/styles/;
+            cp "C:/5.15.2/msvc2019_64/plugins/platforms/qwindows.dll"        LeanHRPT-Demod/bin/platforms/;
+            cp "C:/Program Files/PothosSDR/bin/SoapySDR.dll"                 LeanHRPT-Demod/bin/;
+            cp "C:/Program Files/PothosSDR/bin/libusb-1.0.dll"               LeanHRPT-Demod/bin/;
+            cp "C:/Program Files/PothosSDR/bin/pthreadVC2.dll"               LeanHRPT-Demod/bin/;
+            cp "C:/Program Files/PothosSDR/bin/airspy.dll"                   LeanHRPT-Demod/bin/;
+            cp "C:/Program Files/PothosSDR/bin/bladeRF.dll"                  LeanHRPT-Demod/bin/;
+            cp "C:/Program Files/PothosSDR/bin/hackrf.dll"                   LeanHRPT-Demod/bin/;
+            cp "C:/Program Files/PothosSDR/bin/LimeSuite.dll"                LeanHRPT-Demod/bin/;
+            cp "C:/Program Files/PothosSDR/bin/rtlsdr.dll"                   LeanHRPT-Demod/bin/;
+            cp "C:/Program Files/PothosSDR/bin/sdrplay_api.dll"              LeanHRPT-Demod/bin/;
+            cp "C:/Program Files/PothosSDR/bin/uhd.dll"                      LeanHRPT-Demod/bin/;
+            cp -r "C:/Program Files/PothosSDR/lib/SoapySDR/modules0.8"       LeanHRPT-Demod/lib/SoapySDR/;
             find LeanHRPT-Demod/ -name "*.dll" -exec strip {} \;;
             find LeanHRPT-Demod/ -name "*.exe" -exec strip {} \;;
             7z a LeanHRPT-Demod.zip LeanHRPT-Demod'

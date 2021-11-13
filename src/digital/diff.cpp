@@ -25,7 +25,7 @@ void FengyunDiff::work(uint8_t *in_a, uint8_t *in_b, size_t len, uint8_t *out) {
     size_t o = 0;
 
     for (size_t i = 0; i < len; i++) {
-        for(ssize_t j = 7; j >= 0; j--) {
+        for(int j = 7; j >= 0; j--) {
             bool Xin = std::bitset<8>(in_a[i]).test(j);
             bool Yin = std::bitset<8>(in_b[i]).test(j);
 

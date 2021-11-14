@@ -37,6 +37,7 @@ class QWaterfall : public QWidget {
     public:
         QWaterfall([[maybe_unused]] QWidget *parent) : waterfall(2048, 200) {
             waterfall.fill(QColor(0, 0, 0));
+            std::reverse(gradient.begin(), gradient.end());
         }
         ~QWaterfall() {
 
@@ -57,11 +58,19 @@ class QWaterfall : public QWidget {
             { 0xFF, 0xFF, 0xFF }
         };
         std::vector<QColor> gradient = {
-            QColor(0x00, 0x00, 0x00),
-            QColor(0x00, 0x00, 0x50),
+            QColor(0x4A, 0x00, 0x00),
+            QColor(0x75, 0x00, 0x00),
+            QColor(0x9F, 0x00, 0x00),
+            QColor(0xC6, 0x00, 0x00),
+            QColor(0xFF, 0x00, 0x00),
+            QColor(0xFE, 0x6D, 0x16),
+            QColor(0xFF, 0xFF, 0x00),
             QColor(0x1E, 0x90, 0xFF),
-            QColor(0xAD, 0xD8, 0xE6),
-            QColor(0xFF, 0xFF, 0xFF)
+            QColor(0x00, 0x00, 0x91),
+            QColor(0x00, 0x00, 0x50),
+            QColor(0x00, 0x00, 0x30),
+            QColor(0x00, 0x00, 0x20),
+            QColor(0x00, 0x00, 0x00)
         };
         const float *d_data = nullptr;
         size_t d_data_n = 0;
@@ -72,8 +81,8 @@ class QWaterfall : public QWidget {
             if (d_data != nullptr) {
                 QPainter waterfall_painter(&waterfall);
                 for (size_t i = 0; i < 2048; i++) {
-                    float val = (d_data[i] - d_min) / (d_max-d_min) * (float)gradient.size();
-                    val = std::max(std::min<float>(gradient.size(), val), 0.0f);
+                    float val = (d_data[i] - d_min) / (d_max-d_min) * (float)(gradient.size()-1);
+                    val = std::max(std::min<float>(gradient.size()-1, val), 0.0f);
 
                     QColor a = gradient[(int)floorf(val)];
                     QColor b = gradient[(int)ceilf(val)];

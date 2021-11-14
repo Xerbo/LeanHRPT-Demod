@@ -146,7 +146,7 @@ void MainWindow::on_source_currentTextChanged(const QString &text) {
             }
         }
 
-        ui->startButton->setEnabled(!outputFilename.isEmpty());
+        ui->startButton->setEnabled(!outputFilename.isEmpty() && !ui->device->currentText().isEmpty());
     }
 }
 
@@ -183,5 +183,5 @@ void MainWindow::on_outputFile_clicked() {
 
     outputFilename = _outputFilename;
     ui->outputFile->setText(outputFilename);
-    on_source_currentTextChanged(ui->source->currentText());
+    ui->startButton->setEnabled(!outputFilename.isEmpty() && !ui->device->currentText().isEmpty());
 }

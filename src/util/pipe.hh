@@ -31,8 +31,8 @@ class Pipe {
             pipe_free(pipe);
         }
         ~Pipe() {
-            pipe_producer_free(producer);
-            pipe_consumer_free(consumer);
+            //pipe_producer_free(producer);
+            //pipe_consumer_free(consumer);
         }
         size_t pop(T *ptr, size_t n) {
             return pipe_pop(consumer, ptr, n);

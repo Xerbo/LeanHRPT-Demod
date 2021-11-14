@@ -27,6 +27,7 @@
 #include <complex>
 #include <cstddef>
 #include <thread>
+#include <QThread>
 
 const size_t BUFFER_SIZE = 8192;
 
@@ -36,6 +37,20 @@ using complex = std::complex<float>;
 struct Empty {
     int dummy;
 };
+
+class QtThread : public QThread {
+    public:
+        QtThread(std::function<void()> x)
+            : function(x) { }
+
+        void run() override {
+            function();
+        }
+    private:
+        std::function<void()> function;
+};
+
+#include <iostream>
 
 template<typename A, typename B>
 class Block {
@@ -51,7 +66,7 @@ class Block {
         void start() {
             if (!std::is_same<A, Empty>::value & !std::is_same<B, Empty>::value) {
                 // Input and output
-                thread = std::make_shared<std::thread>([this]() {
+                thread = std::make_shared<QtThread>([this]() {
                     while (running) {
                         if (in_pipe->pop(in.data(), in.size()) != 0) {
                             size_t n = work(in.data(), out.data(), in.size());
@@ -61,7 +76,7 @@ class Block {
                 });
             } else if (!std::is_same<B, Empty>::value){
                 // Output only
-                thread = std::make_shared<std::thread>([this]() {
+                thread = std::make_shared<QtThread>([this]() {
                     while (running) {
                         size_t n = work(out.data(), out.size());
                         out_pipe->push(out.data(), n);
@@ -69,7 +84,7 @@ class Block {
                 });
             } else if (!std::is_same<A, Empty>::value) {
                 // Input only
-                thread = std::make_shared<std::thread>([this]() {
+                thread = std::make_shared<QtThread>([this]() {
                     while (running) {
                         if (in_pipe->pop(in.data(), in.size()) != 0) {
                             work(in.data(), in.size());
@@ -79,6 +94,9 @@ class Block {
             } else {
                 throw std::runtime_error("Cannot have block without an input or output");
             }
+
+            thread->start();
+            thread->setPriority(QThread::TimeCriticalPriority);
         }
 
         void set_runvar(bool &run) {
@@ -90,12 +108,8 @@ class Block {
 
             // This is a very bad hack to forcefully stop the block when cancelled
             if (run == false) {
-                if (!std::is_same<A, Empty>::value) {
-                    std::vector<A> tmp(BUFFER_SIZE*2);
-                    in_pipe->push(tmp.data(), tmp.size());
-                }
-
-                thread->join();
+                thread->terminate();
+                thread->wait();
             }
         }
 
@@ -106,7 +120,7 @@ class Block {
         std::vector<B> out;
 
     private:
-        std::shared_ptr<std::thread> thread;
+        std::shared_ptr<QtThread> thread;
         bool _running = true;
         bool &running = _running;
 

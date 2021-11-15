@@ -41,17 +41,6 @@ PMDemodulator::PMDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> source
     slicer.in_pipe = clock.out_pipe;
     out.in_pipe = slicer.out_pipe;
 
-    file->set_runvar(file->neof);
-    dc.set_runvar(file->neof);  
-    agc.set_runvar(file->neof);
-    pll.set_runvar(file->neof);
-    ft.set_runvar(file->neof);
-    rrc.set_runvar(file->neof);
-    costas.set_runvar(file->neof);
-    clock.set_runvar(file->neof);
-    slicer.set_runvar(file->neof);
-    out.set_runvar(file->neof);
-
     file->start();
     dc.start();
     pll.start();
@@ -65,16 +54,16 @@ PMDemodulator::PMDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> source
 }
 
 void PMDemodulator::stop() {
-    file->set_running(false);
-    dc.set_running(false);
-    pll.set_running(false);
-    ft.set_running(false);
-    rrc.set_running(false);
-    agc.set_running(false);
-    costas.set_running(false);
-    clock.set_running(false);
-    slicer.set_running(false);
-    out.set_running(false);
+    file->stop();
+    dc.stop();
+    pll.stop();
+    ft.stop();
+    rrc.stop();
+    agc.stop();
+    costas.stop();
+    clock.stop();
+    slicer.stop();
+    out.stop();
 }
 
 MetopDemodulator::MetopDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> source, std::string ofname)
@@ -95,16 +84,6 @@ MetopDemodulator::MetopDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> 
     deframer.in_pipe = viterbi.out_pipe;
     out.in_pipe = deframer.out_pipe;
 
-    file->set_runvar(file->neof);
-    dc.set_runvar(file->neof);  
-    agc.set_runvar(file->neof);
-    rrc.set_runvar(file->neof);
-    costas.set_runvar(file->neof);
-    clock.set_runvar(file->neof);
-    viterbi.set_runvar(file->neof);
-    deframer.set_runvar(file->neof);
-    out.set_runvar(file->neof);
-
     file->start();
     dc.start();
     agc.start();
@@ -117,15 +96,15 @@ MetopDemodulator::MetopDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> 
 }
 
 void MetopDemodulator::stop() {
-    file->set_running(false);
-    dc.set_running(false);
-    agc.set_running(false);
-    rrc.set_running(false);
-    costas.set_running(false);
-    clock.set_running(false);
-    viterbi.set_running(false);
-    deframer.set_running(false);
-    out.set_running(false);
+    file->stop();
+    dc.stop();
+    agc.stop();
+    rrc.stop();
+    costas.stop();
+    clock.stop();
+    viterbi.stop();
+    deframer.stop();
+    out.stop();
 }
 
 
@@ -147,16 +126,6 @@ FengyunDemodulator::FengyunDemodulator(float SAMP_RATE, std::shared_ptr<FileRead
     deframer.in_pipe = viterbi.out_pipe;
     out.in_pipe = deframer.out_pipe;
 
-    file->set_runvar(file->neof);
-    dc.set_runvar(file->neof);  
-    agc.set_runvar(file->neof);
-    rrc.set_runvar(file->neof);
-    costas.set_runvar(file->neof);
-    clock.set_runvar(file->neof);
-    viterbi.set_runvar(file->neof);
-    deframer.set_runvar(file->neof);
-    out.set_runvar(file->neof);
-
     file->start();
     dc.start();
     agc.start();
@@ -169,13 +138,13 @@ FengyunDemodulator::FengyunDemodulator(float SAMP_RATE, std::shared_ptr<FileRead
 }
 
 void FengyunDemodulator::stop() {
-    file->set_running(false);
-    dc.set_running(false);
-    agc.set_running(false);
-    rrc.set_running(false);
-    costas.set_running(false);
-    clock.set_running(false);
-    viterbi.set_running(false);
-    deframer.set_running(false);
-    out.set_running(false);
+    file->stop();
+    dc.stop();
+    agc.stop();
+    rrc.stop();
+    costas.stop();
+    clock.stop();
+    viterbi.stop();
+    deframer.stop();
+    out.stop();
 }

@@ -58,7 +58,7 @@ class FengyunViterbi : public Block<complex, uint8_t> {
             qData.reserve(n/2); // Way larger than needed
 
             // Deinterleave I and Q (badly)
-            for (int i = 0; i < n/2-2; i++) {
+            for (size_t i = 0; i < n/2-2; i++) {
                 iSymbols[i] = std::complex<int8_t>(
                     clamp(in[i*2     + offset].imag()*127.0f, 127.0f),
                     clamp(in[i*2 + 1 + offset].imag()*127.0f, 127.0f)

@@ -98,16 +98,14 @@ class Block {
             thread->start();
             thread->setPriority(QThread::TimeCriticalPriority);
         }
+        void stop() {
+            running = false;
 
-        void set_runvar(bool &run) {
-            running = run;
-        }
-        void set_running(bool run) {
-            _running = run;
-            running = _running;
+            // Give it some time to respond gracefully
+            std::this_thread::sleep_for(std::chrono::milliseconds(20));
 
-            // This is a very bad hack to forcefully stop the block when cancelled
-            if (run == false) {
+            // Kick it up the ass if it doesn't
+            if (thread->isRunning()) {
                 thread->terminate();
                 thread->wait();
             }
@@ -121,8 +119,7 @@ class Block {
 
     private:
         std::shared_ptr<QtThread> thread;
-        bool _running = true;
-        bool &running = _running;
+        bool running = true;
 
         // Virtual work functions
         virtual size_t work([[maybe_unused]] const A *in, [[maybe_unused]] B *out, [[maybe_unused]] size_t n) { throw std::runtime_error("No matching function with signature size_t(const A* in, B* out, size_t n"); };

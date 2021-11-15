@@ -44,10 +44,13 @@ class MainWindow : public QMainWindow {
     private:
         Ui::MainWindow *ui;
         FFTDialog *fft;
+
+        bool isDemodulating = false;
         void closeEvent(QCloseEvent *event);
 
-        Demodulator *demod = nullptr;
+        Demodulator *demod;
         QTimer *timer;
+
         QString wavFilename;
         QString rawFilename;
         QString outputFilename;

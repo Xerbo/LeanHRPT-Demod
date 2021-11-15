@@ -28,17 +28,24 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     timer = new QTimer(this);
     QTimer::connect(timer, &QTimer::timeout, this, [this]() {
-        if (demod != nullptr && !demod->is_running()) {
-            ui->startButton->setText("Start");
+        if (!demod->is_running()) {
             demod->stop();
+            delete demod;
+
+            isDemodulating = false;
+            ui->startButton->setText("Start");
             timer->stop();
+        } else {
+            std::vector<complex> &symbols = demod->symbols();
+            for (size_t i = 0; i < ui->constellation->num_points()/2; i++) {
+                ui->constellation->push_sample(symbols[i]);
+            }
+
+            ui->constellation->repaint();
+            if (fft->isVisible()) {
+                fft->load_data(demod->freq().data());
+            }
         }
-        std::vector<complex> &symbols = demod->symbols();
-        for (size_t i = 0; i < ui->constellation->num_points()/2; i++) {
-            ui->constellation->push_sample(symbols[i]);
-        }
-        ui->constellation->repaint();
-        if (fft->isVisible()) fft->load_data(demod->freq().data());
     });
 
     fft = new FFTDialog(this);
@@ -49,7 +56,7 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
-    if (demod != nullptr && demod->is_running()) {
+    if (isDemodulating) {
         QMessageBox confirm;
         confirm.setText("Are you sure you want to exit? There is currently a file being demodulated.");
         confirm.setStandardButtons(QMessageBox::Cancel | QMessageBox::Ok);
@@ -102,6 +109,7 @@ void MainWindow::on_startButton_clicked() {
             ui->constellation->num_points(2048);
         }
 
+        isDemodulating = true;
         timer->start(1000.0f/30.0f);
         ui->startButton->setText("Stop");
         ui->gain->setEnabled(true);
@@ -117,6 +125,8 @@ void MainWindow::on_startButton_clicked() {
 
         demod->stop();
         delete demod;
+
+        isDemodulating = false;
         timer->stop();
         ui->startButton->setText("Start");
         ui->gain->setEnabled(false);
@@ -151,7 +161,7 @@ void MainWindow::on_source_currentTextChanged(const QString &text) {
 }
 
 void MainWindow::on_gain_valueChanged(int value) {
-    if (demod != nullptr) {
+    if (isDemodulating) {
         demod->file->set_gain(value);
     }
 }
@@ -183,5 +193,12 @@ void MainWindow::on_outputFile_clicked() {
 
     outputFilename = _outputFilename;
     ui->outputFile->setText(outputFilename);
-    ui->startButton->setEnabled(!outputFilename.isEmpty() && !ui->device->currentText().isEmpty());
+
+    if (ui->source->currentText() == "WAV") { 
+        ui->startButton->setEnabled(!outputFilename.isEmpty() && !wavFilename.isEmpty());
+    } else if (ui->source->currentText() == "raw") {
+        ui->startButton->setEnabled(!outputFilename.isEmpty() && !rawFilename.isEmpty());
+    } else { // SDR
+        ui->startButton->setEnabled(!outputFilename.isEmpty() && !ui->device->currentText().isEmpty());
+    }
 }

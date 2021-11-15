@@ -66,7 +66,7 @@ class QSpectrum : public QWidget {
             for (size_t i = 0; i < points.size(); i++) {
                 size_t x = (double)i * (double)fft.size()/(double)width();
                 float max = -1000.0f;
-                for (size_t j = 0; j < std::max(1, 2048/width()); j++) {
+                for (size_t j = 0; j < std::max<size_t>(1, 2048/width()); j++) {
                     max = std::max(fft[x + j], max);
                 }
                 points[i] = QPoint(i, height() - (max-d_min) * height()/(d_max-d_min));

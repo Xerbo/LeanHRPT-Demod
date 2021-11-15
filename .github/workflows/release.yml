@@ -28,30 +28,6 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  upload_flowcharts:
-    runs-on: ubuntu-latest
-    needs: [prepare_release]
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-
-    - name: Install apt dependencies
-      run: 'sudo apt-get update && sudo apt-get install -y zip'
-
-    - name: Zip up flowcharts
-      run: 'zip -r Flowcharts.zip Flowcharts/'
-
-    - name: Upload flowcharts
-      uses: actions/upload-release-asset@v1
-      with:
-        upload_url: ${{ needs.prepare_release.outputs.upload_url }}
-        asset_path: ./Flowcharts.zip
-        asset_name: Flowcharts.zip
-        asset_content_type: application/zip
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
-
   build_linux:
     runs-on: ubuntu-latest
     needs: [prepare_release]

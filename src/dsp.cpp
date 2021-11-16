@@ -26,7 +26,7 @@ PMDemodulator::PMDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> source
       rrc(make_rrc(1.0, SAMP_RATE, 665.4e3, 0.6, 51)),
       agc(0.001f, 0.707f),
       costas(2, loop(0.005f)),
-      clock(SAMP_RATE/665.4e3, loop(0.01f)),
+      clock(2, SAMP_RATE/665.4e3, loop(0.01f)),
       out(ofname) {
 
     file = std::move(source);
@@ -70,7 +70,7 @@ MetopDemodulator::MetopDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> 
     : dc(0.001f),
       rrc(make_rrc(1.0, SAMP_RATE, 2.3333e6, 0.6, 51)),
       costas(4, loop(0.005f)),
-      clock(SAMP_RATE/2.3333e6, loop(0.01f)),
+      clock(4, SAMP_RATE/2.3333e6, loop(0.01f)),
       out(ofname) {
 
     file = std::move(source);
@@ -112,7 +112,7 @@ FengyunDemodulator::FengyunDemodulator(float SAMP_RATE, std::shared_ptr<FileRead
     : dc(0.001f),
       rrc(make_rrc(1.0, SAMP_RATE, 2.8e6, 0.8, 51)),
       costas(4, loop(0.005f)),
-      clock(SAMP_RATE/2.8e6, loop(0.01f)),
+      clock(4, SAMP_RATE/2.8e6, loop(0.01f)),
       out(ofname) {
 
     file = std::move(source);

@@ -27,6 +27,7 @@
 #include <complex>
 #include <cstddef>
 #include <thread>
+#include <atomic>
 #include <QThread>
 
 const size_t BUFFER_SIZE = 8192;
@@ -95,6 +96,7 @@ class Block {
                 throw std::runtime_error("Cannot have block without an input or output");
             }
 
+            running = true;
             thread->start();
             thread->setPriority(QThread::TimeCriticalPriority);
         }
@@ -119,7 +121,7 @@ class Block {
 
     private:
         std::shared_ptr<QtThread> thread;
-        bool running = true;
+        std::atomic<bool> running;
 
         // Virtual work functions
         virtual size_t work([[maybe_unused]] const A *in, [[maybe_unused]] B *out, [[maybe_unused]] size_t n) { throw std::runtime_error("No matching function with signature size_t(const A* in, B* out, size_t n"); };

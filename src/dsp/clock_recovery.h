@@ -36,12 +36,13 @@
 
 class SymbolSync : public Block<complex, complex> {
     public:
-        SymbolSync(float sps, std::pair<float, float> loop, float max_dev = 0.0f)
+        SymbolSync(size_t order, float sps, std::pair<float, float> loop, float max_dev = 0.0f)
             : d_sps(sps),
               d_target_sps(sps),
               d_alpha(loop.first),
               d_beta(loop.second),
               d_limit(max_dev),
+              d_order(order),
               d_history(HISTORY_SIZE) { };
 
         size_t work(const std::complex<float> *in, std::complex<float> *output, size_t length) {
@@ -68,6 +69,7 @@ class SymbolSync : public Block<complex, complex> {
         const float d_alpha; // gainMu (phase)
         const float d_beta; // gainOmega (frequency)
         const float d_limit; // omegaRelativeLimit
+        const size_t d_order;
 
 #ifdef EXPERIMENTAL
         CubicInterpolator d_interp;
@@ -89,14 +91,25 @@ class SymbolSync : public Block<complex, complex> {
                 d_history.push_back(out[oo]); // Add to back
 
                 // Early-late TED
-                float ted_error = (slicer(d_history[0].real()) - slicer(d_history[2].real())) * d_history[1].real();
+                float error;
+                switch (d_order) { 
+                    case 2: 
+                        error = (slicer(d_history[0].real()) - slicer(d_history[2].real())) * d_history[1].real();
+                        break;
+                    case 4:
+                        error = (slicer(d_history[0].real()) - slicer(d_history[2].real())) * d_history[1].real() +
+                                (slicer(d_history[0].imag()) - slicer(d_history[2].imag())) * d_history[1].imag();
+                        break;
+                    default:
+                        throw std::runtime_error("Invalid of unsupported PSK order");
+                }
 
                 // Adjust sps (frequency)
-                d_sps = d_sps + d_beta*ted_error;
+                d_sps = d_sps + d_beta*error;
                 d_sps = d_target_sps + clamp(d_sps - d_target_sps, d_limit);
 
                 // Adjust Mu (phase)
-                d_mu = d_mu + d_sps + d_alpha*ted_error;
+                d_mu = d_mu + d_sps + d_alpha*error;
                 ii += (size_t)floor(d_mu); // Shift input index
                 d_mu -= floor(d_mu); // Wrap to [0,1]
 

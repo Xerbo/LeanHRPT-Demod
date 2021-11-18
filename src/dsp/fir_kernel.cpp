@@ -17,8 +17,7 @@
  */
 
 #include "fir_kernel.h"
-#include "util/sse.h"
-
+#include <immintrin.h>
 
 std::complex<float> volk_32fc_32f_dot_prod_32fc_u_sse(const std::complex<float>* input,
                                                      const float* taps,
@@ -94,37 +93,6 @@ std::complex<float> volk_32fc_32f_dot_prod_32fc_u_sse(const std::complex<float>*
     }
 
     return *(std::complex<float>*)(&res[0]);
-}
-
-std::complex<float> dotprod(const std::complex<float> *data, const float *taps, size_t n) {
-    __m128 real = _mm_setzero_ps();
-    __m128 imag = _mm_setzero_ps();
-
-    for (size_t i = 0; i < n / 4; i++) {
-        const complex128 _data = deinterleave_complex(data);
-        const __m128     _taps = _mm_loadu_ps(taps);
-
-        // Multiply and accumulate
-        real = _mm_add_ps(real, _mm_mul_ps(_data.real, _taps));
-        imag = _mm_add_ps(imag, _mm_mul_ps(_data.imag, _taps));
-
-        data += 4;
-        taps += 4;
-    }
-
-    float real_sum = sum(real);
-    float imag_sum = sum(imag);
-
-    // Deal with the left over samples
-    for (size_t i = n/4*4; i < n; i++) {
-        real_sum += data[0].real() * *taps;
-        imag_sum += data[0].imag() * *taps;
-
-        data++;
-        taps++;
-    }
-
-    return std::complex<float>(real_sum, imag_sum);
 }
 
 std::complex<float> FIRKernel::filter(const std::complex<float> *in) {

@@ -21,7 +21,7 @@
 
 PMDemodulator::PMDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> source, std::string ofname)
     : dc(0.001f),
-      pll(loop(M_PIf/150.0f)),
+      pll(loop(0.005f)),
       ft(2.0f*M_PIf * -665.4e3/SAMP_RATE),
       rrc(make_rrc(1.0, SAMP_RATE, 665.4e3, 0.6, 51)),
       agc(0.001f, 0.707f),

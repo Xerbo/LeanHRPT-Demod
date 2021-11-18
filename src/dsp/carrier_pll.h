@@ -26,8 +26,6 @@
 #include <vector>
 #include <complex>
 
-#define M_TWOPI (2 * M_PI)  
-
 // Locks onto a carrier with a PLL and outputs the input signal mixed with the carrier
 class CarrierPLL : public Block<complex, complex> {
     public:
@@ -41,8 +39,8 @@ class CarrierPLL : public Block<complex, complex> {
         size_t work(const std::complex<float> *in, std::complex<float> *out, size_t n) {
             phases.reserve(n);
             for (size_t i = 0; i < n/4; i++) {
-                complex128 samp = deinterleave_complex(&in[i*4]);
-                __m128 phase = atan2_sse(samp.imag, samp.real);
+                sse::complex samp = sse::deinterleave_complex(&in[i*4]);
+                __m128 phase = sse::atan2(samp.imag, samp.real);
                 _mm_storeu_ps(&phases[i*4], phase);
             }
 

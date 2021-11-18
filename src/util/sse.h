@@ -22,14 +22,25 @@
 #include <immintrin.h>
 #include <complex>
 
-struct complex128 {
-    __m128 real;
-    __m128 imag;
-};
+namespace sse {
+    struct complex {
+        __m128 real;
+        __m128 imag;
+    };
 
-complex128 deinterleave_complex(const std::complex<float> *input);
-float sum(__m128 x);
-__m128 _mm_abs_ps(__m128 __a);
-__m128 atan2_sse(__m128 y, __m128 x);
+    complex deinterleave_complex(const std::complex<float> *in);
+    void interleave_complex(std::complex<float> *out, complex x);
+
+    complex complex_multiply(complex a, complex b);
+
+    float sum(__m128 x);
+    float avg(__m128 x);
+
+    __m128 sin(__m128 x);
+    __m128 cos(__m128 x);
+    __m128 abs(__m128 x);
+    __m128 atan2(__m128 y, __m128 x);
+    __m128 sqrt(__m128 x);
+}
 
 #endif

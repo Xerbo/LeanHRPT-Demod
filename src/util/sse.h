@@ -39,6 +39,7 @@ namespace sse {
     __m128 sin(__m128 x);
     __m128 cos(__m128 x);
     __m128 abs(__m128 x);
+    __m128 abs(complex x);
     __m128 atan2(__m128 y, __m128 x);
     __m128 sqrt(__m128 x);
 }

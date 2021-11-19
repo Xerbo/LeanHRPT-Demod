@@ -99,17 +99,6 @@ std::complex<float> FIRKernel::filter(const std::complex<float> *in) {
     return volk_32fc_32f_dot_prod_32fc_u_sse(in, d_taps.data(), d_taps.size());
 }
 
-std::complex<float> convolute(const std::complex<float> *input, float *taps, size_t n) {
-    float real = 0.0f;
-    float imag = 0.0f;
-    for (size_t i = 0; i < n; i++) {
-        real += input[i].real() * taps[i];
-        imag += input[i].imag() * taps[i];
-    }
-
-    return std::complex<float>(real, imag);
-}
-
 void FIRKernel::filter(const std::complex<float> *in, std::complex<float> *out, size_t n) {
     for (size_t i = 0; i < n; i++) {
         out[i] = volk_32fc_32f_dot_prod_32fc_u_sse(&in[i], d_taps.data(), d_taps.size());

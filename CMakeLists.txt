@@ -20,7 +20,7 @@ set_property(TARGET LeanHRPT-Demod PROPERTY CXX_STANDARD 11)
 target_include_directories(LeanHRPT-Demod PUBLIC src)
 
 if (NOT MSVC)
-    target_compile_options(LeanHRPT-Demod PRIVATE -Wall -Wextra -Wpedantic -ffast-math -g)
+    target_compile_options(LeanHRPT-Demod PRIVATE -Wall -Wextra -Wpedantic -ffast-math)
 endif()
 
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets REQUIRED)

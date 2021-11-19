@@ -51,8 +51,6 @@ class QtThread : public QThread {
         std::function<void()> function;
 };
 
-#include <iostream>
-
 template<typename A, typename B>
 class Block {
     public:
@@ -98,7 +96,7 @@ class Block {
 
             running = true;
             thread->start();
-            thread->setPriority(QThread::TimeCriticalPriority);
+            thread->setPriority(QThread::HighestPriority);
         }
         void stop() {
             running = false;

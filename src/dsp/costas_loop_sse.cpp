@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "simd_costas.h"
+#include "costas_loop_sse.h"
 
 #include "util/math.h"
 #include "util/sse.h"
@@ -41,7 +41,7 @@ namespace sse {
         return _mm_sub_ps(x.real, x.imag);
     }
 
-    // Create a quadrate oscillator with phase `x`
+    // Create a quadrate oscillator with phase x+pi/2
     complex create_osc(__m128 x){
         return {
             cos(x),

@@ -32,7 +32,7 @@
 #include "digital/blocks.h"
 
 #ifdef EXPERIMENTAL
-#include "dsp/simd_costas.h"
+#include "dsp/costas_loop_sse.h"
 #else
 #include "dsp/costas_loop.h"
 #endif

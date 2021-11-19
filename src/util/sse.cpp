@@ -80,6 +80,12 @@ namespace sse {
         return _mm_and_ps(__a, mask);
     }
 
+    __m128 abs(complex x) {
+        __m128 real = _mm_mul_ps(x.real, x.real);
+        __m128 imag = _mm_mul_ps(x.imag, x.imag);
+        return sqrt(_mm_add_ps(real, imag));
+    }
+
     // 2D Arctangent
     __m128 atan2(__m128 y, __m128 x) {
         const __m128 abs_x = abs(x);

@@ -20,6 +20,7 @@
 #define DSP_AGC_H
 
 #include "block.h"
+#include "util/sse.h"
 #include <complex>
 
 // Automatic Gain Control, normalizes the magnitude of a signal
@@ -32,10 +33,16 @@ class AGC : public Block<complex, complex> {
               d_max_gain(max_gain) { }
 
         size_t work(const std::complex<float> *in, std::complex<float> *out, size_t n) {
+            powers.reserve(n);
+            for (size_t i = 0; i < n/4; i++) {
+                __m128 power = sse::abs(sse::deinterleave_complex(&in[i * 4]));
+                _mm_storeu_ps(&powers[i * 4], power);
+            }
+
             for (size_t i = 0; i < n; i++) {
                 out[i] = in[i] * d_gain;
 
-                float abs = std::sqrt(out[i].real()*out[i].real() + out[i].imag()*out[i].imag());
+                float abs = powers[i] * d_gain;
                 d_gain += d_rate * (d_reference - abs);
                 d_gain = std::min(d_gain, d_max_gain);
             }
@@ -47,6 +54,8 @@ class AGC : public Block<complex, complex> {
         const float d_reference;
         float d_gain;
         const float d_max_gain;
+
+        std::vector<float> powers;
 };
 
 #endif

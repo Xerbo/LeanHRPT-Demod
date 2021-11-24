@@ -40,10 +40,10 @@ class SDRSource : public FileReader {
             if (stream == nullptr) {
                 throw std::runtime_error("Could not open RX stream");
             }
-            sdr->activateStream(stream, 0, 0, 8192);
+            sdr->activateStream(stream);
         }
         ~SDRSource() {
-            sdr->deactivateStream(stream, 0, 0);
+            sdr->deactivateStream(stream);
 	        sdr->closeStream(stream);
             SoapySDR::Device::unmake(sdr);
         }
@@ -70,7 +70,6 @@ class SDRSource : public FileReader {
 
         bool has_biastee() {
             for (const auto &setting : sdr->getSettingInfo()) {
-                std::cout << setting.key << std::endl;
                 if (setting.key == "biastee") {
                     return true;
                 }
@@ -79,6 +78,10 @@ class SDRSource : public FileReader {
             return false;
         }
         void set_biastee(double enabled) { sdr->writeSetting("biastee", enabled ? "true" : "false"); }
+
+        std::vector<std::string> antennas() { return sdr->listAntennas(SOAPY_SDR_RX, 0);}
+        void set_antenna(const std::string &antenna) { return sdr->setAntenna(SOAPY_SDR_RX, 0, antenna); }
+        std::string antenna() { return sdr->getAntenna(SOAPY_SDR_RX, 0); }
     private:
         SoapySDR::Device *sdr;
         SoapySDR::Stream *stream = nullptr;

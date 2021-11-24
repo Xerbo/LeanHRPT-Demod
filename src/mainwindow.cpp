@@ -95,6 +95,14 @@ void MainWindow::on_startButton_clicked() {
             file->set_gain(0);
 
             ui->bias->setEnabled(file->has_biastee());
+
+            ui->antenna->clear();
+            for (const auto &antenna : file->antennas()) {
+                ui->antenna->addItem(QString::fromStdString(antenna));
+            }
+            QString antenna = QString::fromStdString(file->antenna());
+            ui->antenna->setCurrentIndex(ui->antenna->findText(antenna));
+            ui->antenna->setEnabled(true);
         }
 
         if (ui->downlink->currentText() == "MetOp HRPT") {
@@ -133,10 +141,11 @@ void MainWindow::on_startButton_clicked() {
         ui->startButton->setText("Start");
         ui->gain->setEnabled(false);
         ui->bias->setEnabled(false);
+        ui->antenna->setEnabled(false);
     }
 }
 
-void MainWindow::on_source_currentTextChanged(const QString &text) {
+void MainWindow::on_source_textActivated(const QString &text) {
     if (text == "WAV") { 
         ui->startButton->setEnabled(!outputFilename.isEmpty() && !wavFilename.isEmpty());
     } else if (text == "raw") {

@@ -82,6 +82,8 @@ public:
     QLabel *gainLabel;
     QCheckBox *bias;
     QLabel *biasLabel;
+    QLabel *antennaLabel;
+    QComboBox *antenna;
     QLabel *outputFileLabel;
     QPushButton *outputFile;
     QPushButton *startButton;
@@ -312,6 +314,19 @@ public:
 
         formLayout_4->setWidget(4, QFormLayout::LabelRole, biasLabel);
 
+        antennaLabel = new QLabel(groupBox_3);
+        antennaLabel->setObjectName(QString::fromUtf8("antennaLabel"));
+
+        formLayout_4->setWidget(5, QFormLayout::LabelRole, antennaLabel);
+
+        antenna = new QComboBox(groupBox_3);
+        antenna->setObjectName(QString::fromUtf8("antenna"));
+        antenna->setEnabled(false);
+        sizePolicy.setHeightForWidth(antenna->sizePolicy().hasHeightForWidth());
+        antenna->setSizePolicy(sizePolicy);
+
+        formLayout_4->setWidget(5, QFormLayout::FieldRole, antenna);
+
 
         verticalLayout_3->addWidget(groupBox_3);
 
@@ -433,6 +448,7 @@ public:
         gainLabel->setText(QCoreApplication::translate("MainWindow", "Gain", nullptr));
         bias->setText(QString());
         biasLabel->setText(QCoreApplication::translate("MainWindow", "Enable Bias Tee", nullptr));
+        antennaLabel->setText(QCoreApplication::translate("MainWindow", "Antenna", nullptr));
         outputFileLabel->setText(QCoreApplication::translate("MainWindow", "Output File", nullptr));
         outputFile->setText(QCoreApplication::translate("MainWindow", "Select...", nullptr));
         startButton->setText(QCoreApplication::translate("MainWindow", "Start", nullptr));

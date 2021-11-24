@@ -35,6 +35,10 @@ class FileReader : public Block<Empty, complex> {
         virtual void set_biastee([[maybe_unused]] double enabled) { };
         virtual bool has_biastee() { return false; };
 
+        virtual std::vector<std::string> antennas() { return {}; }
+        virtual std::string antenna() { return ""; }
+        virtual void set_antenna([[maybe_unused]] const std::string &antenna) { }
+
         static std::shared_ptr<FileReader> choose_type(std::string type, std::string filename);
         bool neof = true;
 

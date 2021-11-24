@@ -67,7 +67,18 @@ class SDRSource : public FileReader {
         void set_rate(double rate)           { sdr->setSampleRate(SOAPY_SDR_RX, 0, rate); }
         void set_frequency(double frequency) { sdr->setFrequency(SOAPY_SDR_RX, 0, frequency); }
         void set_gain(double gain)           { sdr->setGain(SOAPY_SDR_RX, 0, gain); }
-        
+
+        bool has_biastee() {
+            for (const auto &setting : sdr->getSettingInfo()) {
+                std::cout << setting.key << std::endl;
+                if (setting.key == "biastee") {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+        void set_biastee(double enabled) { sdr->writeSetting("biastee", enabled ? "true" : "false"); }
     private:
         SoapySDR::Device *sdr;
         SoapySDR::Stream *stream = nullptr;

@@ -13,6 +13,7 @@
 #include <QtGui/QIcon>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QCheckBox>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QDoubleSpinBox>
 #include <QtWidgets/QFormLayout>
@@ -79,6 +80,8 @@ public:
     QDoubleSpinBox *sdrSampleRate;
     QSlider *gain;
     QLabel *gainLabel;
+    QCheckBox *bias;
+    QLabel *biasLabel;
     QLabel *outputFileLabel;
     QPushButton *outputFile;
     QPushButton *startButton;
@@ -298,6 +301,17 @@ public:
 
         formLayout_4->setWidget(3, QFormLayout::LabelRole, gainLabel);
 
+        bias = new QCheckBox(groupBox_3);
+        bias->setObjectName(QString::fromUtf8("bias"));
+        bias->setEnabled(false);
+
+        formLayout_4->setWidget(4, QFormLayout::FieldRole, bias);
+
+        biasLabel = new QLabel(groupBox_3);
+        biasLabel->setObjectName(QString::fromUtf8("biasLabel"));
+
+        formLayout_4->setWidget(4, QFormLayout::LabelRole, biasLabel);
+
 
         verticalLayout_3->addWidget(groupBox_3);
 
@@ -417,6 +431,8 @@ public:
         sdrSampleRateLabel->setText(QCoreApplication::translate("MainWindow", "Sample Rate", nullptr));
         sdrSampleRate->setSuffix(QCoreApplication::translate("MainWindow", " msps", nullptr));
         gainLabel->setText(QCoreApplication::translate("MainWindow", "Gain", nullptr));
+        bias->setText(QString());
+        biasLabel->setText(QCoreApplication::translate("MainWindow", "Enable Bias Tee", nullptr));
         outputFileLabel->setText(QCoreApplication::translate("MainWindow", "Output File", nullptr));
         outputFile->setText(QCoreApplication::translate("MainWindow", "Select...", nullptr));
         startButton->setText(QCoreApplication::translate("MainWindow", "Start", nullptr));

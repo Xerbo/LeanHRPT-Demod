@@ -63,6 +63,7 @@ class MainWindow : public QMainWindow {
 
         void on_source_currentTextChanged(const QString &text);
         void on_gain_valueChanged(int value);
+        void on_bias_toggled(bool state) { demod->file->set_biastee(state); }
 
         // menuFile
         void on_actionQuit_triggered() { QApplication::quit(); }

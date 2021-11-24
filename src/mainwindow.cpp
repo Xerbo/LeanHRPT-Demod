@@ -93,6 +93,8 @@ void MainWindow::on_startButton_clicked() {
             ui->gain->setRange(range.minimum(), range.maximum());
             ui->gain->setValue(0);
             file->set_gain(0);
+
+            ui->bias->setEnabled(file->has_biastee());
         }
 
         if (ui->downlink->currentText() == "MetOp HRPT") {
@@ -130,6 +132,7 @@ void MainWindow::on_startButton_clicked() {
         timer->stop();
         ui->startButton->setText("Start");
         ui->gain->setEnabled(false);
+        ui->bias->setEnabled(false);
     }
 }
 

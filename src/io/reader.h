@@ -32,6 +32,9 @@ class FileReader : public Block<Empty, complex> {
         virtual void set_gain([[maybe_unused]] double gain) { };
         virtual SoapySDR::Range gain_range() { return SoapySDR::Range(); }
 
+        virtual void set_biastee([[maybe_unused]] double enabled) { };
+        virtual bool has_biastee() { return false; };
+
         static std::shared_ptr<FileReader> choose_type(std::string type, std::string filename);
         bool neof = true;
 

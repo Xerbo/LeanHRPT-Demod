@@ -51,8 +51,14 @@ class QtThread : public QThread {
         std::function<void()> function;
 };
 
+class BlockInterface {
+    public:
+        virtual void start()=0;
+        virtual void stop()=0;
+};
+
 template<typename A, typename B>
-class Block {
+class Block : public BlockInterface {
     public:
         Block(size_t request = BUFFER_SIZE, size_t size = BUFFER_SIZE*10) 
             : in(request),

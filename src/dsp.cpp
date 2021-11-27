@@ -22,7 +22,7 @@
 PMDemodulator::PMDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> source, std::string ofname)
     : dc(0.001f),
       pll(loop(0.005f)),
-      ft(2.0f*M_PIf * -665.4e3/SAMP_RATE),
+      ft(2.0f*M_PIf32 * -665.4e3/SAMP_RATE),
       rrc(make_rrc(1.0, SAMP_RATE, 665.4e3, 0.6, 51)),
       agc(0.001f, 0.707f),
       costas(2, loop(0.005f)),
@@ -41,29 +41,16 @@ PMDemodulator::PMDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> source
     slicer.in_pipe = clock.out_pipe;
     out.in_pipe = slicer.out_pipe;
 
-    file->start();
-    dc.start();
-    pll.start();
-    ft.start();
-    rrc.start();
-    agc.start();
-    costas.start();
-    clock.start();
-    slicer.start();
-    out.start();
+    blocks = { file.get(), &dc, &pll, &ft, &rrc, &agc, &costas, &clock, &slicer, &out };
+    for (BlockInterface *block : blocks) {
+        block->start();
+    }
 }
 
 void PMDemodulator::stop() {
-    file->stop();
-    dc.stop();
-    pll.stop();
-    ft.stop();
-    rrc.stop();
-    agc.stop();
-    costas.stop();
-    clock.stop();
-    slicer.stop();
-    out.stop();
+    for (BlockInterface *block : blocks) {
+        block->stop();
+    }
 }
 
 MetopDemodulator::MetopDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> source, std::string ofname)
@@ -84,29 +71,17 @@ MetopDemodulator::MetopDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> 
     deframer.in_pipe = viterbi.out_pipe;
     out.in_pipe = deframer.out_pipe;
 
-    file->start();
-    dc.start();
-    agc.start();
-    rrc.start();
-    costas.start();
-    clock.start();
-    viterbi.start();
-    deframer.start();
-    out.start();
+    blocks = { file.get(), &dc, &agc, &rrc, &costas, &clock, &viterbi, &deframer, &out };
+    for (BlockInterface *block : blocks) {
+        block->start();
+    }
 }
 
 void MetopDemodulator::stop() {
-    file->stop();
-    dc.stop();
-    agc.stop();
-    rrc.stop();
-    costas.stop();
-    clock.stop();
-    viterbi.stop();
-    deframer.stop();
-    out.stop();
+    for (BlockInterface *block : blocks) {
+        block->stop();
+    }
 }
-
 
 FengyunDemodulator::FengyunDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> source, std::string ofname)
     : dc(0.001f),
@@ -126,25 +101,14 @@ FengyunDemodulator::FengyunDemodulator(float SAMP_RATE, std::shared_ptr<FileRead
     deframer.in_pipe = viterbi.out_pipe;
     out.in_pipe = deframer.out_pipe;
 
-    file->start();
-    dc.start();
-    agc.start();
-    rrc.start();
-    costas.start();
-    clock.start();
-    viterbi.start();
-    deframer.start();
-    out.start();
+    blocks = { file.get(), &dc, &agc, &rrc, &costas, &clock, &viterbi, &deframer, &out };
+    for (BlockInterface *block : blocks) {
+        block->start();
+    }
 }
 
 void FengyunDemodulator::stop() {
-    file->stop();
-    dc.stop();
-    agc.stop();
-    rrc.stop();
-    costas.stop();
-    clock.stop();
-    viterbi.stop();
-    deframer.stop();
-    out.stop();
+    for (BlockInterface *block : blocks) {
+        block->stop();
+    }
 }

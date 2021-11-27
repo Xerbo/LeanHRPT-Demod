@@ -32,15 +32,21 @@ namespace sse {
     void interleave_complex(std::complex<float> *out, complex x);
 
     complex complex_multiply(complex a, complex b);
+    complex complex_multiply(complex a, __m128 b);
+    inline complex complex_multiply(__m128 a, complex b) { return complex_multiply(b, a); }
 
     float sum(__m128 x);
     float avg(__m128 x);
+
+    __m128 copysign(__m128 mag, __m128 sign);
+    __m128 phase_wrap(__m128 x);
 
     __m128 sin(__m128 x);
     __m128 cos(__m128 x);
     __m128 abs(__m128 x);
     __m128 abs(complex x);
     __m128 atan2(__m128 y, __m128 x);
+    inline __m128 atan2(complex x) { return atan2(x.imag, x.real); }
     __m128 sqrt(__m128 x);
 }
 

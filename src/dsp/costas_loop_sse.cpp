@@ -76,8 +76,8 @@ size_t CostasLoopSSE::work(const std::complex<float> *in, std::complex<float> *o
         d_phase = d_phase + d_freq + d_alpha * error;
 
         // Wrap phase (faster than std::remainder)
-        if (d_phase >  M_PIf) d_phase -= 2*M_PIf;
-        if (d_phase < -M_PIf) d_phase += 2*M_PIf;
+        if (d_phase >  M_PIf32) d_phase -= 2*M_PIf32;
+        if (d_phase < -M_PIf32) d_phase += 2*M_PIf32;
     }
 
     return n;

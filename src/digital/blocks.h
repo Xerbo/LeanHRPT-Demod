@@ -106,7 +106,7 @@ class FengyunViterbi : public Block<complex, uint8_t> {
 
 class VCDUExtractor : public Block<uint8_t, uint8_t> {
     public:
-        VCDUExtractor() : Block(1024) { }
+        VCDUExtractor(bool cadu = false) : Block(1024), use_cadu(cadu) { }
 
         size_t work(const uint8_t *in, uint8_t *out, size_t n) {
             uint8_t frame[1024];
@@ -116,14 +116,20 @@ class VCDUExtractor : public Block<uint8_t, uint8_t> {
 
                 uint8_t VCID = frame[5] & 0x3f;
                 if (VCID != 63) {
-                    std::memcpy(out, &frame[4], 892);
-                    return 892;
+                    if (use_cadu) {
+                        std::memcpy(out, frame, 1024);
+                        return 1024;
+                    } else {
+                        std::memcpy(out, &frame[4], 892);
+                        return 892;
+                    }
                 }
             }
 
             return 0;
         }
     private:
+        const bool use_cadu;
         ccsds::Deframer deframer;
         ccsds::Derand derand;
         SatHelper::ReedSolomon rs;

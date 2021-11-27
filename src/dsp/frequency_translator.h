@@ -33,7 +33,7 @@ class FrequencyTranslator : public Block<complex, complex> {
         size_t work(const std::complex<float> *in, std::complex<float> *out, size_t n) {
             for (size_t i = 0; i < n; i++) {
                 out[i] = in[i].imag() * std::complex<float>(fast_cos(d_phase), -fast_sin(d_phase));
-                d_phase = std::remainder(d_phase + d_shift, M_PIf * 2.0f);
+                d_phase = std::remainder(d_phase + d_shift, M_PIf32 * 2.0f);
             }
 
             return n;

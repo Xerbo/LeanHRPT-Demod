@@ -36,12 +36,12 @@ static inline float phase_detector_bpsk(std::complex<float> sample) {
 // Locks onto a carrier with a PLL and outputs the input signal mixed with the carrier
 class CostasLoop : public Block<complex, complex> {
     public:
-        CostasLoop(size_t order, float alpha, float beta, float max_freq = M_PIf)
+        CostasLoop(size_t order, float alpha, float beta, float max_freq = M_PIf32)
             : d_order(order),
               d_alpha(alpha),
               d_beta(beta),
               d_max_freq(max_freq) { }
-        CostasLoop(size_t order, std::pair<float, float> loop, float max_freq = M_PIf)
+        CostasLoop(size_t order, std::pair<float, float> loop, float max_freq = M_PIf32)
             : CostasLoop(order, loop.first, loop.second, max_freq) { }
 
         size_t work(const std::complex<float> *in, std::complex<float> *out, size_t n) {
@@ -64,8 +64,8 @@ class CostasLoop : public Block<complex, complex> {
 
                 // Could also use std::remainder here
                 // But is faster due to the miniscule changes in d_phase
-                if (d_phase >  M_PIf) d_phase -= 2*M_PIf;
-                if (d_phase < -M_PIf) d_phase += 2*M_PIf;
+                if (d_phase >  M_PIf32) d_phase -= 2*M_PIf32;
+                if (d_phase < -M_PIf32) d_phase += 2*M_PIf32;
             }
 
             return n;

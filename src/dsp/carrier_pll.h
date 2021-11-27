@@ -29,11 +29,11 @@
 // Locks onto a carrier with a PLL and outputs the input signal mixed with the carrier
 class CarrierPLL : public Block<complex, complex> {
     public:
-        CarrierPLL(float alpha, float beta, float max_freq = M_PIf)
+        CarrierPLL(float alpha, float beta, float max_freq = M_PIf32)
             : d_alpha(alpha),
               d_beta(beta),
               d_max_freq(max_freq) { }
-        CarrierPLL(std::pair<float, float> loop, float max_freq = M_PIf)
+        CarrierPLL(std::pair<float, float> loop, float max_freq = M_PIf32)
             : CarrierPLL(loop.first, loop.second, max_freq) { }
 
         size_t work(const std::complex<float> *in, std::complex<float> *out, size_t n) {
@@ -50,7 +50,7 @@ class CarrierPLL : public Block<complex, complex> {
 
                 // Calculate phase error (wrapping if necessary)
                 float phase = std::isnan(phases[i]) ? std::arg(in[i]) : phases[i];
-                float error = std::remainder(phase - d_phase, M_PIf*2.0f);
+                float error = std::remainder(phase - d_phase, M_PIf32*2.0f);
 
                 // Adjust frequency based on the phase error (clamping if necessary)
                 d_freq = d_freq + d_beta * error;
@@ -58,8 +58,8 @@ class CarrierPLL : public Block<complex, complex> {
 
                 // Could also use std::remainder here
                 // But is faster due to the miniscule changes in d_phase
-                while (d_phase >  M_PIf) d_phase -= 2*M_PIf;
-                while (d_phase < -M_PIf) d_phase += 2*M_PIf;
+                while (d_phase >  M_PIf32) d_phase -= 2*M_PIf32;
+                while (d_phase < -M_PIf32) d_phase += 2*M_PIf32;
             }
 
             return n;

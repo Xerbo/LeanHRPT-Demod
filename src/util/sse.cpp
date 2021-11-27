@@ -17,6 +17,7 @@
  */
 
 #include "sse.h"
+#include "math.h"
 
 namespace sse {
     // AB, AB, AB, AB -> AAAA, BBBB
@@ -48,30 +49,41 @@ namespace sse {
         };
     }
 
-    // Sine
-    __m128 sin(__m128 x) {
-        float y[4];
-        _mm_storeu_ps(y, x);
-
-        return _mm_set_ps(
-            sinf(y[0]),
-            sinf(y[1]),
-            sinf(y[2]),
-            sinf(y[3])
-        );
+    complex complex_multiply(complex a, __m128 b) {
+        return {
+            _mm_mul_ps(a.real, b),
+            _mm_mul_ps(a.imag, b)
+        };
     }
 
-    // Cosine
-    __m128 cos(__m128 x) {
-        float y[4];
-        _mm_storeu_ps(y, x);
+    __m128 copysign(__m128 mag, __m128 sign) {
+        // Make the sign bit 0
+        mag = abs(mag);
 
-        return _mm_set_ps(
-            cosf(y[0]),
-            cosf(y[1]),
-            cosf(y[2]),
-            cosf(y[3])
-        );
+        // Extract sign bit
+        __m128 mask = _mm_castsi128_ps(_mm_set1_epi32(0x80000000));
+        sign = _mm_and_ps(sign, mask);
+
+        // Merge
+        return _mm_or_ps(mag, sign);
+    }
+
+    __m128 phase_wrap(__m128 x) {
+        return x - M_TAUf32 * _mm_floor_ps((x + M_PIf32) * (1.0f / M_TAUf32));
+    }
+
+    __m128 sin(__m128 x) {
+        x = phase_wrap(x);
+        __m128 abs_x = abs(x);
+
+        __m128 numerator   = 16.0f*abs_x * (M_PIf32 - abs_x);
+        __m128 denominator = 5.0f*M_PIf32*M_PIf32 - 4.0f*abs_x*(M_PIf32 - abs_x);
+
+        return copysign(numerator/denominator, x);
+    }
+
+    __m128 cos(__m128 x) {
+        return sin(x + M_PIf32/2.0f);
     }
 
     // Absolute value

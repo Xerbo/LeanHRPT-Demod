@@ -75,6 +75,7 @@ class PMDemodulator : public Demodulator {
         SymbolSync clock;
         BinarySlicer slicer;
         FileWriter<uint8_t> out;
+        std::array<BlockInterface *, 10> blocks;
 };
 
 class MetopDemodulator : public Demodulator {
@@ -103,6 +104,7 @@ class MetopDemodulator : public Demodulator {
         MetopViterbi viterbi;
         VCDUExtractor deframer;
         FileWriter<uint8_t> out;
+        std::array<BlockInterface *, 9> blocks;
 };
 
 class FengyunDemodulator : public Demodulator {
@@ -131,6 +133,7 @@ class FengyunDemodulator : public Demodulator {
         FengyunViterbi viterbi;
         VCDUExtractor deframer;
         FileWriter<uint8_t> out;
+        std::array<BlockInterface *, 9> blocks;
 };
 
 #endif

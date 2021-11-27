@@ -187,11 +187,6 @@ jobs:
             cp -r "C:/Program Files/PothosSDR/lib/SoapySDR/modules0.8"       LeanHRPT-Demod/lib/SoapySDR/;
             7z a LeanHRPT-Demod.zip LeanHRPT-Demod'
 
-    - uses: actions/upload-artifact@v2
-      with:
-        name: LeanHRPT-Demod.zip
-        path: ./LeanHRPT-Demod.zip
-
     - name: Upload Build
       uses: actions/upload-release-asset@v1
       with:

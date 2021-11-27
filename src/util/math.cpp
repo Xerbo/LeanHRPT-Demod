@@ -40,15 +40,15 @@ std::pair<float, float> loop(float bandwidth, float damping) {
 float fast_sin(float x) {
     float abs_x = std::abs(x);
 
-    float numerator   = 16.0f*abs_x * (M_PIf - abs_x);
-    float denominator = 5.0f*M_PIf*M_PIf - 4.0f*abs_x*(M_PIf - abs_x);
+    float numerator   = 16.0f*abs_x * (M_PIf32 - abs_x);
+    float denominator = 5.0f*M_PIf32*M_PIf32 - 4.0f*abs_x*(M_PIf32 - abs_x);
 
     return std::copysign(numerator/denominator, x);
 }
 
 float fast_cos(float x) {
-    x += M_PIf/2.0f;
-    if (x > M_PIf) x -= M_PIf*2.0f;
+    x += M_PIf32/2.0f;
+    if (x > M_PIf32) x -= M_PIf32*2.0f;
 
     return fast_sin(x);
 }

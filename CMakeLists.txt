@@ -21,6 +21,9 @@ target_include_directories(LeanHRPT-Demod PUBLIC src)
 
 if (NOT MSVC)
     target_compile_options(LeanHRPT-Demod PRIVATE -Wall -Wextra -Wpedantic -ffast-math)
+
+    # If you CPU doesn't have SSE 4.1 then get a newer CPU
+    target_compile_options(LeanHRPT-Demod PRIVATE -msse4.1)
 endif()
 
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets REQUIRED)
@@ -70,4 +73,5 @@ endif()
 option(EXPERIMENTAL "Enable experimental features" OFF)
 if(EXPERIMENTAL)
     target_compile_definitions(LeanHRPT-Demod -DEXPERIMENTAL)
+    target_compile_options(LeanHRPT-Demod PRIVATE -march=native)
 endif()

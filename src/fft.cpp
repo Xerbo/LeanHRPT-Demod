@@ -37,7 +37,7 @@ void FFT::init_window() {
     window_sum = 0.0f;
 
     for (size_t i = 0; i < bins; i++) {
-        float n = ((float)i / (float)bins) * M_PIf;
+        float n = ((float)i / (float)bins) * M_PIf32;
         window[i] = 0.42f - 0.5f*std::cos(2 * n) + 0.08f*std::cos(4 * n);
         window_sum += window[i];
     }

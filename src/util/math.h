@@ -19,7 +19,15 @@
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
-#define M_PIf (float)M_PI
+#ifndef M_PIf3232
+#define M_PIf3232 3.141592653589793238462643383279502884f
+#endif
+#ifndef M_TAU
+#define M_TAU 6.28318530717958647692
+#endif
+#ifndef M_TAUf32
+#define M_TAUf32 6.283185307179586476925286766559005768f
+#endif
 
 #ifndef UTIL_MATH_H
 #define UTIL_MATH_H

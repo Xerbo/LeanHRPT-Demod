@@ -14,7 +14,7 @@ And then see the [wiki](https://github.com/Xerbo/LeanHRPT-Demod/wiki) for how to
 
 ## Building from source
 
-For those who wish to compile from source you will need `qtbase5-dev`, [`libcorrect`](https://github.com/quiet/libcorrect) and a C++11 compiler (tested with gcc, clang and MSVC) installed. After that you can compile with:
+For those who wish to compile from source you will need `qtbase5-dev`, [`libcorrect`](https://github.com/quiet/libcorrect), `libsndfile1-dev`, `libsndfile1-dev` and a C++11 compiler (tested with gcc, clang and MSVC) installed. After that you can compile with:
 
 ```sh
 mkdir build && cd build

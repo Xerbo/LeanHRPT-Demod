@@ -184,6 +184,7 @@ jobs:
             cp "C:/Program Files/PothosSDR/bin/rtlsdr.dll"                   LeanHRPT-Demod/bin/;
             cp "C:/Program Files/PothosSDR/bin/uhd.dll"                      LeanHRPT-Demod/bin/;
             cp "C:/Program Files/PothosSDR/bin/mirisdr.dll"                  LeanHRPT-Demod/bin/;
+            cp "C:/Program Files/PothosSDR/bin/mir_sdr_api.dll"              LeanHRPT-Demod/bin/;
             cp -r "C:/Program Files/PothosSDR/lib/SoapySDR/modules0.8"       LeanHRPT-Demod/lib/SoapySDR/;
             7z a LeanHRPT-Demod.zip LeanHRPT-Demod'
 

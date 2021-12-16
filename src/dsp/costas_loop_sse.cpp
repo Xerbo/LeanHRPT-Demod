@@ -38,14 +38,14 @@ namespace sse {
         x.real = _mm_mul_ps(x.real, imagslice);
         x.imag = _mm_mul_ps(x.imag, realslice);
 
-        return _mm_sub_ps(x.real, x.imag);
+        return _mm_sub_ps(x.imag, x.real);
     }
 
     // Create a quadrate oscillator with phase x+pi/2
     complex create_osc(__m128 x){
         return {
             cos(x),
-            _mm_mul_ps(sin(x), _mm_set1_ps(-1.0f))
+            sse::inv(sin(x))
         };
     }
 }

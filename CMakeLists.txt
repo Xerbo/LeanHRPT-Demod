@@ -72,6 +72,6 @@ endif()
 
 option(EXPERIMENTAL "Enable experimental features" OFF)
 if(EXPERIMENTAL)
-    target_compile_definitions(LeanHRPT-Demod -DEXPERIMENTAL)
+    target_compile_definitions(LeanHRPT-Demod PRIVATE -DEXPERIMENTAL)
     target_compile_options(LeanHRPT-Demod PRIVATE -march=native)
 endif()

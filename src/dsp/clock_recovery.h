@@ -19,11 +19,7 @@
 #ifndef DSP_SYMBOL_SYNC_H
 #define DSP_SYMBOL_SYNC_H
 
-#ifdef EXPERIMENTAL
-#include "cubic_interpolator.h"
-#else
 #include "fir_intrepolator.h"
-#endif
 #include "block.h"
 
 #include <complex>
@@ -71,11 +67,7 @@ class SymbolSync : public Block<complex, complex> {
         const float d_limit; // omegaRelativeLimit
         const size_t d_order;
 
-#ifdef EXPERIMENTAL
-        CubicInterpolator d_interp;
-#else
         FIRInterpolator d_interp;
-#endif
         std::vector<std::complex<float>> d_history;
 
         size_t internal_work(const std::complex<float> *in, std::complex<float> *out, size_t n) {

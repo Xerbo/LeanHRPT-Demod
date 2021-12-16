@@ -40,7 +40,7 @@ class CarrierPLL : public Block<complex, complex> {
             phases.reserve(n);
             for (size_t i = 0; i < n/4; i++) {
                 sse::complex samp = sse::deinterleave_complex(&in[i*4]);
-                __m128 phase = sse::atan2(samp.imag, samp.real);
+                __m128 phase = sse::atan2(samp);
                 _mm_storeu_ps(&phases[i*4], phase);
             }
 

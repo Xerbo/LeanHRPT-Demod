@@ -48,6 +48,8 @@ namespace sse {
     __m128 atan2(__m128 y, __m128 x);
     inline __m128 atan2(complex x) { return atan2(x.imag, x.real); }
     __m128 sqrt(__m128 x);
+    __m128 fast_div(__m128 a, __m128 b);
+    __m128 inv(__m128 x);
 }
 
 #endif

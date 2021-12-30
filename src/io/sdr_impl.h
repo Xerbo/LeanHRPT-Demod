@@ -70,14 +70,15 @@ class SDRSource : public FileReader {
 
         bool has_biastee() {
             for (const auto &setting : sdr->getSettingInfo()) {
-                if (setting.key == "biastee") {
+                if (setting.key == "biastee" || setting.key == "biasT_ctrl" || setting.key == "bias_tx") {
+                    bias_name = setting.key;
                     return true;
                 }
             }
 
             return false;
         }
-        void set_biastee(double enabled) { sdr->writeSetting("biastee", enabled ? "true" : "false"); }
+        void set_biastee(double enabled) { sdr->writeSetting(bias_name, enabled ? "true" : "false"); }
 
         std::vector<std::string> antennas() { return sdr->listAntennas(SOAPY_SDR_RX, 0);}
         void set_antenna(const std::string &antenna) { return sdr->setAntenna(SOAPY_SDR_RX, 0, antenna); }
@@ -85,6 +86,8 @@ class SDRSource : public FileReader {
     private:
         SoapySDR::Device *sdr;
         SoapySDR::Stream *stream = nullptr;
+
+        std::string bias_name;
 };
 
 #endif

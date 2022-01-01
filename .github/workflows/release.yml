@@ -145,8 +145,8 @@ jobs:
             cp -r libsndfile-1.0.31-win64/* "C:/Program Files/libsndfile"'
 
     - name: Install PothosSDR
-      run: 'curl -O https://downloads.myriadrf.org/builds/PothosSDR/PothosSDR-2020.01.26-vc14-x64.exe;
-            7z x PothosSDR-2020.01.26-vc14-x64.exe -o"C:/Program Files/PothosSDR/"'
+      run: 'curl -O https://downloads.myriadrf.org/builds/PothosSDR/PothosSDR-2021.07.25-vc16-x64.exe;
+            7z x PothosSDR-2021.07.25-vc16-x64.exe -o"C:/Program Files/PothosSDR/"'
 
     - name: Compile LeanHRPT
       run: 'mkdir build;
@@ -184,10 +184,11 @@ jobs:
             cp "C:/Program Files/PothosSDR/bin/rtlsdr.dll"                   LeanHRPT-Demod/bin/;
             cp "C:/Program Files/PothosSDR/bin/uhd.dll"                      LeanHRPT-Demod/bin/;
             cp "C:/Program Files/PothosSDR/bin/mirisdr.dll"                  LeanHRPT-Demod/bin/;
-            cp "C:/Program Files/PothosSDR/bin/mir_sdr_api.dll"              LeanHRPT-Demod/bin/;
+            cp "C:/Program Files/PothosSDR/bin/sdrplay_api.dll"              LeanHRPT-Demod/bin/;
             cp "C:/Program Files/PothosSDR/bin/libiio.dll"                   LeanHRPT-Demod/bin/;
             cp "C:/Program Files/PothosSDR/bin/libad9361.dll"                LeanHRPT-Demod/bin/;
             cp -r "C:/Program Files/PothosSDR/lib/SoapySDR/modules0.8"       LeanHRPT-Demod/lib/SoapySDR/;
+            rm LeanHRPT-Demod/lib/SoapySDR/modules0.8/osmosdrSupport.dll;
             7z a LeanHRPT-Demod.zip LeanHRPT-Demod'
 
     - name: Upload Build

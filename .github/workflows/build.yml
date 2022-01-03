@@ -128,7 +128,9 @@ jobs:
 
     - name: Install PothosSDR
       run: 'curl -O https://downloads.myriadrf.org/builds/PothosSDR/PothosSDR-2021.07.25-vc16-x64.exe;
-            7z x PothosSDR-2021.07.25-vc16-x64.exe -o"C:/Program Files/PothosSDR/"'
+            7z x PothosSDR-2021.07.25-vc16-x64.exe -o"C:/Program Files/PothosSDR/";
+            rm "C:/Program Files/PothosSDR/lib/sndfile.lib";
+            rm "C:/Program Files/PothosSDR/lib/pkgconfig/sndfile.pc"'
 
     - name: Compile LeanHRPT
       run: 'mkdir build;

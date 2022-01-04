@@ -114,12 +114,12 @@ class VCDUExtractor : public Block<uint8_t, uint8_t> {
                 derand.work(frame, 1024);
                 rs.decode_intreleaved_ccsds(frame);
 
-                uint8_t VCID = frame[5] & 0x3f;
-                if (VCID != 63) {
-                    if (use_cadu) {
-                        std::memcpy(out, frame, 1024);
-                        return 1024;
-                    } else {
+                if (use_cadu) {
+                    std::memcpy(out, frame, 1024);
+                    return 1024;
+                } else {
+                    uint8_t VCID = frame[5] & 0x3f;
+                    if (VCID != 63) {
                         std::memcpy(out, &frame[4], 892);
                         return 892;
                     }

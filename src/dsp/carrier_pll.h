@@ -53,7 +53,7 @@ class CarrierPLL : public Block<complex, complex> {
                 float error = std::remainder(phase - d_phase, M_PIf32*2.0f);
 
                 // Adjust frequency based on the phase error (clamping if necessary)
-                d_freq = d_freq + d_beta * error;
+                d_freq = clamp(d_freq + d_beta * error, d_max_freq);
                 d_phase = d_phase + d_freq + d_alpha * error;
 
                 // Could also use std::remainder here

@@ -22,7 +22,7 @@
 
 PMDemodulator::PMDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> source, std::string ofname)
     : dc(0.001f),
-      pll(loop(0.005f), M_TAUf32 * 50e3f/SAMP_RATE),
+      pll(loop(0.005f), M_TAUf32 * 150e3f/SAMP_RATE),
       ft(2.0f*M_PIf32 * -665.4e3/SAMP_RATE),
       rrc(make_rrc(1.0, SAMP_RATE, 665.4e3, 0.6, 51)),
       agc(0.001f, 0.707f),
@@ -57,7 +57,7 @@ void PMDemodulator::stop() {
 MetopDemodulator::MetopDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> source, std::string ofname)
     : dc(0.001f),
       rrc(make_rrc(1.0, SAMP_RATE, 2.3333e6, 0.6, 51)),
-      costas(4, loop(0.005f), M_TAUf32 * 50e3f/SAMP_RATE),
+      costas(4, loop(0.005f), M_TAUf32 * 150e3f/SAMP_RATE),
       clock(4, SAMP_RATE/2.3333e6, loop(0.01f)),
       deframer(QFileInfo(QString::fromStdString(ofname)).suffix() == "cadu"),
       out(ofname) {
@@ -88,7 +88,7 @@ void MetopDemodulator::stop() {
 FengyunDemodulator::FengyunDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> source, std::string ofname)
     : dc(0.001f),
       rrc(make_rrc(1.0, SAMP_RATE, 2.8e6, 0.8, 51)),
-      costas(4, loop(0.005f), M_TAUf32 * 50e3f/SAMP_RATE),
+      costas(4, loop(0.005f), M_TAUf32 * 150e3f/SAMP_RATE),
       clock(4, SAMP_RATE/2.8e6, loop(0.01f)),
       deframer(QFileInfo(QString::fromStdString(ofname)).suffix() == "cadu"),
       out(ofname) {

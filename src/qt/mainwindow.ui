@@ -79,6 +79,11 @@
          </item>
          <item>
           <property name="text">
+           <string>NOAA GAC</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
            <string>MetOp HRPT</string>
           </property>
          </item>

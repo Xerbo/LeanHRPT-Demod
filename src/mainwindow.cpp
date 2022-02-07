@@ -113,7 +113,11 @@ void MainWindow::on_startButton_clicked() {
             demod = new FengyunDemodulator(samp_rate, std::move(file), ui->outputFile->text().toStdString());
             ui->constellation->set_lines(true, true);
             ui->constellation->num_points(4096);
-        } else{
+        } else if (ui->downlink->currentText() == "NOAA GAC") {
+            demod = new GACDemodulator(samp_rate, std::move(file), ui->outputFile->text().toStdString());
+            ui->constellation->set_lines(false, true);
+            ui->constellation->num_points(2048);
+        } else {
             demod = new PMDemodulator(samp_rate, std::move(file), ui->outputFile->text().toStdString());
             ui->constellation->set_lines(false, true);
             ui->constellation->num_points(2048);
@@ -196,7 +200,7 @@ void MainWindow::on_rawInput_clicked() {
 }
 void MainWindow::on_outputFile_clicked() {
     QString _outputFilename;
-    if (ui->downlink->currentText() != "NOAA/Meteor HRPT") {
+    if (ui->downlink->currentText() != "NOAA/Meteor HRPT" && ui->downlink->currentText() != "NOAA GAC") {
         _outputFilename = QFileDialog::getSaveFileName(this, "Select Output File", "", "VCDUs (*.vcdu);;CADUs (*.cadu)");
     } else {
         _outputFilename = QFileDialog::getSaveFileName(this, "Select Output File", "", "Binary (*.bin)");

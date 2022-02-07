@@ -136,4 +136,32 @@ class FengyunDemodulator : public Demodulator {
         std::vector<BlockInterface *> blocks;
 };
 
+class GACDemodulator : public Demodulator {
+    public:
+        GACDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> source, std::string ofname);
+        std::vector<complex> &symbols() {
+            return slicer.in;
+        }
+        std::vector<complex> &freq() {
+            return agc.in;
+        }
+        bool is_running() {
+            return file->neof;
+        }
+        void stop();
+    private:
+        FastDCBlocker dc;
+        AGC agc;
+        FIRFilter rrc;
+#ifdef EXPERIMENTAL
+        CostasLoopSSE costas;
+#else
+        CostasLoop costas;
+#endif
+        SymbolSync clock;
+        BinarySlicer slicer;
+        FileWriter<uint8_t> out;
+        std::vector<BlockInterface *> blocks;
+};
+
 #endif

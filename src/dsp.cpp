@@ -115,3 +115,33 @@ void FengyunDemodulator::stop() {
         block->stop();
     }
 }
+
+GACDemodulator::GACDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> source, std::string ofname)
+    : dc(0.05f),
+      agc(0.001f, 0.707f),
+      rrc(make_rrc(1.0, SAMP_RATE, 2661.6e3, 0.6, 51)),
+      costas(2, loop(0.005f), M_TAUf32 * 150e3f/SAMP_RATE),
+      clock(2, SAMP_RATE/2661.6e3, loop(0.01f)),
+      out(ofname) {
+
+    file = std::move(source);
+
+    dc.in_pipe = file->out_pipe;
+    agc.in_pipe = dc.out_pipe;
+    rrc.in_pipe = agc.out_pipe;
+    costas.in_pipe = rrc.out_pipe;
+    clock.in_pipe = costas.out_pipe;
+    slicer.in_pipe = clock.out_pipe;
+    out.in_pipe = slicer.out_pipe;
+
+    blocks = { file.get(), &dc, &agc, &rrc, &costas, &clock, &slicer, &out };
+    for (BlockInterface *block : blocks) {
+        block->start();
+    }
+}
+
+void GACDemodulator::stop() {
+    for (BlockInterface *block : blocks) {
+        block->stop();
+    }
+}

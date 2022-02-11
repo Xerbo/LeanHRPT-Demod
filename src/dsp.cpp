@@ -117,8 +117,7 @@ void FengyunDemodulator::stop() {
 }
 
 GACDemodulator::GACDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> source, std::string ofname)
-    : dc(0.05f),
-      agc(0.001f, 0.707f),
+    : dc(0.001f),
       rrc(make_rrc(1.0, SAMP_RATE, 2661.6e3, 0.6, 51)),
       costas(2, loop(0.005f), M_TAUf32 * 150e3f/SAMP_RATE),
       clock(2, SAMP_RATE/2661.6e3, loop(0.01f)),

@@ -49,6 +49,10 @@ class CostasLoop : public Block<complex, complex> {
                 // Mix incoming signal with the locked oscillator
                 out[i] = in[i] * std::complex<float>(fast_cos(d_phase), -fast_sin(d_phase));
 
+                // Remove DC offset
+                accumulator = out[i]*0.001f + accumulator*0.999f;
+                out[i] -= accumulator;
+
                 // Calculate phase error
                 float error;
                 switch (d_order) { 
@@ -78,6 +82,7 @@ class CostasLoop : public Block<complex, complex> {
 
         float d_freq = 0.0f;
         float d_phase = 0.0f;
+        std::complex<float> accumulator;
 };
 
 #endif

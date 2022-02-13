@@ -36,13 +36,14 @@ static inline float phase_detector_bpsk(std::complex<float> sample) {
 // Locks onto a carrier with a PLL and outputs the input signal mixed with the carrier
 class CostasLoop : public Block<complex, complex> {
     public:
-        CostasLoop(size_t order, float alpha, float beta, float max_freq = M_PIf32)
+        CostasLoop(size_t order, float alpha, float beta, float max_freq = M_PIf32, bool dc_block = false)
             : d_order(order),
               d_alpha(alpha),
               d_beta(beta),
-              d_max_freq(max_freq) { }
-        CostasLoop(size_t order, std::pair<float, float> loop, float max_freq = M_PIf32)
-            : CostasLoop(order, loop.first, loop.second, max_freq) { }
+              d_max_freq(max_freq),
+              d_dc_block(dc_block) { }
+        CostasLoop(size_t order, std::pair<float, float> loop, float max_freq = M_PIf32, bool dc_block = false)
+            : CostasLoop(order, loop.first, loop.second, max_freq, dc_block) { }
 
         size_t work(const std::complex<float> *in, std::complex<float> *out, size_t n) {
             for (size_t i = 0; i < n; i++) {
@@ -50,8 +51,10 @@ class CostasLoop : public Block<complex, complex> {
                 out[i] = in[i] * std::complex<float>(fast_cos(d_phase), -fast_sin(d_phase));
 
                 // Remove DC offset
-                accumulator = out[i]*0.001f + accumulator*0.999f;
-                out[i] -= accumulator;
+                if (d_dc_block) {
+                    accumulator = out[i]*0.001f + accumulator*0.999f;
+                    out[i] -= accumulator;
+                }
 
                 // Calculate phase error
                 float error;
@@ -79,6 +82,7 @@ class CostasLoop : public Block<complex, complex> {
         const float d_alpha;
         const float d_beta;
         const float d_max_freq;
+        const bool d_dc_block;
 
         float d_freq = 0.0f;
         float d_phase = 0.0f;

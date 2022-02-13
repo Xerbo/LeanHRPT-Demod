@@ -121,6 +121,7 @@ public:
         horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
         settingsBox = new QGroupBox(centralwidget);
         settingsBox->setObjectName(QString::fromUtf8("settingsBox"));
+        settingsBox->setMaximumSize(QSize(400, 16777215));
         formLayout = new QFormLayout(settingsBox);
         formLayout->setObjectName(QString::fromUtf8("formLayout"));
         sourceLabel = new QLabel(settingsBox);

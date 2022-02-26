@@ -19,6 +19,7 @@
 #ifndef DSP_H
 #define DSP_H
 
+#include <set>
 #include "io/reader.h"
 #include "dsp/dc_blocker.h"
 #include "dsp/carrier_pll.h"
@@ -39,129 +40,86 @@
 
 class Demodulator {
     public:
-        bool running = true;
         std::shared_ptr<FileReader> file;
+
         virtual std::vector<complex> &symbols()=0;
-        virtual std::vector<complex> &freq()=0;
-        virtual bool is_running()=0;
-        virtual void stop()=0;
+        virtual std::vector<complex> &baseband()=0;
         virtual ~Demodulator() { }
-};
 
-class PMDemodulator : public Demodulator {
-    public:
-        PMDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> source, std::string ofname);
-        std::vector<complex> &symbols() {
-            return slicer.in;
+        void stop() {
+            for (BlockInterface *block : blocks) block->stop();
         }
-        std::vector<complex> &freq() {
-            return pll.in;
+        void start() {
+            for (BlockInterface *block : blocks) block->start();
         }
         bool is_running() {
-            return file->neof;
+            return !file->eof;
         }
-        void stop();
+
+    protected:
+        std::set<BlockInterface *> blocks;
+
+        template<class A, class B> void connect(A *a, B *b) {
+            blocks.insert(a);
+            blocks.insert(b);
+            a->in_pipe = b->out_pipe;
+        }
+        template<class A, class B> void connect(A &a, std::shared_ptr<B> &b) { connect(&a, b.get()); }
+        template<class A, class B> void connect(std::shared_ptr<A> &a, B &b) { connect(a.get(), &b); }
+        template<class A, class B> void connect(A &a, B &b)                  { connect(&a, &b); }
+};
+
+class BiphaseDemodulator : public Demodulator {
+    public:
+        BiphaseDemodulator(float samp_rate,
+                           float sym_rate,
+                           std::shared_ptr<FileReader> source,
+                           std::string output_filename);
+        std::vector<complex> &symbols() { return slicer.in; }
+        std::vector<complex> &baseband() { return pll.in; }
+
     private:
-        FastDCBlocker dc;
+        FastDCBlocker dc_blocker;
         CarrierPLL pll;
-        FrequencyTranslator ft;
+        FrequencyTranslator translator;
         FIRFilter rrc;
         AGC agc;
 #ifdef EXPERIMENTAL
-        CostasLoopSSE costas;
+        CostasLoopSSE costas_loop;
 #else
-        CostasLoop costas;
+        CostasLoop costas_loop;
 #endif
-        SymbolSync clock;
+        SymbolSync clock_recovery;
         BinarySlicer slicer;
         FileWriter<uint8_t> out;
-        std::vector<BlockInterface *> blocks;
+        
 };
 
-class MetopDemodulator : public Demodulator {
+template<class SymbolHandler, class Deframer>
+class PSKDemodulator : public Demodulator {
     public:
-        MetopDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> source, std::string ofname);
-        std::vector<complex> &symbols() {
-            return viterbi.in;
-        }
-        std::vector<complex> &freq() {
-            return agc.in;
-        }
-        bool is_running() {
-            return file->neof;
-        }
-        void stop();
+        PSKDemodulator(float samp_rate,
+                       float sym_rate,
+                       size_t order,
+                       bool suppress_carrier,
+                       std::shared_ptr<FileReader> source,
+                       std::string output_filename);
+        std::vector<complex> &symbols() { return symbol_handler.in; }
+        std::vector<complex> &baseband() { return agc.in; }
+
     private:
-        FastDCBlocker dc;
+        FastDCBlocker dc_blocker;
         AGC agc;
         FIRFilter rrc;
 #ifdef EXPERIMENTAL
-        CostasLoopSSE costas;
+        CostasLoopSSE costas_loop;
 #else
-        CostasLoop costas;
+        CostasLoop costas_loop;
 #endif
-        SymbolSync clock;
-        MetopViterbi viterbi;
-        VCDUExtractor deframer;
+        SymbolSync clock_recovery;
+        SymbolHandler symbol_handler;
+        Deframer deframer;
         FileWriter<uint8_t> out;
-        std::vector<BlockInterface *> blocks;
-};
-
-class FengyunDemodulator : public Demodulator {
-    public:
-        FengyunDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> source, std::string ofname);
-        std::vector<complex> &symbols() {
-            return viterbi.in;
-        }
-        std::vector<complex> &freq() {
-            return agc.in;
-        }
-        bool is_running() {
-            return file->neof;
-        }
-        void stop();
-    private:
-        FastDCBlocker dc;
-        AGC agc;
-        FIRFilter rrc;
-#ifdef EXPERIMENTAL
-        CostasLoopSSE costas;
-#else
-        CostasLoop costas;
-#endif
-        SymbolSync clock;
-        FengyunViterbi viterbi;
-        VCDUExtractor deframer;
-        FileWriter<uint8_t> out;
-        std::vector<BlockInterface *> blocks;
-};
-
-class GACDemodulator : public Demodulator {
-    public:
-        GACDemodulator(float SAMP_RATE, std::shared_ptr<FileReader> source, std::string ofname);
-        std::vector<complex> &symbols() {
-            return slicer.in;
-        }
-        std::vector<complex> &freq() {
-            return agc.in;
-        }
-        bool is_running() {
-            return file->neof;
-        }
-        void stop();
-    private:
-        FastDCBlocker dc;
-        AGC agc;
-        FIRFilter rrc;
-#ifdef EXPERIMENTAL
-        CostasLoopSSE costas;
-#else
-        CostasLoop costas;
-#endif
-        SymbolSync clock;
-        BinarySlicer slicer;
-        FileWriter<uint8_t> out;
-        std::vector<BlockInterface *> blocks;
 };
 
 #endif

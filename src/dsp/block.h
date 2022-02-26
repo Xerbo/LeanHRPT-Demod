@@ -133,4 +133,16 @@ class Block : public BlockInterface {
         virtual void work([[maybe_unused]] const A *in, [[maybe_unused]] size_t n)                            { throw std::runtime_error("No matching function with signature void(const A* in, size_t n"); };
 };
 
+// Block where both pipes point to the same address in memory
+// to simply passthrough the pipe pointer
+template<typename T>
+class Passthrough : public BlockInterface {
+    public:
+        Passthrough(...) : out_pipe(in_pipe) { }
+        void start() {}
+        void stop() {}
+        std::shared_ptr<Pipe<T>> &out_pipe;
+        std::shared_ptr<Pipe<T>> in_pipe;
+};
+
 #endif

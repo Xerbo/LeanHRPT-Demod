@@ -106,7 +106,7 @@ class FengyunViterbi : public Block<complex, uint8_t> {
 
 class VCDUExtractor : public Block<uint8_t, uint8_t> {
     public:
-        VCDUExtractor(bool cadu = false) : Block(1024), use_cadu(cadu) { }
+        VCDUExtractor(std::string extension) : Block(1024), use_cadu(extension != "vcdu") { }
 
         size_t work(const uint8_t *in, uint8_t *out, size_t n) {
             uint8_t frame[1024];

@@ -43,7 +43,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
             ui->constellation->repaint();
             if (fft->isVisible()) {
-                fft->load_data(demod->freq().data());
+                fft->load_data(demod->baseband().data());
             }
         }
     });
@@ -106,19 +106,37 @@ void MainWindow::on_startButton_clicked() {
         }
 
         if (ui->downlink->currentText() == "MetOp HRPT") {
-            demod = new MetopDemodulator(samp_rate, std::move(file), ui->outputFile->text().toStdString());
+            demod = new PSKDemodulator<MetopViterbi, VCDUExtractor>(samp_rate,
+                                                                    2.3333e6,
+                                                                    4,
+                                                                    false,
+                                                                    std::move(file),
+                                                                    ui->outputFile->text().toStdString());
             ui->constellation->set_lines(true, true);
             ui->constellation->num_points(4096);
         } else if (ui->downlink->currentText() == "FengYun HRPT") {
-            demod = new FengyunDemodulator(samp_rate, std::move(file), ui->outputFile->text().toStdString());
+            demod = new PSKDemodulator<FengyunViterbi, VCDUExtractor>(samp_rate,
+                                                                      2.8e6,
+                                                                      4,
+                                                                      false,
+                                                                      std::move(file),
+                                                                      ui->outputFile->text().toStdString());
             ui->constellation->set_lines(true, true);
             ui->constellation->num_points(4096);
         } else if (ui->downlink->currentText() == "NOAA GAC") {
-            demod = new GACDemodulator(samp_rate, std::move(file), ui->outputFile->text().toStdString());
+            demod = new PSKDemodulator<BinarySlicer, Passthrough<uint8_t>>(samp_rate,
+                                                                      2.661e6,
+                                                                      2,
+                                                                      true,
+                                                                      std::move(file),
+                                                                      ui->outputFile->text().toStdString());
             ui->constellation->set_lines(false, true);
             ui->constellation->num_points(2048);
         } else {
-            demod = new PMDemodulator(samp_rate, std::move(file), ui->outputFile->text().toStdString());
+            demod = new BiphaseDemodulator(samp_rate,
+                                           665.4e3,
+                                           std::move(file),
+                                           ui->outputFile->text().toStdString());
             ui->constellation->set_lines(false, true);
             ui->constellation->num_points(2048);
         }

@@ -40,7 +40,7 @@ class FileReader : public Block<Empty, complex> {
         virtual void set_antenna([[maybe_unused]] const std::string &antenna) { }
 
         static std::shared_ptr<FileReader> choose_type(std::string type, std::string filename);
-        bool neof = true;
+        bool eof = false;
 
     private:
         size_t work(complex *out, size_t n) {

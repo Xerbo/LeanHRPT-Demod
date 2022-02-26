@@ -55,7 +55,7 @@ class RawFileReader: public FileReader {
                 ptr[i] = std::complex<float>((float)buffer[i*2]*a + b, (float)buffer[i*2+1]*a + b);
             }
 
-            neof = !stream.eof();
+            eof = stream.eof();
             return stream.gcount()/2/sizeof(T);
         }
     private:

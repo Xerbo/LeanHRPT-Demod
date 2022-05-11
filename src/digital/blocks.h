@@ -49,7 +49,7 @@ class MetopViterbi : public Block<complex, uint8_t> {
 
 class FengyunViterbi : public Block<complex, uint8_t> {
     public:
-        FengyunViterbi() : iVit(0.45f, 5, true), qVit(0.45f, 5, true) { }
+        FengyunViterbi(bool fy3c_mode = false) : _fy3c_mode(fy3c_mode), iVit(0.45f, 5, true), qVit(0.45f, 5, true) { }
 
         size_t work(const complex *in, uint8_t *out, size_t n) {
             iSymbols.reserve(n/2);
@@ -67,6 +67,10 @@ class FengyunViterbi : public Block<complex, uint8_t> {
                     clamp(in[i*2     + offset].real()*127.0f, 127.0f), 
                     clamp(in[i*2 + 1 + offset].real()*127.0f, 127.0f)
                 );
+                if (_fy3c_mode) {
+                    qSymbols[i] = -qSymbols[i];
+                    std::swap(qSymbols[i], iSymbols[i]);
+                }
             }
 
             size_t iBytes, qBytes;
@@ -92,6 +96,7 @@ class FengyunViterbi : public Block<complex, uint8_t> {
             return 0;
         }
     private:
+        bool _fy3c_mode;
         Viterbi iVit;
         Viterbi qVit;
         FengyunDiff diff;
@@ -102,6 +107,11 @@ class FengyunViterbi : public Block<complex, uint8_t> {
         std::vector<uint8_t> qData;
 
         bool offset = false;
+};
+
+class Fengyun3CViterbi : public FengyunViterbi {
+    public:
+        Fengyun3CViterbi() : FengyunViterbi(true) {}
 };
 
 class VCDUExtractor : public Block<uint8_t, uint8_t> {

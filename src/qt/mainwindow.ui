@@ -95,7 +95,12 @@
          </item>
          <item>
           <property name="text">
-           <string>FengYun HRPT</string>
+           <string>FengYun 3B HRPT</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>FengYun 3C HRPT</string>
           </property>
          </item>
         </widget>

@@ -114,9 +114,18 @@ void MainWindow::on_startButton_clicked() {
                                                                     ui->outputFile->text().toStdString());
             ui->constellation->set_lines(true, true);
             ui->constellation->num_points(4096);
-        } else if (ui->downlink->currentText() == "FengYun HRPT") {
+        } else if (ui->downlink->currentText() == "FengYun 3B HRPT") {
             demod = new PSKDemodulator<FengyunViterbi, VCDUExtractor>(samp_rate,
                                                                       2.8e6,
+                                                                      4,
+                                                                      false,
+                                                                      std::move(file),
+                                                                      ui->outputFile->text().toStdString());
+            ui->constellation->set_lines(true, true);
+            ui->constellation->num_points(4096);
+        } else if (ui->downlink->currentText() == "FengYun 3C HRPT") {
+            demod = new PSKDemodulator<Fengyun3CViterbi, VCDUExtractor>(samp_rate,
+                                                                      2.6e6,
                                                                       4,
                                                                       false,
                                                                       std::move(file),

@@ -74,4 +74,5 @@ PSKDemodulator<SymbolHandler, Deframer>::PSKDemodulator(float samp_rate,
 
 template class PSKDemodulator<MetopViterbi,   VCDUExtractor>;
 template class PSKDemodulator<FengyunViterbi, VCDUExtractor>;
+template class PSKDemodulator<Fengyun3CViterbi, VCDUExtractor>;
 template class PSKDemodulator<BinarySlicer,   Passthrough<uint8_t>>;

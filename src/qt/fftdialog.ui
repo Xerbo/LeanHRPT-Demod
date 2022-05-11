@@ -152,13 +152,13 @@
   <customwidget>
    <class>QSpectrum</class>
    <extends>QWidget</extends>
-   <header>qspectrum.h</header>
+   <header>qt/qspectrum.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>QWaterfall</class>
    <extends>QWidget</extends>
-   <header>qwaterfall.h</header>
+   <header>qt/qwaterfall.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

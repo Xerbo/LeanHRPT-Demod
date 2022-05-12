@@ -30,7 +30,7 @@ class SDRSource : public FileReader {
         SDRSource(std::string device, double freq, double rate) {
             sdr = SoapySDR::Device::make(device);
             if (sdr == nullptr) {
-                throw std::runtime_error("Could not open SDR");
+                throw std::invalid_argument("Could not open SDR");
             }
 
             set_frequency(freq);
@@ -38,7 +38,7 @@ class SDRSource : public FileReader {
 
             stream = sdr->setupStream(SOAPY_SDR_RX, SOAPY_SDR_CF32);
             if (stream == nullptr) {
-                throw std::runtime_error("Could not open RX stream");
+                throw std::invalid_argument("Could not open RX stream");
             }
             sdr->activateStream(stream);
         }

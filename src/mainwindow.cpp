@@ -76,6 +76,7 @@ void MainWindow::on_startButton_clicked() {
         std::shared_ptr<FileReader> file;
         double samp_rate;
 
+        try {
         if (ui->source->currentText() == "raw") {
             file = FileReader::choose_type(ui->rawFormat->currentText().toStdString(), rawFilename.toStdString());
             samp_rate = ui->sampleRate->value()*1e6;
@@ -103,6 +104,10 @@ void MainWindow::on_startButton_clicked() {
             QString antenna = QString::fromStdString(file->antenna());
             ui->antenna->setCurrentIndex(ui->antenna->findText(antenna));
             ui->antenna->setEnabled(true);
+        }
+        } catch (std::invalid_argument &e) {
+            QMessageBox::critical(this, "Error", QString(e.what()));
+            return;
         }
 
         if (ui->downlink->currentText() == "MetOp HRPT") {

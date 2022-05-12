@@ -18,7 +18,7 @@ For those who wish to compile from source you will need `qtbase5-dev`, [`libcorr
 
 ```sh
 mkdir build && cd build
-cmake -DCMAKE_BUILD_TYPE=Relase ..
+cmake -DCMAKE_BUILD_TYPE=Release ..
 make
 ```
 You can also enable some experimental features by adding `-DEXPERIMENTAL=ON` to cmake.

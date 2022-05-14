@@ -58,16 +58,43 @@ class SDRSource : public FileReader {
             return elements;
         }
 
-        SoapySDR::RangeList rate_range()      { return sdr->getSampleRateRange(SOAPY_SDR_RX, 0); }
-        SoapySDR::RangeList frequency_range() { return sdr->getFrequencyRange(SOAPY_SDR_RX, 0); }
-        SoapySDR::Range gain_range()      { return sdr->getGainRange(SOAPY_SDR_RX, 0); }
-        double rate()      { return sdr->getSampleRate(SOAPY_SDR_RX, 0); }
-        double frequency() { return sdr->getFrequency(SOAPY_SDR_RX, 0); }
-        double gain()      { return sdr->getGain(SOAPY_SDR_RX, 0); }
-        void set_rate(double rate)           { sdr->setSampleRate(SOAPY_SDR_RX, 0, rate); }
-        void set_frequency(double frequency) { sdr->setFrequency(SOAPY_SDR_RX, 0, frequency); }
-        void set_gain(double gain)           { sdr->setGain(SOAPY_SDR_RX, 0, gain); }
+        // Sample rate control
+        SoapySDR::RangeList rate_range() {
+            return sdr->getSampleRateRange(SOAPY_SDR_RX, 0);
+        }
+        double rate() {
+            return sdr->getSampleRate(SOAPY_SDR_RX, 0);
+        }
+        void set_rate(double rate) {
+            sdr->setSampleRate(SOAPY_SDR_RX, 0, rate);
+        }
 
+        // Frequency control
+        SoapySDR::RangeList frequency_range() {
+            return sdr->getFrequencyRange(SOAPY_SDR_RX, 0);
+        }
+        double frequency() {
+            return sdr->getFrequency(SOAPY_SDR_RX, 0);
+        }
+        void set_frequency(double frequency) {
+            sdr->setFrequency(SOAPY_SDR_RX, 0, frequency);
+        }
+
+        // Gain control
+        SoapySDR::Range gain_range(const std::string &name) {
+            return sdr->getGainRange(SOAPY_SDR_RX, 0, name);
+        }
+        double gain() {
+            return sdr->getGain(SOAPY_SDR_RX, 0);
+        }
+        void set_gain(const std::string &name, double gain) {
+            sdr->setGain(SOAPY_SDR_RX, 0, name, gain);
+        }
+        std::vector<std::string> get_gains() {
+            return sdr->listGains(SOAPY_SDR_RX, 0);
+        }
+
+        // Bias tee control
         bool has_biastee() {
             for (const auto &setting : sdr->getSettingInfo()) {
                 if (setting.key == "biastee" || setting.key == "biasT_ctrl" || setting.key == "bias_tx") {
@@ -80,12 +107,19 @@ class SDRSource : public FileReader {
         }
         void set_biastee(double enabled) { sdr->writeSetting(bias_name, enabled ? "true" : "false"); }
 
-        std::vector<std::string> antennas() { return sdr->listAntennas(SOAPY_SDR_RX, 0);}
-        void set_antenna(const std::string &antenna) { return sdr->setAntenna(SOAPY_SDR_RX, 0, antenna); }
-        std::string antenna() { return sdr->getAntenna(SOAPY_SDR_RX, 0); }
+        // Antenna control
+        std::vector<std::string> antennas() {
+            return sdr->listAntennas(SOAPY_SDR_RX, 0);
+        }
+        void set_antenna(const std::string &antenna) {
+            return sdr->setAntenna(SOAPY_SDR_RX, 0, antenna);
+        }
+        std::string antenna() {
+            return sdr->getAntenna(SOAPY_SDR_RX, 0);
+        }
     private:
         SoapySDR::Device *sdr;
-        SoapySDR::Stream *stream = nullptr;
+        SoapySDR::Stream *stream;
 
         std::string bias_name;
 };

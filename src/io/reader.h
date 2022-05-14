@@ -27,17 +27,41 @@
 class FileReader : public Block<Empty, complex> {
     public:
         virtual size_t read_samples(std::complex<float> *ptr, size_t n)=0;
-        virtual double rate() { return -1; };
+        virtual double rate() {
+            return -1;
+        };
 
-        virtual void set_gain([[maybe_unused]] double gain) { };
-        virtual SoapySDR::Range gain_range() { return SoapySDR::Range(); }
+        // (SDR only) gain control
+        virtual void set_gain(const std::string &name, double gain) {
+            (void)name;
+            (void)gain;
+        };
+        virtual SoapySDR::Range gain_range(const std::string &name) {
+            (void)name;
+            return SoapySDR::Range();
+        }
+        virtual std::vector<std::string> get_gains() {
+            return {};
+        }
 
-        virtual void set_biastee([[maybe_unused]] double enabled) { };
-        virtual bool has_biastee() { return false; };
+        // (SDR only) bias tee control
+        virtual void set_biastee(double enabled) {
+            (void)enabled;
+        };
+        virtual bool has_biastee() {
+            return false;
+        };
 
-        virtual std::vector<std::string> antennas() { return {}; }
-        virtual std::string antenna() { return ""; }
-        virtual void set_antenna([[maybe_unused]] const std::string &antenna) { }
+        // (SDR only) antenna control
+        virtual std::vector<std::string> antennas() {
+            return {};
+        }
+        virtual std::string antenna() {
+            return "";
+        }
+        virtual void set_antenna(const std::string &antenna) {
+            (void)antenna;
+        }
 
         static std::shared_ptr<FileReader> choose_type(std::string type, std::string filename);
         bool eof = false;

@@ -90,10 +90,23 @@ void MainWindow::on_startButton_clicked() {
             samp_rate = file->rate();
 
             // Gain configuration
-            SoapySDR::Range range = file->gain_range();
-            ui->gain->setRange(range.minimum(), range.maximum());
-            ui->gain->setValue(0);
-            file->set_gain(0);
+            for (int i = 2; i < ui->formLayout_5->rowCount(); i++) {
+                ui->formLayout_5->removeRow(2);
+            }
+
+            for (std::string name : file->get_gains()) {
+                file->set_gain(name, 0);
+
+                QSlider *slider = new QSlider(Qt::Horizontal, this);
+                SoapySDR::Range range = file->gain_range(name);
+                slider->setRange(range.minimum(), range.maximum());
+                slider->setSingleStep(range.step());
+                ui->formLayout_5->addRow(QString::fromStdString(name), slider);
+
+                QSlider::connect(slider, &QSlider::valueChanged, [this, name](int value) {
+                    demod->file->set_gain(name, value);
+                });
+            }
 
             ui->bias->setEnabled(file->has_biastee());
 
@@ -158,7 +171,8 @@ void MainWindow::on_startButton_clicked() {
         isDemodulating = true;
         timer->start(1000.0f/30.0f);
         ui->startButton->setText("Stop");
-        ui->gain->setEnabled(true);
+        ui->optionsBox->setEnabled(true);
+        ui->setupBox->setEnabled(false);
     } else {
         QMessageBox confirm;
         confirm.setText("Are you sure you want to cancel?");
@@ -175,7 +189,8 @@ void MainWindow::on_startButton_clicked() {
         isDemodulating = false;
         timer->stop();
         ui->startButton->setText("Start");
-        ui->gain->setEnabled(false);
+        ui->optionsBox->setEnabled(false);
+        ui->setupBox->setEnabled(true);
         ui->bias->setEnabled(false);
         ui->antenna->setEnabled(false);
     }
@@ -205,12 +220,6 @@ void MainWindow::on_source_textActivated(const QString &text) {
         }
 
         ui->startButton->setEnabled(!outputFilename.isEmpty() && !ui->device->currentText().isEmpty());
-    }
-}
-
-void MainWindow::on_gain_valueChanged(int value) {
-    if (isDemodulating) {
-        demod->file->set_gain(value);
     }
 }
 

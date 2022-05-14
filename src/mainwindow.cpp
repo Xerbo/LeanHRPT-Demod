@@ -73,6 +73,18 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 
 void MainWindow::on_startButton_clicked() {
     if (ui->startButton->text() == "Start") {
+        if (QFileInfo(ui->outputFile->text()).exists()) {
+            QMessageBox confirm;
+            confirm.setText("Output file already exists. Do you wish to override it?");
+            confirm.setStandardButtons(QMessageBox::Cancel | QMessageBox::Ok);
+            confirm.setDefaultButton(QMessageBox::Cancel);
+            confirm.setIcon(QMessageBox::Warning);
+
+            if (confirm.exec() == QMessageBox::Cancel) {
+                return;
+            }
+        }
+
         std::shared_ptr<FileReader> file;
         double samp_rate;
 

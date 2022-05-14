@@ -88,6 +88,30 @@ jobs:
         name: LeanHRPT_Demod-x86_64.AppImage
         path: ./LeanHRPT_Demod-x86_64.AppImage
 
+  build_debian:
+    strategy:
+      matrix:
+        distro: [debian_bullseye, ubuntu_hirsute, ubuntu_impish, ubuntu_jammy]
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Build and run docker image
+      run: 'cd docker/ &&
+            docker build -f $DISTRO/Dockerfile . --tag build &&
+            docker run -v $GITHUB_WORKSPACE:/root/LeanHRPT-Demod build /root/build.sh'
+      env:
+        DISTRO: ${{ matrix.distro }}
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: ${{ matrix.distro }}_amd64.deb
+        path: build/LeanHRPT-Demod_amd64.deb
+
   build_windows:
     runs-on: windows-latest
 

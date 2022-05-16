@@ -102,7 +102,8 @@ void MainWindow::on_startButton_clicked() {
             samp_rate = file->rate();
 
             // Gain configuration
-            for (int i = 2; i < ui->formLayout_5->rowCount(); i++) {
+            int elements = ui->formLayout_5->rowCount();
+            for (int i = 2; i < elements; i++) {
                 ui->formLayout_5->removeRow(2);
             }
 
@@ -113,10 +114,18 @@ void MainWindow::on_startButton_clicked() {
                 SoapySDR::Range range = file->gain_range(name);
                 slider->setRange(range.minimum(), range.maximum());
                 slider->setSingleStep(range.step());
-                ui->formLayout_5->addRow(QString::fromStdString(name), slider);
 
-                QSlider::connect(slider, &QSlider::valueChanged, [this, name](int value) {
+                QLabel *label = new QLabel(this);
+                label->setText("0");
+
+                QBoxLayout *layout = new QBoxLayout(QBoxLayout::LeftToRight);
+                layout->addWidget(slider);
+                layout->addWidget(label);
+                ui->formLayout_5->addRow(QString::fromStdString(name), layout);
+
+                QSlider::connect(slider, &QSlider::valueChanged, [this, name, label](int value) {
                     demod->file->set_gain(name, value);
+                    label->setText(QString::number(value));
                 });
             }
 

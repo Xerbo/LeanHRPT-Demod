@@ -25,6 +25,7 @@
 #include <vector>
 #include "util/snr_estimator.h"
 #include "util/math.h"
+#include <iostream>
 
 #define NUM_SYMBOLS 2048
 
@@ -41,6 +42,8 @@ class QConstellation : public QWidget {
         void set_lines(bool x, bool y) {
             xline = x;
             yline = y;
+            
+            // reset SNR variables
             snrmax = 0;
             snravg = 0;
             snrtotal = 0;
@@ -55,6 +58,9 @@ class QConstellation : public QWidget {
         SNREstimator snr_est;
         std::vector<std::complex<float>> symbols;
         size_t n = 0;
+        bool xline = false;
+        bool yline = false;
+        
         double snrmax = 0;
         double snravg = 0;
         double snrtotal = 0;
@@ -62,8 +68,6 @@ class QConstellation : public QWidget {
         int snrR = 120;
         int snrG = 120;
         int snrB = 120;
-        bool xline = false;
-        bool yline = false;
 
         virtual void resizeEvent(QResizeEvent *event) {
             event->accept();
@@ -93,9 +97,12 @@ class QConstellation : public QWidget {
                 //snrB = clamp(((snr-10)*12)*2.55,0,255);
                 snrB = 0;
             }
+            
+            // Constellation background
             QPainter painter(this);
             painter.fillRect(0, 0, width(), height(), QColor(0, 0, 0));
 
+            // Constellation symbols
             QPen pen;
             pen.setWidthF(width()/100.0f);
             pen.setColor(QColor(255, 255, 70));
@@ -107,35 +114,52 @@ class QConstellation : public QWidget {
                     (symbol.imag()*0.707+1.0f) * height()/2
                 );
             }
+            
+            // Constellation divider lines
             painter.setPen(QColor(50, 50, 50));
             if (yline) painter.drawLine(width()/2, 0, width()/2, height());
             if (xline) painter.drawLine(0, height()/2, width(), height()/2);
-            painter.fillRect(width()/4, height()-height()/4-8, width()/2, height()/4, QColor(snrR, snrG, snrB));
-            painter.fillRect(width()/4+4, height()-height()/4-4, width()/2-8, height()/4-8, QColor(snrR*0.2+180, snrG*0.2+180, snrB*0.2+180));
-            painter.setPen(QColor(0, 0, 0));
+            
+            if (width() > 50){
+		    // SNR meter outline
+		    painter.fillRect(0 +width()*0.25, 0, width()*0.5, height()*0.25, QColor(snrR, snrG, snrB));
+		    
+		    // SNR meter background
+		    painter.fillRect(width()*0.02+1 +width()*0.25, height()*0.02+1, width()*0.46, height()*0.21, QColor(snrR*0.2+180, snrG*0.2+180, snrB*0.2+180));
+		    
+		    painter.setPen(QColor(0, 0, 0));
+		    QFont font = painter.font();
 
-            QFont font = painter.font();
-
-            // Current SNR readout:
-            font.setPointSize(font.pointSize() * height()/80);
-            painter.setFont(font);
-            painter.drawText(width()*0.25, height()*0.7, width()*0.5, height()*0.25, Qt::AlignCenter, QString("%1").arg(QString::number(snr, 'f', 2)));
+		    // Current SNR readout:
+		    font.setPointSize(font.pointSize() * height()/80);
+		    painter.setFont(font);
+		    painter.drawText(width()*0.02+1 +width()*0.25, height()*0.02+1 -height()*0.03, width()*0.46, height()*0.21, Qt::AlignCenter, QString("%1").arg(QString::number(snr, 'f', 2)));
+ 
+		    if (width() > 100){           
+			    // Max SNR readout:
+			    font.setPointSize(font.pointSize()/3);
+			    painter.setFont(font);
+			    painter.drawText(width()*0.02+1 -width()*0.13 +width()*0.25, height()*0.02+1 +height()*0.05, width()*0.46, height()*0.21, Qt::AlignCenter, QString("%1").arg(QString::number(snrmax, 'f', 2)));
+			    
+			    // Avg SNR readout:
+			    painter.drawText(width()*0.02+1 +width()*0.13 +width()*0.25, height()*0.02+1 +height()*0.05, width()*0.46, height()*0.21, Qt::AlignCenter, QString("%1").arg(QString::number(snravg, 'f', 2)));
+		    
+			    if (width() > 200){
+				    // Max SNR label:
+				    font.setPointSize(font.pointSize()/1.5);
+				    painter.setFont(font);
+				    painter.drawText(width()*0.02+1 -width()*0.13 +width()*0.25, height()*0.02+1 +height()*0.08, width()*0.46, height()*0.21, Qt::AlignCenter, QString("max"));
+				    
+				    // Avg SNR label:
+				    painter.drawText(width()*0.02+1 +width()*0.13 +width()*0.25, height()*0.02+1 +height()*0.08, width()*0.46, height()*0.21, Qt::AlignCenter, QString("avg"));
+				    
+				    // dB label:
+				    painter.drawText(width()*0.02+1 +width()*0.25, height()*0.02+1 +height()*0.07, width()*0.46, height()*0.21, Qt::AlignCenter, QString("dB\nSNR"));
+			    }
+		    }
+            }
             
-            // Max SNR readout:
-            font.setPointSize(font.pointSize()/3);
-            painter.setFont(font);
-            painter.drawText(width()*0.15, height()*0.8, width()*0.5, height()*0.25, Qt::AlignCenter, QString("%1").arg(QString::number(snrmax, 'f', 2)));
             
-            // Avg SNR readout:
-            painter.drawText(width()*0.35, height()*0.8, width()*0.5, height()*0.25, Qt::AlignCenter, QString("%1").arg(QString::number(snravg, 'f', 2)));
-            
-            // Max SNR label:
-            font.setPointSize(font.pointSize()/1.5);
-            painter.setFont(font);
-            painter.drawText(width()*0.15, height()*0.83, width()*0.5, height()*0.25, Qt::AlignCenter, QString("max"));
-            
-            // Avg SNR label:
-            painter.drawText(width()*0.35, height()*0.83, width()*0.5, height()*0.25, Qt::AlignCenter, QString("avg"));
         }
 };
 

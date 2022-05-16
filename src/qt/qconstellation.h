@@ -67,7 +67,7 @@ class QConstellation : public QWidget {
         int snrR = 120;
         int snrG = 120;
         int snrB = 120;
-
+        int style = 1;
         virtual void resizeEvent(QResizeEvent *event) {
             event->accept();
             if (event->size().width() < event->size().height()) {
@@ -120,22 +120,39 @@ class QConstellation : public QWidget {
 		    if (yline) painter.drawLine(width()/2, 0, width()/2, height());
 		    if (xline) painter.drawLine(0, height()/2, width(), height()/2);
 		    
-		    if (width() > 50){
-			    // SNR meter outline
-			    painter.fillRect(0 +width()*0.25, 0, width()*0.5, height()*0.25, QColor(snrR, snrG, snrB));
+		    if ((width() > 50) && (style > 0)){
 			    
-			    // SNR meter background
-			    painter.fillRect(width()*0.02+1 +width()*0.25, height()*0.02+1, width()*0.46, height()*0.21, QColor(snrR*0.2+180, snrG*0.2+180, snrB*0.2+180));
-			    
-			    painter.setPen(QColor(0, 0, 0));
-			    QFont font = painter.font();
+			    if (style == 1){
+			        // SNR meter outline
+			        painter.fillRect(0 +width()*0.25, 0, width()*0.5, height()*0.25, QColor(snrR, snrG, snrB));
+			        // SNR meter background
+			        painter.fillRect(width()*0.02+1 +width()*0.25, height()*0.02+1, width()*0.46, height()*0.21, QColor(snrR*0.2+180, snrG*0.2+180, snrB*0.2+180));
+			        
+       			        painter.setPen(QColor(0, 0, 0));
+			    }
+			    if (style == 2){
+			        // SNR meter outline
+			        painter.fillRect(0 +width()*0.25, 0, width()*0.5, height()*0.25, QColor(255, 255, 70));
+			        // SNR meter background
+			        painter.fillRect(width()*0.005+1 +width()*0.25, height()*0.005+1, width()*0.49, height()*0.24, QColor(0,0,0));
+			        
+       			        painter.setPen(QColor(255, 255, 70));
+			    }
 
 			    // Current SNR readout:
-			    font.setPointSize(font.pointSize() * height()/80);
-			    painter.setFont(font);
-			    painter.drawText(width()*0.02+1 +width()*0.25, height()*0.02+1 -height()*0.03, width()*0.46, height()*0.21, Qt::AlignCenter, QString("%1").arg(QString::number(snr, 'f', 2)));
+			    QFont font = painter.font();
+			    if (style == 1){
+				    font.setPointSize(font.pointSize() * height()/80);
+				    painter.setFont(font);
+				    painter.drawText(width()*0.02+1 +width()*0.25, height()*0.02+1 -height()*0.03, width()*0.46, height()*0.21, Qt::AlignCenter, QString("%1").arg(QString::number(snr, 'f', 2)));
+		            }
+			    if (style == 2){
+				    font.setPointSize(font.pointSize() * height()/70);
+				    painter.setFont(font);
+				    painter.drawText(width()*0.02 +width()*0.25, height()*0.02+1 , width()*0.46, height()*0.21, Qt::AlignCenter, QString("%1").arg(QString::number(snr, 'f', 2)));
+		            }
 	 
-			    if (width() > 100){           
+			    if ((width() > 100) && (style == 1)){           
 				    // Max SNR readout:
 				    font.setPointSize(font.pointSize()/3);
 				    painter.setFont(font);
@@ -158,9 +175,21 @@ class QConstellation : public QWidget {
 				    }
 			    }
 		    }
+		    if (style == 0){
+         	        painter.setPen(QColor(70, 70, 70));
+		    	painter.drawText(5, height()-105, 100, 100, Qt::AlignBottom, QString("SNR: %1 dB").arg(QString::number(snr, 'f', 2)));
+		    }
             }
             
             
+        }
+        virtual void mousePressEvent(QMouseEvent *E){
+            (void)E;
+            style += 1;
+            if (style == 3){
+                style = 0;
+            }
+            QWidget::update();
         }
 };
 

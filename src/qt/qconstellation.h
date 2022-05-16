@@ -79,8 +79,12 @@ class QConstellation : public QWidget {
 
         virtual void paintEvent([[maybe_unused]] QPaintEvent* p) override {
             snr = snr_est.get_snr(symbols.data(), symbols.size());
-            if (snr < 0) {
+            if ((snr < 0)) {
             	snr = 0;
+            }
+            if (snrstep == 0){
+            	snr = 0;
+            	snrstep += 1;
             }
             if (snr > snrmax){
                 snrmax = snr;
@@ -89,12 +93,14 @@ class QConstellation : public QWidget {
             	snrstep += 1;
             	snrtotal = (snrtotal+snr); 
             	snravg = (snrtotal/snrstep);
-            }
-            if (snr > 0){
 	        snrR = clamp((100-snr*7)*2.55,0,255);
                 snrG = clamp((snr*6.6)*2.55,0,255);
-                //snrB = clamp(((snr-10)*12)*2.55,0,255);
                 snrB = 0;
+            }
+            if (snr == 0){
+                snrR = 120;
+                snrG = 120;
+                snrB = 120;
             }
             
             if (width() > 10){

@@ -109,8 +109,8 @@ class PSKDemodulator : public Demodulator {
 
     private:
         FastDCBlocker dc_blocker;
-        AGC agc;
         FIRFilter rrc;
+        AGC agc;
 #ifdef EXPERIMENTAL
         CostasLoopSSE costas_loop;
 #else

@@ -55,6 +55,7 @@ PSKDemodulator<SymbolHandler, Deframer>::PSKDemodulator(float samp_rate,
                                                         std::string output_filename)
     : dc_blocker(0.001f),
       rrc(make_rrc(1.0, samp_rate, sym_rate, 0.6, 51)),
+      agc(0.001f, 0.707f),
       costas_loop(order, loop(0.005f), M_TAUf32 * 150e3f/samp_rate, suppress_carrier),
       clock_recovery(order, samp_rate/sym_rate, loop(0.01f)),
       deframer(QFileInfo(QString::fromStdString(output_filename)).suffix().toStdString()),
@@ -62,9 +63,9 @@ PSKDemodulator<SymbolHandler, Deframer>::PSKDemodulator(float samp_rate,
 
     file = std::move(source);
     connect(dc_blocker, file);
-    connect(agc, dc_blocker);
-    connect(rrc, agc);
-    connect(costas_loop, rrc);
+    connect(rrc, dc_blocker);
+    connect(agc, rrc);
+    connect(costas_loop, agc);
     connect(clock_recovery, costas_loop);
     connect(symbol_handler, clock_recovery);
     connect(deframer, symbol_handler);

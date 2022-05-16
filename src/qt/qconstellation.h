@@ -59,7 +59,7 @@ class QConstellation : public QWidget {
         size_t n = 0;
         bool xline = false;
         bool yline = false;
-        
+        double snr = 0;
         double snrmax = 0;
         double snravg = 0;
         double snrtotal = 0;
@@ -67,7 +67,7 @@ class QConstellation : public QWidget {
         int snrR = 120;
         int snrG = 120;
         int snrB = 120;
-        int style = 1;
+        int style = 0;
         virtual void resizeEvent(QResizeEvent *event) {
             event->accept();
             if (event->size().width() < event->size().height()) {
@@ -78,7 +78,7 @@ class QConstellation : public QWidget {
         }
 
         virtual void paintEvent([[maybe_unused]] QPaintEvent* p) override {
-            double snr = snr_est.get_snr(symbols.data(), symbols.size());
+            snr = snr_est.get_snr(symbols.data(), symbols.size());
             if (snr < 0) {
             	snr = 0;
             }
@@ -147,7 +147,7 @@ class QConstellation : public QWidget {
 				    painter.drawText(width()*0.02+1 +width()*0.25, height()*0.02+1 -height()*0.03, width()*0.46, height()*0.21, Qt::AlignCenter, QString("%1").arg(QString::number(snr, 'f', 2)));
 		            }
 			    if (style == 2){
-				    font.setPointSize(font.pointSize() * height()/70);
+				    font.setPointSize(font.pointSize() * height()/75);
 				    painter.setFont(font);
 				    painter.drawText(width()*0.02 +width()*0.25, height()*0.02+1 , width()*0.46, height()*0.21, Qt::AlignCenter, QString("%1").arg(QString::number(snr, 'f', 2)));
 		            }

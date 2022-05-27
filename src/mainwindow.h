@@ -65,6 +65,7 @@ class MainWindow : public QMainWindow {
         void on_source_textActivated(const QString &text);
         void on_bias_toggled(bool state) { demod->file->set_biastee(state); }
         void on_antenna_textActivated(const QString &text) { demod->file->set_antenna(text.toStdString()); }
+        void on_device_textActivated(const QString &text);
 
         // menuFile
         void on_actionQuit_triggered() { QApplication::quit(); }

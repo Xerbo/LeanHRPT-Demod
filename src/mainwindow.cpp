@@ -96,7 +96,12 @@ void MainWindow::on_startButton_clicked() {
             file = FileReader::choose_type("wav", wavFilename.toStdString());
             samp_rate = file->rate();
         } else {
-            std::string device = ui->device->currentText().toStdString();
+            std::string device;
+            if (ui->device->currentText() == "Custom") {
+                device = ui->customDevice->text().toStdString();
+            } else {
+                device = ui->device->currentText().toStdString();
+            }
             file = std::make_shared<SDRSource>(device, ui->frequency->value()*1e6, ui->sdrSampleRate->value()*1e6);
             // Exact sample rate of the SDR, not the target
             samp_rate = file->rate();
@@ -139,7 +144,7 @@ void MainWindow::on_startButton_clicked() {
             ui->antenna->setCurrentIndex(ui->antenna->findText(antenna));
             ui->antenna->setEnabled(true);
         }
-        } catch (std::invalid_argument &e) {
+        } catch (std::exception &e) {
             QMessageBox::critical(this, "Error", QString(e.what()));
             return;
         }
@@ -240,6 +245,8 @@ void MainWindow::on_source_textActivated(const QString &text) {
             }
         }
 
+        ui->device->addItem("Custom");
+        ui->customDevice->setEnabled(ui->device->currentText() == "Custom");
         ui->startButton->setEnabled(!outputFilename.isEmpty() && !ui->device->currentText().isEmpty());
     }
 }
@@ -279,4 +286,8 @@ void MainWindow::on_outputFile_clicked() {
     } else { // SDR
         ui->startButton->setEnabled(!outputFilename.isEmpty() && !ui->device->currentText().isEmpty());
     }
+}
+
+void MainWindow::on_device_textActivated(const QString &text) {
+    ui->customDevice->setEnabled(text == "Custom");
 }

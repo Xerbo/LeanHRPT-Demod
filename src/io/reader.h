@@ -31,6 +31,22 @@ class FileReader : public Block<Empty, complex> {
             return -1;
         };
 
+        // (SDR only) sample rate control
+        SoapySDR::RangeList rate_range() {
+            return SoapySDR::RangeList();
+        }
+        void set_rate(double rate) {
+            (void)rate;
+        }
+
+        // (SDR only) frequency control
+        virtual SoapySDR::RangeList frequency_range() {
+            return SoapySDR::RangeList();
+        }
+        virtual void set_frequency(double frequency) {
+            (void)frequency;
+        }
+
         // (SDR only) gain control
         virtual void set_gain(const std::string &name, double gain) {
             (void)name;

@@ -102,9 +102,25 @@ void MainWindow::on_startButton_clicked() {
             } else {
                 device = ui->device->currentText().toStdString();
             }
-            file = std::make_shared<SDRSource>(device, ui->frequency->value()*1e6, ui->sdrSampleRate->value()*1e6);
-            // Exact sample rate of the SDR, not the target
-            samp_rate = file->rate();
+
+            samp_rate = ui->sdrSampleRate->value()*1e6;
+            double frequency = ui->frequency->value()*1e6;
+            file = std::make_shared<SDRSource>(device);
+            file->set_rate(samp_rate);
+
+            // Check that we can satisfy this frequency
+            bool frequency_ok = false;
+            for (const auto &range : file->frequency_range()) {
+                if (frequency > range.minimum() && frequency < range.maximum()) {
+                    frequency_ok = true;
+                }
+            }
+            if (frequency_ok) {
+                file->set_frequency(frequency);
+            } else {
+                throw std::runtime_error("Could not satisfy requested frequency");
+            }
+
 
             // Gain configuration
             int elements = ui->formLayout_5->rowCount();

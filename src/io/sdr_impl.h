@@ -27,14 +27,11 @@
 
 class SDRSource : public FileReader {
     public:
-        SDRSource(std::string device, double freq, double rate) {
+        SDRSource(std::string device) {
             sdr = SoapySDR::Device::make(device);
             if (sdr == nullptr) {
                 throw std::invalid_argument("Could not open SDR");
             }
-
-            set_frequency(freq);
-            set_rate(rate);
 
             stream = sdr->setupStream(SOAPY_SDR_RX, SOAPY_SDR_CF32);
             if (stream == nullptr) {
@@ -62,9 +59,6 @@ class SDRSource : public FileReader {
         SoapySDR::RangeList rate_range() {
             return sdr->getSampleRateRange(SOAPY_SDR_RX, 0);
         }
-        double rate() {
-            return sdr->getSampleRate(SOAPY_SDR_RX, 0);
-        }
         void set_rate(double rate) {
             sdr->setSampleRate(SOAPY_SDR_RX, 0, rate);
         }
@@ -73,9 +67,6 @@ class SDRSource : public FileReader {
         SoapySDR::RangeList frequency_range() {
             return sdr->getFrequencyRange(SOAPY_SDR_RX, 0);
         }
-        double frequency() {
-            return sdr->getFrequency(SOAPY_SDR_RX, 0);
-        }
         void set_frequency(double frequency) {
             sdr->setFrequency(SOAPY_SDR_RX, 0, frequency);
         }
@@ -83,9 +74,6 @@ class SDRSource : public FileReader {
         // Gain control
         SoapySDR::Range gain_range(const std::string &name) {
             return sdr->getGainRange(SOAPY_SDR_RX, 0, name);
-        }
-        double gain() {
-            return sdr->getGain(SOAPY_SDR_RX, 0);
         }
         void set_gain(const std::string &name, double gain) {
             sdr->setGain(SOAPY_SDR_RX, 0, name, gain);
@@ -113,9 +101,6 @@ class SDRSource : public FileReader {
         }
         void set_antenna(const std::string &antenna) {
             return sdr->setAntenna(SOAPY_SDR_RX, 0, antenna);
-        }
-        std::string antenna() {
-            return sdr->getAntenna(SOAPY_SDR_RX, 0);
         }
     private:
         SoapySDR::Device *sdr;

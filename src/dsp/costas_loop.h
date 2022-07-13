@@ -63,11 +63,14 @@ class CostasLoop : public Block<complex, complex> {
                     case 4: error = phase_detector_qpsk(out[i]); break;
                     default: throw std::runtime_error("Invalid of unsupported PSK order");
                 }
-                //error = clamp(error, 1.0f);
+                error = clamp(error, 1.0f);
+                d_error = error*0.001f + d_error*0.999f;
+                float d_alpha2 = d_alpha * error*5.0f;
+                float d_beta2  = d_beta  * error*5.0f;
 
                 // Adjust frequency based on the phase error (clamping if necessary)
-                d_freq = clamp(d_freq + d_beta * error, d_max_freq);
-                d_phase = d_phase + d_freq + d_alpha * error;
+                d_freq = clamp(d_freq + d_beta2 * error, d_max_freq);
+                d_phase = d_phase + d_freq + d_alpha2 * error;
 
                 // Could also use std::remainder here
                 // But is faster due to the miniscule changes in d_phase
@@ -84,6 +87,7 @@ class CostasLoop : public Block<complex, complex> {
         const float d_max_freq;
         const bool d_dc_block;
 
+        float d_error = 1;
         float d_freq = 0.0f;
         float d_phase = 0.0f;
         std::complex<float> accumulator;

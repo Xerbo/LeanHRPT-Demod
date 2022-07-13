@@ -28,6 +28,7 @@
 #include "dsp/agc.h"
 #include "dsp/clock_recovery.h"
 #include "dsp/binary_slicer.h"
+#include "dsp/complex_to_char.h"
 #include "util/pipe.hh"
 #include "io/writer.h"
 #include "digital/blocks.h"
@@ -95,7 +96,7 @@ class BiphaseDemodulator : public Demodulator {
         
 };
 
-template<class SymbolHandler, class Deframer>
+template<class SymbolHandler, class Deframer, typename OutputType = uint8_t>
 class PSKDemodulator : public Demodulator {
     public:
         PSKDemodulator(float samp_rate,
@@ -119,7 +120,7 @@ class PSKDemodulator : public Demodulator {
         SymbolSync clock_recovery;
         SymbolHandler symbol_handler;
         Deframer deframer;
-        FileWriter<uint8_t> out;
+        FileWriter<OutputType> out;
 };
 
 #endif

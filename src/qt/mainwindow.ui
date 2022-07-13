@@ -103,6 +103,11 @@
            <string>FengYun 3C HRPT</string>
           </property>
          </item>
+         <item>
+          <property name="text">
+           <string>Meteor M2 LRPT</string>
+          </property>
+         </item>
         </widget>
        </item>
        <item row="2" column="0" colspan="2">

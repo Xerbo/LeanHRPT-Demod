@@ -35,7 +35,7 @@ class WAVFileReader: public FileReader {
             if (file.channels() != 2) {
                 throw std::invalid_argument("WAVFileReader: file does not have 2 channels");
             }
-            if (file.samplerate() < 1e6) {
+            if (file.samplerate() < 100e3) {
                 throw std::invalid_argument("WAVFileReader: sample rate not high enough");
             }
         }

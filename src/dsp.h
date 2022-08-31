@@ -103,6 +103,7 @@ class PSKDemodulator : public Demodulator {
                        float sym_rate,
                        size_t order,
                        bool suppress_carrier,
+                       float costas_bw,
                        std::shared_ptr<FileReader> source,
                        std::string output_filename);
         std::vector<complex> &symbols() { return symbol_handler.in; }

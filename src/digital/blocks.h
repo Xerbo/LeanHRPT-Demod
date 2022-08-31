@@ -26,7 +26,27 @@
 #include "derand.h"
 #include "reedsolomon.h"
 #include "viterbi.h"
+#include "viterbi_lrpt.h"
 #include "diff.h"
+
+class LrptViterbiBlock : public Block<complex, uint8_t> {
+    public:
+        LrptViterbiBlock() : vit(0.45f, 5) { }
+
+        size_t work(const complex *in, uint8_t *out, size_t n) {
+            symbols.reserve(n);
+            for (size_t i = 0; i < n; i++) {
+                float real = clamp(in[i].real()*127.0f, 127.0f);
+                float imag = clamp(in[i].imag()*127.0f, 127.0f);
+                symbols[i] = std::complex<int8_t>(real, imag);
+            }
+
+            return vit.work(symbols.data(), out, BUFFER_SIZE);
+        }
+    private:
+        LrptViterbi vit;
+        std::vector<std::complex<int8_t>> symbols;
+};
 
 class MetopViterbi : public Block<complex, uint8_t> {
     public:
@@ -116,13 +136,13 @@ class Fengyun3CViterbi : public FengyunViterbi {
 
 class VCDUExtractor : public Block<uint8_t, uint8_t> {
     public:
-        VCDUExtractor(std::string extension) : Block(1024), use_cadu(extension != "vcdu") { }
+        VCDUExtractor(std::string extension, bool ccsds = true) : Block(1024), use_cadu(extension != "vcdu"), d_ccsds(ccsds) { }
 
         size_t work(const uint8_t *in, uint8_t *out, size_t n) {
             uint8_t frame[1024];
             if (deframer.work(in, frame, n)) {
                 derand.work(frame, 1024);
-                rs.decode_intreleaved_ccsds(frame);
+                rs.decode_intreleaved(frame, d_ccsds);
 
                 if (use_cadu) {
                     std::memcpy(out, frame, 1024);
@@ -140,9 +160,15 @@ class VCDUExtractor : public Block<uint8_t, uint8_t> {
         }
     private:
         const bool use_cadu;
+        const bool d_ccsds;
         ccsds::Deframer deframer;
         ccsds::Derand derand;
         SatHelper::ReedSolomon rs;
+};
+
+class MeteorVCDUExtractor : public VCDUExtractor {
+    public:
+        MeteorVCDUExtractor(std::string extension) : VCDUExtractor(extension, false) {}
 };
 
 #endif

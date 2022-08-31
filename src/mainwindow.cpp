@@ -170,6 +170,7 @@ void MainWindow::on_startButton_clicked() {
                                                                     2.3333e6,
                                                                     4,
                                                                     false,
+                                                                    0.001f,
                                                                     std::move(file),
                                                                     ui->outputFile->text().toStdString());
             ui->constellation->set_lines(true, true);
@@ -179,6 +180,7 @@ void MainWindow::on_startButton_clicked() {
                                                                       2.8e6,
                                                                       4,
                                                                       false,
+                                                                      0.001f,
                                                                       std::move(file),
                                                                       ui->outputFile->text().toStdString());
             ui->constellation->set_lines(true, true);
@@ -188,6 +190,7 @@ void MainWindow::on_startButton_clicked() {
                                                                       2.6e6,
                                                                       4,
                                                                       false,
+                                                                      0.001f,
                                                                       std::move(file),
                                                                       ui->outputFile->text().toStdString());
             ui->constellation->set_lines(true, true);
@@ -197,15 +200,17 @@ void MainWindow::on_startButton_clicked() {
                                                                       2.661e6,
                                                                       2,
                                                                       true,
+                                                                      0.001f,
                                                                       std::move(file),
                                                                       ui->outputFile->text().toStdString());
             ui->constellation->set_lines(false, true);
             ui->constellation->num_points(2048);
         } if (ui->downlink->currentText() == "Meteor M2 LRPT") {
-            demod = new PSKDemodulator<ComplexToChar, Passthrough<std::complex<char>>, std::complex<char>>(samp_rate,
+            demod = new PSKDemodulator<LrptViterbiBlock, MeteorVCDUExtractor>(samp_rate,
                                                                       72e3,
                                                                       4,
                                                                       true,
+                                                                      0.005f,
                                                                       std::move(file),
                                                                       ui->outputFile->text().toStdString());
             ui->constellation->set_lines(false, true);
@@ -301,7 +306,7 @@ void MainWindow::on_outputFile_clicked() {
     } else if (ui->downlink->currentText() == "FengYun 3C HRPT") {
         _outputFilename = QFileDialog::getSaveFileName(this, "Select Output File", "", "VCDUs (*.vcdu);;CADUs (*.cadu)");
     } else if (ui->downlink->currentText() == "Meteor M2 LRPT") {
-        _outputFilename = QFileDialog::getSaveFileName(this, "Select Output File", "", "Soft Symbols (*.s)");
+        _outputFilename = QFileDialog::getSaveFileName(this, "Select Output File", "", "VCDUs (*.vcdu);;CADUs (*.cadu)");
     } else {
         _outputFilename = QFileDialog::getSaveFileName(this, "Select Output File", "", "Binary (*.bin)");
     }

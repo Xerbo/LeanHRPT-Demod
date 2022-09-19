@@ -107,7 +107,7 @@ class PSKDemodulator : public Demodulator {
                        std::shared_ptr<FileReader> source,
                        std::string output_filename);
         std::vector<complex> &symbols() { return symbol_handler.in; }
-        std::vector<complex> &baseband() { return agc.in; }
+        std::vector<complex> &baseband() { return rrc.in; }
 
     private:
         FastDCBlocker dc_blocker;

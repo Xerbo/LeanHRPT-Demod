@@ -206,14 +206,14 @@ void MainWindow::on_startButton_clicked() {
             ui->constellation->set_lines(false, true);
             ui->constellation->num_points(2048);
         } if (ui->downlink->currentText() == "Meteor M2 LRPT") {
-            demod = new PSKDemodulator<LrptViterbiBlock, MeteorVCDUExtractor>(samp_rate,
+            demod = new PSKDemodulator<CCSDSCorrelator, Passthrough<uint8_t>>(samp_rate,
                                                                       72e3,
                                                                       4,
                                                                       true,
                                                                       0.005f,
                                                                       std::move(file),
                                                                       ui->outputFile->text().toStdString());
-            ui->constellation->set_lines(false, true);
+            ui->constellation->set_lines(true, true);
             ui->constellation->num_points(2048);
         } else {
             demod = new BiphaseDemodulator(samp_rate,
@@ -306,7 +306,7 @@ void MainWindow::on_outputFile_clicked() {
     } else if (ui->downlink->currentText() == "FengYun 3C HRPT") {
         _outputFilename = QFileDialog::getSaveFileName(this, "Select Output File", "", "VCDUs (*.vcdu);;CADUs (*.cadu)");
     } else if (ui->downlink->currentText() == "Meteor M2 LRPT") {
-        _outputFilename = QFileDialog::getSaveFileName(this, "Select Output File", "", "VCDUs (*.vcdu);;CADUs (*.cadu)");
+        _outputFilename = QFileDialog::getSaveFileName(this, "Select Output File", "", "CADUs (*.cadu);;VCDUs (*.vcdu)");
     } else {
         _outputFilename = QFileDialog::getSaveFileName(this, "Select Output File", "", "Binary (*.bin)");
     }

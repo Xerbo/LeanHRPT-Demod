@@ -21,6 +21,7 @@
 
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QScreen>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     ui = new Ui::MainWindow;
@@ -41,7 +42,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
                 ui->constellation->push_sample(symbols[i]);
             }
 
-            ui->constellation->repaint();
+            ui->constellation->update();
             if (fft->isVisible()) {
                 fft->load_data(demod->baseband().data());
             }
@@ -211,7 +212,8 @@ void MainWindow::on_startButton_clicked() {
         }
 
         isDemodulating = true;
-        timer->start(1000.0f/30.0f);
+        double refresh_rate = screen()->refreshRate();
+        timer->start(1000.0/refresh_rate);
         ui->startButton->setText("Stop");
         ui->optionsBox->setEnabled(true);
         ui->setupBox->setEnabled(false);

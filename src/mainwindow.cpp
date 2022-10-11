@@ -166,6 +166,7 @@ void MainWindow::on_startButton_clicked() {
             return;
         }
 
+        // TODO: use make_demod
         if (ui->downlink->currentText() == "MetOp HRPT") {
             demod = new PSKDemodulator<MetopViterbi, VCDUExtractor>(samp_rate,
                                                                     2.3333e6,

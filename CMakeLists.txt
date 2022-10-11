@@ -52,7 +52,7 @@ target_link_libraries(LeanHRPT-Demod PRIVATE sndfile)
 target_link_libraries(LeanHRPT-Demod PRIVATE fftw3f)
 target_link_libraries(LeanHRPT-Demod PRIVATE SoapySDR)
 
-if(USE_ADDRESSS_SANITIZER)
+if(USE_ADDRESS_SANITIZER)
     target_compile_options(LeanHRPT-Demod PRIVATE -fsanitize=address -fno-omit-frame-pointer)
     target_link_options(LeanHRPT-Demod PRIVATE -fsanitize=address)
 endif()

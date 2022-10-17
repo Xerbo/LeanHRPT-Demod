@@ -27,145 +27,6 @@
 #include "reedsolomon.h"
 #include "viterbi.h"
 #include "diff.h"
-#include "correlator.h"
-#include "packetfixer.h"
-
-const std::vector<uint64_t> CCSDS_QPSK_SYNC = {
-    0xfca2b63db00d9794,
-    0x56fbd394daa4c1c2,
-    0x035d49c24ff2686b,
-    0xa9042c6b255b3e3d,
-    0xfc51793e700e6b68,
-    0xa9f7e368e558c2c1,
-    0x03ae86c18ff19497,
-    0x56081c971aa73d3e
-};
-const std::vector<uint64_t> CCSDS_BPSK_SYNC = {
-    0xfca2b63db00d9794,
-    0x035d49c24ff2686b
-};
-
-class CCSDSCorrelator : public Block<complex, uint8_t> {
-    public:
-        CCSDSCorrelator(size_t frame_size = 16384, std::vector<uint64_t> syncwords = CCSDS_QPSK_SYNC) : d_frame_size(frame_size) {
-            for (const auto &syncword : syncwords) {
-                correlator.addWord(syncword);
-            }
-
-            frame.resize(frame_size);
-            decoded.resize(frame_size/16);
-            d_conv = correct_convolutional_sse_create(2, 7, new uint16_t[2]{0x4F, 0x6D});
-        }
-        ~CCSDSCorrelator() {
-            correct_convolutional_sse_destroy(d_conv);
-        }
-
-        size_t work(const complex *in, uint8_t *out, size_t n) {
-            bool have_frame = false;
-            size_t nsymbols;
-
-            switch (correlator.getCorrelationWordCount()) {
-                case 2: // BPSK
-                    nsymbols = n;
-                    deinterleaved.reserve(nsymbols+64);
-
-                    for (size_t i = 0; i < 64; i++) deinterleaved[i] = wraparound[i];
-                    for (size_t i = 0; i < n; i++) {
-                        deinterleaved[i] = map_symbol(in[i].real());
-                    }
-                    for (size_t i = 0; i < 64; i++) wraparound[i] = deinterleaved[nsymbols + i];
-                    break;
-                case 8: // QPSK
-                    nsymbols = n*2;
-                    deinterleaved.reserve(nsymbols+64);
-
-                    for (size_t i = 0; i < 64; i++) deinterleaved[i] = wraparound[i];
-                    for (size_t i = 0; i < n; i++) {
-                        deinterleaved[64 + i * 2 + 0] = map_symbol(in[i].real());
-                        deinterleaved[64 + i * 2 + 1] = map_symbol(in[i].imag());
-                    }
-                    for (size_t i = 0; i < 64; i++) wraparound[i] = deinterleaved[nsymbols + i];
-                    break;
-                default:
-                    throw std::runtime_error("CCSDSCorrelator: Unknown modulation");
-            }
-
-            if (frame_pos != 0) {
-                size_t symbols_needed = d_frame_size - frame_pos;
-                for (size_t i = 0; i < std::min(symbols_needed, nsymbols); i++) {
-                    frame[frame_pos++] = deinterleaved[i];
-                }
-
-                if (frame_pos == d_frame_size) {
-                    frame_pos = 0;
-
-                    fixer.fixPacket(frame.data(), d_frame_size, shift, invert);
-                    correct_convolutional_sse_decode_soft(d_conv, frame.data(), d_frame_size, decoded.data());
-                    derand.work(decoded.data(), d_frame_size/16);
-                    std::vector<ssize_t> errors = rs.decode_intreleaved(decoded.data(), false);
-
-                    uint8_t VCID = decoded[5] & 0x3f;
-                    if (VCID != 63 && (errors[0] != -1 || errors[1] != -1 || errors[2] != -1 || errors[3] != -1)) {
-                        decoded[0] = 0x1A;
-                        decoded[1] = 0xCF;
-                        decoded[2] = 0xFC;
-                        decoded[3] = 0x1D;
-                        memcpy(out, decoded.data(), d_frame_size/16);
-                        have_frame = true;
-                    }
-                }
-            }
-
-            correlator.correlate(deinterleaved.data(), nsymbols+64);
-            uint32_t highest_correlation = correlator.getHighestCorrelation();
-            uint32_t word = correlator.getCorrelationWordNumber();
-            uint32_t pos = correlator.getHighestCorrelationPosition();
-
-            if (frame_pos == 0 && highest_correlation > 10) {
-                switch (correlator.getCorrelationWordCount()) {
-                    case 2: // BPSK
-                        invert = word > 1;
-                        shift = SatHelper::PhaseShift::DEG_0;
-                        break;
-                    case 8: // QPSK
-                        invert = word > 3;
-                        shift = (SatHelper::PhaseShift)(word % 4);
-                        break;
-                    default:
-                        throw std::runtime_error("CCSDSCorrelator: Unknown modulation");
-                }
-
-                for (size_t i = pos; i < nsymbols; i++) {
-                    frame[frame_pos++] = deinterleaved[i];
-                }
-            }
-
-            return have_frame ? d_frame_size/16 : 0;
-        }
-
-    private:
-        const size_t d_frame_size;
-        std::vector<uint8_t> deinterleaved;
-        std::vector<uint8_t> frame;
-        std::vector<uint8_t> decoded;
-        uint8_t wraparound[64];
-
-        SatHelper::Correlator correlator;
-        SatHelper::PacketFixer fixer;
-        correct_convolutional_sse *d_conv;
-        SatHelper::ReedSolomon rs;
-        ccsds::Derand derand;
-
-        size_t frame_pos = 0;
-        bool invert;
-        SatHelper::PhaseShift shift;
-
-        uint8_t map_symbol(float x) {
-            uint8_t y = clamp(x*50.0f + 127.0f, 0, UINT8_MAX);
-            if (y == 128) y = 127;
-            return y;
-        }
-};
 
 class MetopViterbi : public Block<complex, uint8_t> {
     public:
@@ -255,13 +116,13 @@ class Fengyun3CViterbi : public FengyunViterbi {
 
 class VCDUExtractor : public Block<uint8_t, uint8_t> {
     public:
-        VCDUExtractor(std::string extension, bool ccsds = true) : Block(1024), use_cadu(extension != "vcdu"), d_ccsds(ccsds) { }
+        VCDUExtractor(std::string extension) : Block(1024), use_cadu(extension != "vcdu") { }
 
         size_t work(const uint8_t *in, uint8_t *out, size_t n) {
             uint8_t frame[1024];
             if (deframer.work(in, frame, n)) {
                 derand.work(frame, 1024);
-                rs.decode_intreleaved(frame, d_ccsds);
+                rs.decode_intreleaved_ccsds(frame);
 
                 if (use_cadu) {
                     std::memcpy(out, frame, 1024);
@@ -279,15 +140,9 @@ class VCDUExtractor : public Block<uint8_t, uint8_t> {
         }
     private:
         const bool use_cadu;
-        const bool d_ccsds;
         ccsds::Deframer deframer;
         ccsds::Derand derand;
         SatHelper::ReedSolomon rs;
-};
-
-class MeteorVCDUExtractor : public VCDUExtractor {
-    public:
-        MeteorVCDUExtractor(std::string extension) : VCDUExtractor(extension, false) {}
 };
 
 #endif

@@ -165,59 +165,27 @@ void MainWindow::on_startButton_clicked() {
             return;
         }
 
-        if (ui->downlink->currentText() == "MetOp HRPT") {
-            demod = new PSKDemodulator<MetopViterbi, VCDUExtractor>(samp_rate,
-                                                                    2.3333e6,
+        if (ui->downlink->currentText() == "BPSK") {
+            demod = new PSKDemodulator<BinarySlicer, Passthrough<uint8_t>>(samp_rate,
+                                                                    ui->symRate->value(),
+                                                                    2,
+                                                                    ui->dcBlock->isChecked(),
+                                                                    std::move(file),
+                                                                    ui->outputFile->text().toStdString());
+            ui->constellation->set_lines(true, true);
+            ui->constellation->num_points(2048);
+        } else if (ui->downlink->currentText() == "QPSK") {
+            demod = new PSKDemodulator<BinarySlicer2, Passthrough<uint8_t>>(samp_rate,
+                                                                    ui->symRate->value(),
                                                                     4,
-                                                                    false,
-                                                                    0.001f,
+                                                                    ui->dcBlock->isChecked(),
                                                                     std::move(file),
                                                                     ui->outputFile->text().toStdString());
             ui->constellation->set_lines(true, true);
             ui->constellation->num_points(4096);
-        } else if (ui->downlink->currentText() == "FengYun 3B HRPT") {
-            demod = new PSKDemodulator<FengyunViterbi, VCDUExtractor>(samp_rate,
-                                                                      2.8e6,
-                                                                      4,
-                                                                      false,
-                                                                      0.001f,
-                                                                      std::move(file),
-                                                                      ui->outputFile->text().toStdString());
-            ui->constellation->set_lines(true, true);
-            ui->constellation->num_points(4096);
-        } else if (ui->downlink->currentText() == "FengYun 3C HRPT") {
-            demod = new PSKDemodulator<Fengyun3CViterbi, VCDUExtractor>(samp_rate,
-                                                                      2.6e6,
-                                                                      4,
-                                                                      false,
-                                                                      0.001f,
-                                                                      std::move(file),
-                                                                      ui->outputFile->text().toStdString());
-            ui->constellation->set_lines(true, true);
-            ui->constellation->num_points(4096);
-        } else if (ui->downlink->currentText() == "NOAA GAC") {
-            demod = new PSKDemodulator<BinarySlicer, Passthrough<uint8_t>>(samp_rate,
-                                                                      2.661e6,
-                                                                      2,
-                                                                      true,
-                                                                      0.001f,
-                                                                      std::move(file),
-                                                                      ui->outputFile->text().toStdString());
-            ui->constellation->set_lines(false, true);
-            ui->constellation->num_points(2048);
-        } if (ui->downlink->currentText() == "Meteor M2 LRPT") {
-            demod = new PSKDemodulator<CCSDSCorrelator, Passthrough<uint8_t>>(samp_rate,
-                                                                      72e3,
-                                                                      4,
-                                                                      true,
-                                                                      0.005f,
-                                                                      std::move(file),
-                                                                      ui->outputFile->text().toStdString());
-            ui->constellation->set_lines(true, true);
-            ui->constellation->num_points(2048);
         } else {
             demod = new BiphaseDemodulator(samp_rate,
-                                           665.4e3,
+                                           ui->symRate->value(),
                                            std::move(file),
                                            ui->outputFile->text().toStdString());
             ui->constellation->set_lines(false, true);
@@ -299,18 +267,11 @@ void MainWindow::on_rawInput_clicked() {
 }
 void MainWindow::on_outputFile_clicked() {
     QString _outputFilename;
-    if (ui->downlink->currentText() == "MetOp HRPT") {
+    if (ui->downlink->currentText() != "NOAA/Meteor HRPT" && ui->downlink->currentText() != "NOAA GAC") {
         _outputFilename = QFileDialog::getSaveFileName(this, "Select Output File", "", "VCDUs (*.vcdu);;CADUs (*.cadu)");
-    } else if (ui->downlink->currentText() == "FengYun 3B HRPT") {
-        _outputFilename = QFileDialog::getSaveFileName(this, "Select Output File", "", "VCDUs (*.vcdu);;CADUs (*.cadu)");
-    } else if (ui->downlink->currentText() == "FengYun 3C HRPT") {
-        _outputFilename = QFileDialog::getSaveFileName(this, "Select Output File", "", "VCDUs (*.vcdu);;CADUs (*.cadu)");
-    } else if (ui->downlink->currentText() == "Meteor M2 LRPT") {
-        _outputFilename = QFileDialog::getSaveFileName(this, "Select Output File", "", "CADUs (*.cadu);;VCDUs (*.vcdu)");
     } else {
         _outputFilename = QFileDialog::getSaveFileName(this, "Select Output File", "", "Binary (*.bin)");
     }
-
     if (_outputFilename.isEmpty()) return;
 
     outputFilename = _outputFilename;

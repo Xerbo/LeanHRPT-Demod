@@ -28,8 +28,8 @@
 #include "dsp.h"
 #include "fftdialog.h"
 
-#define ABOUT_TEXT "<h2>LeanHRPT Demod</h2>\
-An easy to use HRPT demodulator<br/>\
+#define ABOUT_TEXT "<h2>LeanHRPT Generic Demod</h2>\
+An easy to use demodulator<br/>\
 Licensed under GPL-3.0.\
 <p>Version: " VERSION "</p>"
 

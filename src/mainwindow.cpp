@@ -267,11 +267,7 @@ void MainWindow::on_rawInput_clicked() {
 }
 void MainWindow::on_outputFile_clicked() {
     QString _outputFilename;
-    if (ui->downlink->currentText() != "NOAA/Meteor HRPT" && ui->downlink->currentText() != "NOAA GAC") {
-        _outputFilename = QFileDialog::getSaveFileName(this, "Select Output File", "", "VCDUs (*.vcdu);;CADUs (*.cadu)");
-    } else {
-        _outputFilename = QFileDialog::getSaveFileName(this, "Select Output File", "", "Binary (*.bin)");
-    }
+    _outputFilename = QFileDialog::getSaveFileName(this, "Select Output File", "", "Binary (*.bin)");
     if (_outputFilename.isEmpty()) return;
 
     outputFilename = _outputFilename;

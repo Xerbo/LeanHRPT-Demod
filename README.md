@@ -1,6 +1,6 @@
 # LeanHRPT Generic Demod
 
-A generic demodulator. For the original software [LeanHRPT Demod](https://github.com/Xerbo/LeanHRPT-Demod) and [LeanHRPT Decode](https://github.com/Xerbo/LeanHRPT-Decode).
+A generic demodulator. For the original software see [LeanHRPT Demod](https://github.com/Xerbo/LeanHRPT-Demod) and [LeanHRPT Decode](https://github.com/Xerbo/LeanHRPT-Decode).
 
 ![Screenshot of LeanHRPT-Demod demodulating Cloudsat](images/example.webp)
 

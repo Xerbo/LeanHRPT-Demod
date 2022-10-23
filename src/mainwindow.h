@@ -49,6 +49,8 @@ class MainWindow : public QMainWindow {
         bool isDemodulating = false;
         void closeEvent(QCloseEvent *event);
 
+        void setOutputFilename(QString filename);
+
         Demodulator *demod;
         QTimer *timer;
 

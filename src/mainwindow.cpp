@@ -270,21 +270,37 @@ void MainWindow::on_source_textActivated(const QString &text) {
     }
 }
 
+static QString auto_filename(QString input, QString downlink) {
+    QString extension;
+    if (downlink == "NOAA/Meteor HRPT" || downlink == "NOAA GAC") {
+        extension = "bin";
+    } else {
+        extension = "vcdu";
+    }
+
+    QFileInfo fi(input);
+    return fi.dir().absolutePath() + "/" + fi.completeBaseName() + "." + extension;
+}
+
 void MainWindow::on_wavInput_clicked() {
     QString _inputFilename = QFileDialog::getOpenFileName(this, "Select Input File", "", "Baseband (*.wav)");
     if (_inputFilename.isEmpty()) return;
 
     wavFilename = _inputFilename;
     ui->wavInput->setText(wavFilename);
-    ui->startButton->setEnabled(!outputFilename.isEmpty() && !wavFilename.isEmpty());
+    setOutputFilename(auto_filename(wavFilename, ui->downlink->currentText()));
+
+    ui->startButton->setEnabled(!outputFilename.isEmpty() && !wavFilename.isEmpty());    
 }
 void MainWindow::on_rawInput_clicked() {
-    QString _inputFilename = QFileDialog::getOpenFileName(this, "Select Input File", "", "Baseband (*.bin *.raw)");
+    QString _inputFilename = QFileDialog::getOpenFileName(this, "Select Input File", "", "Baseband (*.bin *.raw *.c32)");
     if (_inputFilename.isEmpty()) return;
 
     rawFilename = _inputFilename;
     ui->rawInput->setText(rawFilename);
-    ui->startButton->setEnabled(!outputFilename.isEmpty() && !rawFilename.isEmpty());
+    setOutputFilename(auto_filename(rawFilename, ui->downlink->currentText()));
+
+    ui->startButton->setEnabled(!outputFilename.isEmpty() && !rawFilename.isEmpty());  
 }
 void MainWindow::on_outputFile_clicked() {
     QString _outputFilename;
@@ -293,9 +309,14 @@ void MainWindow::on_outputFile_clicked() {
     } else {
         _outputFilename = QFileDialog::getSaveFileName(this, "Select Output File", "", "Binary (*.bin)");
     }
-    if (_outputFilename.isEmpty()) return;
 
-    outputFilename = _outputFilename;
+    setOutputFilename(_outputFilename);
+}
+
+void MainWindow::setOutputFilename(QString filename) {
+    if (filename.isEmpty()) return;
+
+    outputFilename = filename;
     ui->outputFile->setText(outputFilename);
 
     if (ui->source->currentText() == "WAV") { 

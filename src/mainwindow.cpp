@@ -213,7 +213,12 @@ void MainWindow::on_startButton_clicked() {
         }
 
         isDemodulating = true;
+#if QT_VERSION >= 0x050E00
+        // This is bad, should be using something like requestUpdate instead
         double refresh_rate = screen()->refreshRate();
+#else
+        double refresh_rate = 30.0;
+#endif
         timer->start(1000.0/refresh_rate);
         ui->startButton->setText("Stop");
         ui->optionsBox->setEnabled(true);
@@ -241,7 +246,7 @@ void MainWindow::on_startButton_clicked() {
     }
 }
 
-void MainWindow::on_source_textActivated(const QString &text) {
+void MainWindow::on_source_currentTextChanged(const QString &text) {
     if (text == "WAV") { 
         ui->startButton->setEnabled(!outputFilename.isEmpty() && !wavFilename.isEmpty());
     } else if (text == "raw") {
@@ -328,6 +333,6 @@ void MainWindow::setOutputFilename(QString filename) {
     }
 }
 
-void MainWindow::on_device_textActivated(const QString &text) {
+void MainWindow::on_device_currentTextChanged(const QString &text) {
     ui->customDevice->setEnabled(text == "Custom");
 }

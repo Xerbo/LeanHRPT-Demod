@@ -56,6 +56,8 @@ class MainWindow : public QMainWindow {
         QString rawFilename;
         QString outputFilename;
     private slots:
+        void on_preset_currentIndexChanged(int index);
+        void on_preset_currentTextChanged(const QString &text);
         void on_startButton_clicked();
 
         void on_wavInput_clicked();

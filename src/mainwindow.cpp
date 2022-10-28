@@ -71,6 +71,54 @@ void MainWindow::closeEvent(QCloseEvent *event) {
     }
 }
 
+void MainWindow::on_preset_currentIndexChanged(int index){
+    if (index == 0){
+        ui->downlink->setDisabled(false);
+        ui->symRate->setDisabled(false);
+        ui->dcBlock->setDisabled(false);
+    } else {
+        ui->downlink->setDisabled(true);
+        ui->symRate->setDisabled(true);
+        ui->dcBlock->setDisabled(true);
+    }
+}
+
+void MainWindow::on_preset_currentTextChanged(const QString &text){
+    if (text == "ARGOS-4/Gazelle L-band A-DCS"){
+        ui->downlink->setCurrentText("QPSK");
+        ui->symRate->setValue(1000000);
+        ui->dcBlock->setChecked(false);
+    } else if (text == "CloudSat CPR"){
+        ui->downlink->setCurrentText("BPSK");
+        ui->symRate->setValue(1000000);
+        ui->dcBlock->setChecked(false);
+    } else if (text == "Meteor-M HRPT") {
+        ui->downlink->setCurrentText("Split-phase BPSK");
+        ui->symRate->setValue(665400);
+        ui->dcBlock->setChecked(false);
+    } else if (text == "Meteor-M TLM 32k") {
+        ui->downlink->setCurrentText("Split-phase BPSK");
+        ui->symRate->setValue(32000);
+        ui->dcBlock->setChecked(false);
+    } else if (text == "Elektro-L TLM 8k") {
+        ui->downlink->setCurrentText("Split-phase BPSK");
+        ui->symRate->setValue(8000);
+        ui->dcBlock->setChecked(false);
+    } else if (text == "MetOp HRPT"){
+        ui->downlink->setCurrentText("QPSK");
+        ui->symRate->setValue(2333333);
+        ui->dcBlock->setChecked(false);
+    } else if (text == "NOAA POES GAC"){
+        ui->downlink->setCurrentText("BPSK");
+        ui->symRate->setValue(2660000);
+        ui->dcBlock->setChecked(true);
+    } else if (text == "NOAA POES HRPT"){
+        ui->downlink->setCurrentText("Split-phase BPSK");
+        ui->symRate->setValue(665400);
+        ui->dcBlock->setChecked(false);
+    }
+}
+
 void MainWindow::on_startButton_clicked() {
     if (ui->startButton->text() == "Start") {
         if (QFileInfo(ui->outputFile->text()).exists()) {

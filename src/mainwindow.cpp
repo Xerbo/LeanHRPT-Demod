@@ -71,51 +71,35 @@ void MainWindow::closeEvent(QCloseEvent *event) {
     }
 }
 
-void MainWindow::on_preset_currentIndexChanged(int index){
-    if (index == 0){
-        ui->downlink->setDisabled(false);
-        ui->symRate->setDisabled(false);
-        ui->dcBlock->setDisabled(false);
-    } else {
-        ui->downlink->setDisabled(true);
+void MainWindow::on_downlink_currentTextChanged(const QString &text){
+    if (text == "NOAA/Meteor-M HRPT") {
+        ui->symRate->setValue(665400);
+        ui->dcBlock->setChecked(false);
         ui->symRate->setDisabled(true);
         ui->dcBlock->setDisabled(true);
-    }
-}
-
-void MainWindow::on_preset_currentTextChanged(const QString &text){
-    if (text == "ARGOS-4/Gazelle L-band A-DCS"){
-        ui->downlink->setCurrentText("QPSK");
-        ui->symRate->setValue(1000000);
-        ui->dcBlock->setChecked(false);
-    } else if (text == "CloudSat CPR"){
-        ui->downlink->setCurrentText("BPSK");
-        ui->symRate->setValue(1000000);
-        ui->dcBlock->setChecked(false);
-    } else if (text == "Meteor-M HRPT") {
-        ui->downlink->setCurrentText("Split-phase BPSK");
-        ui->symRate->setValue(665400);
-        ui->dcBlock->setChecked(false);
-    } else if (text == "Meteor-M TLM 32k") {
-        ui->downlink->setCurrentText("Split-phase BPSK");
-        ui->symRate->setValue(32000);
-        ui->dcBlock->setChecked(false);
-    } else if (text == "Elektro-L TLM 8k") {
-        ui->downlink->setCurrentText("Split-phase BPSK");
-        ui->symRate->setValue(8000);
-        ui->dcBlock->setChecked(false);
     } else if (text == "MetOp HRPT"){
-        ui->downlink->setCurrentText("QPSK");
         ui->symRate->setValue(2333333);
         ui->dcBlock->setChecked(false);
-    } else if (text == "NOAA POES GAC"){
-        ui->downlink->setCurrentText("BPSK");
+        ui->symRate->setDisabled(true);
+        ui->dcBlock->setDisabled(true);
+    } else if (text == "NOAA GAC"){
         ui->symRate->setValue(2660000);
         ui->dcBlock->setChecked(true);
-    } else if (text == "NOAA POES HRPT"){
-        ui->downlink->setCurrentText("Split-phase BPSK");
-        ui->symRate->setValue(665400);
+        ui->symRate->setDisabled(true);
+        ui->dcBlock->setDisabled(true);
+    } else if (text == "FengYun-3B HRPT"){
+        ui->symRate->setValue(2800000);
         ui->dcBlock->setChecked(false);
+        ui->symRate->setDisabled(true);
+        ui->dcBlock->setDisabled(true);
+    } else if (text == "FengYun-3C HRPT"){
+        ui->symRate->setValue(2600000);
+        ui->dcBlock->setChecked(false);
+        ui->symRate->setDisabled(true);
+        ui->dcBlock->setDisabled(true);
+    } else {
+        ui->symRate->setDisabled(false);
+        ui->dcBlock->setDisabled(false);
     }
 }
 
@@ -213,7 +197,51 @@ void MainWindow::on_startButton_clicked() {
             return;
         }
 
-        if (ui->downlink->currentText() == "BPSK") {
+
+        if (ui->downlink->currentText() == "MetOp HRPT") {
+            demod = new PSKDemodulator<MetopViterbi, VCDUExtractor>(samp_rate,
+                                                                    ui->symRate->value(),
+                                                                    4,
+                                                                    false,
+                                                                    std::move(file),
+                                                                    ui->outputFile->text().toStdString());
+            ui->constellation->set_lines(true, true);
+            ui->constellation->num_points(4096);
+        } else if (ui->downlink->currentText() == "FengYun-3B HRPT") {
+            demod = new PSKDemodulator<FengyunViterbi, VCDUExtractor>(samp_rate,
+                                                                      ui->symRate->value(),
+                                                                      4,
+                                                                      false,
+                                                                      std::move(file),
+                                                                      ui->outputFile->text().toStdString());
+            ui->constellation->set_lines(true, true);
+            ui->constellation->num_points(4096);
+        } else if (ui->downlink->currentText() == "FengYun-3C HRPT") {
+            demod = new PSKDemodulator<Fengyun3CViterbi, VCDUExtractor>(samp_rate,
+                                                                      ui->symRate->value(),
+                                                                      4,
+                                                                      false,
+                                                                      std::move(file),
+                                                                      ui->outputFile->text().toStdString());
+            ui->constellation->set_lines(true, true);
+            ui->constellation->num_points(4096);
+        } else if (ui->downlink->currentText() == "NOAA GAC") {
+            demod = new PSKDemodulator<BinarySlicer, Passthrough<uint8_t>>(samp_rate,
+                                                                      ui->symRate->value(),
+                                                                      2,
+                                                                      true,
+                                                                      std::move(file),
+                                                                      ui->outputFile->text().toStdString());
+            ui->constellation->set_lines(false, true);
+            ui->constellation->num_points(2048);
+        } else if (ui->downlink->currentText() == "NOAA/Meteor-M HRPT"){
+            demod = new BiphaseDemodulator(samp_rate,
+                                          ui->symRate->value(),
+                                           std::move(file),
+                                           ui->outputFile->text().toStdString());
+            ui->constellation->set_lines(false, true);
+            ui->constellation->num_points(2048);
+        } else if (ui->downlink->currentText() == "Custom BPSK") {
             demod = new PSKDemodulator<BinarySlicer, Passthrough<uint8_t>>(samp_rate,
                                                                     ui->symRate->value(),
                                                                     2,
@@ -222,7 +250,7 @@ void MainWindow::on_startButton_clicked() {
                                                                     ui->outputFile->text().toStdString());
             ui->constellation->set_lines(true, true);
             ui->constellation->num_points(2048);
-        } else if (ui->downlink->currentText() == "QPSK") {
+        } else if (ui->downlink->currentText() == "Custom QPSK") {
             demod = new PSKDemodulator<BinarySlicer2, Passthrough<uint8_t>>(samp_rate,
                                                                     ui->symRate->value(),
                                                                     4,

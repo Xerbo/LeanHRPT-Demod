@@ -1,12 +1,20 @@
-# LeanHRPT Generic Demod
+# LeanHRPT Demod
 
-A generic demodulator. For the original software see [LeanHRPT Demod](https://github.com/Xerbo/LeanHRPT-Demod) and [LeanHRPT Decode](https://github.com/Xerbo/LeanHRPT-Decode).
+[![Build](https://github.com/Xerbo/LeanHRPT-Demod/actions/workflows/build.yml/badge.svg)](https://github.com/Xerbo/LeanHRPT-Demod/actions/workflows/build.yml)
 
-![Screenshot of LeanHRPT-Demod demodulating Cloudsat](images/example.webp)
+A demodulator for weather satellites. Also see [LeanHRPT Decode](https://github.com/Xerbo/LeanHRPT-Decode).
 
-## Compiling
+![Screenshot of LeanHRPT-Demod demodulating FengYun in realtime and outputting VCDUs](images/example.webp)
 
-To compile from source you will need `qtbase5-dev`, [`libcorrect`](https://github.com/quiet/libcorrect), `libsndfile1-dev`, `libsoapysdr-dev`, `libfftw3-dev` and a C++11 compiler (tested with gcc, clang and MSVC) installed. After that you can compile with:
+## Installation
+
+Compiled builds for Linux and Windows are available from the [releases](https://github.com/Xerbo/LeanHRPT-Demod/releases) page.
+
+And then see the [wiki](https://github.com/Xerbo/LeanHRPT-Demod/wiki) for how to use.
+
+## Building from source
+
+For those who wish to compile from source you will need `qtbase5-dev`, [`libcorrect`](https://github.com/quiet/libcorrect), `libsndfile1-dev`, `libsoapysdr-dev`, `libfftw3-dev` and a C++11 compiler (tested with gcc, clang and MSVC) installed. After that you can compile with:
 
 ```sh
 mkdir build && cd build

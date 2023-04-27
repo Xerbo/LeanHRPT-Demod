@@ -124,4 +124,6 @@ class PSKDemodulator : public Demodulator {
         FileWriter<uint8_t> out;
 };
 
+Demodulator *make_demod(std::string downlink, double samp_rate, std::shared_ptr<FileReader> file, std::string output);
+
 #endif

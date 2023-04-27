@@ -45,10 +45,10 @@ class FFTDialog : public QDialog {
             float offset = ui->verticalSlider->value();
             ui->spectrum->d_min = offset;
             ui->spectrum->d_max = offset+range;
-            ui->spectrum->repaint();
+            ui->spectrum->update();
             ui->waterfall->d_min = offset;
             ui->waterfall->d_max = offset+range;
-            ui->waterfall->repaint();
+            ui->waterfall->update();
         }
 
     private:

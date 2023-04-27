@@ -16,25 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "mainwindow.h"
-#include "cli.h"
+#ifndef LEANHRPT_CLI_H_
+#define LEANHRPT_CLI_H_
 
-#include <QApplication>
+#include <QCommandLineParser>
 
-int main(int argc, char *argv[]) {
-    QApplication app(argc, argv);
-    QApplication::setApplicationName("LeanHRPT Demod");
-    QApplication::setApplicationVersion(VERSION);
+void init_parser(QCommandLineParser &parser);
+int run_cli(QCommandLineParser &parser);
 
-    QCommandLineParser parser;
-    init_parser(parser);
-    parser.process(app);
-
-    if (parser.positionalArguments().isEmpty()) {
-        MainWindow window;
-        window.show();
-        return app.exec();
-    } else {
-        return run_cli(parser);
-    }
-}
+#endif

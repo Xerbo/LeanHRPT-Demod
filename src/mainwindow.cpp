@@ -21,6 +21,7 @@
 
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QScreen>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     ui = new Ui::MainWindow;
@@ -41,7 +42,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
                 ui->constellation->push_sample(symbols[i]);
             }
 
-            ui->constellation->repaint();
+            ui->constellation->update();
             if (fft->isVisible()) {
                 fft->load_data(demod->baseband().data());
             }
@@ -269,7 +270,13 @@ void MainWindow::on_startButton_clicked() {
         }
 
         isDemodulating = true;
-        timer->start(1000.0f/30.0f);
+#if QT_VERSION >= 0x050E00
+        // This is bad, should be using something like requestUpdate instead
+        double refresh_rate = screen()->refreshRate();
+#else
+        double refresh_rate = 30.0;
+#endif
+        timer->start(1000.0/refresh_rate);
         ui->startButton->setText("Stop");
         ui->optionsBox->setEnabled(true);
         ui->setupBox->setEnabled(false);
@@ -296,7 +303,7 @@ void MainWindow::on_startButton_clicked() {
     }
 }
 
-void MainWindow::on_source_textActivated(const QString &text) {
+void MainWindow::on_source_currentTextChanged(const QString &text) {
     if (text == "WAV") { 
         ui->startButton->setEnabled(!outputFilename.isEmpty() && !wavFilename.isEmpty());
     } else if (text == "raw") {
@@ -325,28 +332,51 @@ void MainWindow::on_source_textActivated(const QString &text) {
     }
 }
 
+static QString auto_filename(QString input, QString downlink) {
+    QString extension;
+    if (downlink == "NOAA/Meteor HRPT" || downlink == "NOAA GAC") {
+        extension = "bin";
+    } else {
+        extension = "vcdu";
+    }
+
+    QFileInfo fi(input);
+    return fi.dir().absolutePath() + "/" + fi.completeBaseName() + "." + extension;
+}
+
 void MainWindow::on_wavInput_clicked() {
     QString _inputFilename = QFileDialog::getOpenFileName(this, "Select Input File", "", "Baseband (*.wav)");
     if (_inputFilename.isEmpty()) return;
 
     wavFilename = _inputFilename;
     ui->wavInput->setText(wavFilename);
-    ui->startButton->setEnabled(!outputFilename.isEmpty() && !wavFilename.isEmpty());
+    setOutputFilename(auto_filename(wavFilename, ui->downlink->currentText()));
+
+    ui->startButton->setEnabled(!outputFilename.isEmpty() && !wavFilename.isEmpty());    
 }
 void MainWindow::on_rawInput_clicked() {
-    QString _inputFilename = QFileDialog::getOpenFileName(this, "Select Input File", "", "Baseband (*.bin *.raw)");
+    QString _inputFilename = QFileDialog::getOpenFileName(this, "Select Input File", "", "Baseband (*.bin *.raw *.c32)");
     if (_inputFilename.isEmpty()) return;
 
     rawFilename = _inputFilename;
     ui->rawInput->setText(rawFilename);
-    ui->startButton->setEnabled(!outputFilename.isEmpty() && !rawFilename.isEmpty());
+    setOutputFilename(auto_filename(rawFilename, ui->downlink->currentText()));
+
+    ui->startButton->setEnabled(!outputFilename.isEmpty() && !rawFilename.isEmpty());  
 }
 void MainWindow::on_outputFile_clicked() {
     QString _outputFilename;
     _outputFilename = QFileDialog::getSaveFileName(this, "Select Output File", "", "Binary (*.bin)");
     if (_outputFilename.isEmpty()) return;
 
-    outputFilename = _outputFilename;
+    setOutputFilename(_outputFilename);
+}
+
+void MainWindow::
+(QString filename) {
+    if (filename.isEmpty()) return;
+
+    outputFilename = filename;
     ui->outputFile->setText(outputFilename);
 
     if (ui->source->currentText() == "WAV") { 
@@ -358,6 +388,6 @@ void MainWindow::on_outputFile_clicked() {
     }
 }
 
-void MainWindow::on_device_textActivated(const QString &text) {
+void MainWindow::on_device_currentTextChanged(const QString &text) {
     ui->customDevice->setEnabled(text == "Custom");
 }

@@ -49,6 +49,8 @@ class MainWindow : public QMainWindow {
         bool isDemodulating = false;
         void closeEvent(QCloseEvent *event);
 
+        void setOutputFilename(QString filename);
+
         Demodulator *demod;
         QTimer *timer;
 
@@ -63,10 +65,10 @@ class MainWindow : public QMainWindow {
         void on_rawInput_clicked();
         void on_outputFile_clicked();
 
-        void on_source_textActivated(const QString &text);
+        void on_source_currentTextChanged(const QString &text);
         void on_bias_toggled(bool state) { demod->file->set_biastee(state); }
-        void on_antenna_textActivated(const QString &text) { demod->file->set_antenna(text.toStdString()); }
-        void on_device_textActivated(const QString &text);
+        void on_antenna_currentTextChanged(const QString &text) { demod->file->set_antenna(text.toStdString()); }
+        void on_device_currentTextChanged(const QString &text);
 
         // menuFile
         void on_actionQuit_triggered() { QApplication::quit(); }

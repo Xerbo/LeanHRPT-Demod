@@ -78,3 +78,43 @@ template class PSKDemodulator<FengyunViterbi, VCDUExtractor>;
 template class PSKDemodulator<Fengyun3CViterbi, VCDUExtractor>;
 template class PSKDemodulator<BinarySlicer,   Passthrough<uint8_t>>;
 template class PSKDemodulator<BinarySlicer2,   Passthrough<uint8_t>>;
+
+// TODO: downlink should be an enum
+Demodulator *make_demod(std::string downlink, double samp_rate, std::shared_ptr<FileReader> file, std::string output) {
+    if (downlink == "metop_hrpt") {
+        return new PSKDemodulator<MetopViterbi, VCDUExtractor>(samp_rate,
+                                                               2.3333e6,
+                                                               4,
+                                                               false,
+                                                               std::move(file),
+                                                               output);
+    } else if (downlink == "fy3b_hrpt") {
+        return new PSKDemodulator<FengyunViterbi, VCDUExtractor>(samp_rate,
+                                                                 2.8e6,
+                                                                 4,
+                                                                 false,
+                                                                 std::move(file),
+                                                                 output);
+    } else if (downlink == "fy3c_hrpt") {
+        return new PSKDemodulator<Fengyun3CViterbi, VCDUExtractor>(samp_rate,
+                                                                   2.6e6,
+                                                                   4,
+                                                                   false,
+                                                                   std::move(file),
+                                                                   output);
+    } else if (downlink == "noaa_gac") {
+        return new PSKDemodulator<BinarySlicer, Passthrough<uint8_t>>(samp_rate,
+                                                                      2.661e6,
+                                                                      2,
+                                                                      true,
+                                                                      std::move(file),
+                                                                      output);
+    } else if (downlink == "noaa_hrpt" || downlink == "meteor_hrpt") {
+        return new BiphaseDemodulator(samp_rate,
+                                      665.4e3,
+                                      std::move(file),
+                                      output);
+    } else {
+        throw std::runtime_error("Unknown downlink, must be {noaa,meteor,fy3b,fy3c}_hrpt or noaa_gac");
+    }
+}

@@ -334,10 +334,10 @@ void MainWindow::on_source_currentTextChanged(const QString &text) {
 
 static QString auto_filename(QString input, QString downlink) {
     QString extension;
-    if (downlink == "NOAA/Meteor HRPT" || downlink == "NOAA GAC") {
-        extension = "bin";
-    } else {
+    if (downlink == "MetOp HRPT" || downlink == "FengYun-3B HRPT" || downlink == "FengYun-3C HRPT") {
         extension = "vcdu";
+    } else {
+        extension = "bin";
     }
 
     QFileInfo fi(input);
@@ -372,8 +372,7 @@ void MainWindow::on_outputFile_clicked() {
     setOutputFilename(_outputFilename);
 }
 
-void MainWindow::
-(QString filename) {
+void MainWindow::setOutputFilename(QString filename) {
     if (filename.isEmpty()) return;
 
     outputFilename = filename;

@@ -140,12 +140,12 @@
        transform="translate(9.0000405,-2.9708407e-5)">
       <path
          id="rect849-8"
-         style="fill:#ff732d;fill-opacity:1;stroke-width:0.379249;filter:url(#filter1223)"
+         style="fill:#ab3d16;fill-opacity:1;stroke-width:0.379249;filter:url(#filter1223)"
          d="M 0,0 V 188.97656 H 37.794922 132.2832 V 151.18164 H 37.794922 V 0 Z"
          transform="scale(0.26458333)" />
       <path
          id="rect866"
-         style="fill:#ffffbd;fill-opacity:1;stroke-width:1.01162;filter:url(#filter1235)"
+         style="fill:#d48700;fill-opacity:1;stroke-width:1.01162;filter:url(#filter1235)"
          d="M 94.488281,0 V 56.693359 H 41.574219 V 94.488281 H 94.488281 V 147.40234 H 132.2832 V 0 Z"
          transform="scale(0.26458333)" />
     </g>

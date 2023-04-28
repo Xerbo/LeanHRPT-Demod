@@ -128,8 +128,8 @@ void Correlator::correlate(uint8_t *data, uint32_t length) {
         for (int n = 0; n < numWords; n++) {
             __m128i sum = _mm_set1_epi8(0);
             for (int k = 0; k < wordSize/16; k++) {
-                const __m128i _words = _mm_loadu_si128((__m128i_u *)&wordsPtr[n][k*16]);
-                const __m128i _data  = _mm_loadu_si128((__m128i_u *)&data[i + k*16]);
+                const __m128i _words = _mm_loadu_si128((__m128i *)&wordsPtr[n][k*16]);
+                const __m128i _data  = _mm_loadu_si128((__m128i *)&data[i + k*16]);
                 sum = _mm_add_epi8(sum, Correlator::hardCorrelate(_data, _words));
             }
         

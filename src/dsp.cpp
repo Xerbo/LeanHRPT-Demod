@@ -46,16 +46,17 @@ BiphaseDemodulator::BiphaseDemodulator(float samp_rate,
     start();
 }
 
-template<class SymbolHandler, class Deframer>
-PSKDemodulator<SymbolHandler, Deframer>::PSKDemodulator(float samp_rate,
+template<class SymbolHandler, class Deframer, typename OutputType>
+PSKDemodulator<SymbolHandler, Deframer, OutputType>::PSKDemodulator(float samp_rate,
                                                         float sym_rate,
                                                         size_t order,
                                                         bool suppress_carrier,
+                                                        float costas_bw,
                                                         std::shared_ptr<FileReader> source,
                                                         std::string output_filename)
     : dc_blocker(0.001f),
-      rrc(make_rrc(1.0, samp_rate, sym_rate, 0.6, 51)),
-      agc(0.001f, 0.707f),
+      rrc(make_rrc(1.0, samp_rate, sym_rate, 0.6, 101)),
+      agc(costas_bw, 0.707f),
       costas_loop(order, loop(0.005f), M_TAUf32 * 150e3f/samp_rate, suppress_carrier),
       clock_recovery(order, samp_rate/sym_rate, loop(0.01f)),
       deframer(QFileInfo(QString::fromStdString(output_filename)).suffix().toStdString()),
@@ -73,11 +74,13 @@ PSKDemodulator<SymbolHandler, Deframer>::PSKDemodulator(float samp_rate,
     start();
 }
 
-template class PSKDemodulator<MetopViterbi,   VCDUExtractor>;
+template class PSKDemodulator<MetopViterbi, VCDUExtractor>;
 template class PSKDemodulator<FengyunViterbi, VCDUExtractor>;
 template class PSKDemodulator<Fengyun3CViterbi, VCDUExtractor>;
-template class PSKDemodulator<BinarySlicer,   Passthrough<uint8_t>>;
-template class PSKDemodulator<BinarySlicer2,   Passthrough<uint8_t>>;
+template class PSKDemodulator<BinarySlicer, Passthrough<uint8_t>>;
+template class PSKDemodulator<BinarySlicer2, Passthrough<uint8_t>>;
+template class PSKDemodulator<ComplexToChar, Passthrough<std::complex<char>>, std::complex<char>>;
+template class PSKDemodulator<CCSDSCorrelator, Passthrough<uint8_t>>;
 
 // TODO: downlink should be an enum
 Demodulator *make_demod(std::string downlink, double samp_rate, std::shared_ptr<FileReader> file, std::string output) {
@@ -86,6 +89,7 @@ Demodulator *make_demod(std::string downlink, double samp_rate, std::shared_ptr<
                                                                2.3333e6,
                                                                4,
                                                                false,
+                                                               0.001f,
                                                                std::move(file),
                                                                output);
     } else if (downlink == "fy3b_hrpt") {
@@ -93,6 +97,7 @@ Demodulator *make_demod(std::string downlink, double samp_rate, std::shared_ptr<
                                                                  2.8e6,
                                                                  4,
                                                                  false,
+                                                                 0.001f,
                                                                  std::move(file),
                                                                  output);
     } else if (downlink == "fy3c_hrpt") {
@@ -100,6 +105,7 @@ Demodulator *make_demod(std::string downlink, double samp_rate, std::shared_ptr<
                                                                    2.6e6,
                                                                    4,
                                                                    false,
+                                                                   0.001f,
                                                                    std::move(file),
                                                                    output);
     } else if (downlink == "noaa_gac") {
@@ -107,6 +113,7 @@ Demodulator *make_demod(std::string downlink, double samp_rate, std::shared_ptr<
                                                                       2.661e6,
                                                                       2,
                                                                       true,
+                                                                      0.001f,
                                                                       std::move(file),
                                                                       output);
     } else if (downlink == "noaa_hrpt" || downlink == "meteor_hrpt") {

@@ -98,6 +98,11 @@ void MainWindow::on_downlink_currentTextChanged(const QString &text){
         ui->dcBlock->setChecked(false);
         ui->symRate->setDisabled(true);
         ui->dcBlock->setDisabled(true);
+    } else if (text == "Meteor-M N2 LRPT"){
+        ui->symRate->setValue(72000);
+        ui->dcBlock->setChecked(false);
+        ui->symRate->setDisabled(true);
+        ui->dcBlock->setDisabled(true);
     } else {
         ui->symRate->setDisabled(false);
         ui->dcBlock->setDisabled(false);
@@ -204,6 +209,7 @@ void MainWindow::on_startButton_clicked() {
                                                                     ui->symRate->value(),
                                                                     4,
                                                                     false,
+                                                                    0.001f,
                                                                     std::move(file),
                                                                     ui->outputFile->text().toStdString());
             ui->constellation->set_lines(true, true);
@@ -213,6 +219,7 @@ void MainWindow::on_startButton_clicked() {
                                                                       ui->symRate->value(),
                                                                       4,
                                                                       false,
+                                                                      0.001f,
                                                                       std::move(file),
                                                                       ui->outputFile->text().toStdString());
             ui->constellation->set_lines(true, true);
@@ -222,6 +229,17 @@ void MainWindow::on_startButton_clicked() {
                                                                       ui->symRate->value(),
                                                                       4,
                                                                       false,
+                                                                      0.001f,
+                                                                      std::move(file),
+                                                                      ui->outputFile->text().toStdString());
+            ui->constellation->set_lines(true, true);
+            ui->constellation->num_points(4096);
+        } else if (ui->downlink->currentText() == "Meteor-M N2 LRPT") {
+            demod = new PSKDemodulator<CCSDSCorrelator, Passthrough<uint8_t>>(samp_rate,
+                                                                      ui->symRate->value(),
+                                                                      4,
+                                                                      false,
+                                                                      0.005f,
                                                                       std::move(file),
                                                                       ui->outputFile->text().toStdString());
             ui->constellation->set_lines(true, true);
@@ -231,6 +249,7 @@ void MainWindow::on_startButton_clicked() {
                                                                       ui->symRate->value(),
                                                                       2,
                                                                       true,
+                                                                      0.001f,
                                                                       std::move(file),
                                                                       ui->outputFile->text().toStdString());
             ui->constellation->set_lines(false, true);
@@ -247,6 +266,7 @@ void MainWindow::on_startButton_clicked() {
                                                                     ui->symRate->value(),
                                                                     2,
                                                                     ui->dcBlock->isChecked(),
+                                                                    0.001f,
                                                                     std::move(file),
                                                                     ui->outputFile->text().toStdString());
             ui->constellation->set_lines(true, true);
@@ -256,6 +276,7 @@ void MainWindow::on_startButton_clicked() {
                                                                     ui->symRate->value(),
                                                                     4,
                                                                     ui->dcBlock->isChecked(),
+                                                                    0.001f,
                                                                     std::move(file),
                                                                     ui->outputFile->text().toStdString());
             ui->constellation->set_lines(true, true);
@@ -334,7 +355,7 @@ void MainWindow::on_source_currentTextChanged(const QString &text) {
 
 static QString auto_filename(QString input, QString downlink) {
     QString extension;
-    if (downlink == "MetOp HRPT" || downlink == "FengYun-3B HRPT" || downlink == "FengYun-3C HRPT") {
+    if (downlink == "MetOp HRPT" || downlink == "FengYun-3B HRPT" || downlink == "FengYun-3C HRPT" || downlink == "Meteor-M N2 LRPT") {
         extension = "vcdu";
     } else {
         extension = "bin";
@@ -366,10 +387,30 @@ void MainWindow::on_rawInput_clicked() {
 }
 void MainWindow::on_outputFile_clicked() {
     QString _outputFilename;
-    _outputFilename = QFileDialog::getSaveFileName(this, "Select Output File", "", "Binary (*.bin)");
+    if (ui->downlink->currentText() == "MetOp HRPT") {
+        _outputFilename = QFileDialog::getSaveFileName(this, "Select Output File", "", "VCDUs (*.vcdu);;CADUs (*.cadu)");
+    } else if (ui->downlink->currentText() == "FengYun-3B HRPT") {
+        _outputFilename = QFileDialog::getSaveFileName(this, "Select Output File", "", "VCDUs (*.vcdu);;CADUs (*.cadu)");
+    } else if (ui->downlink->currentText() == "FengYun-3C HRPT") {
+        _outputFilename = QFileDialog::getSaveFileName(this, "Select Output File", "", "VCDUs (*.vcdu);;CADUs (*.cadu)");
+    } else if (ui->downlink->currentText() == "Meteor-M N2 LRPT") {
+        _outputFilename = QFileDialog::getSaveFileName(this, "Select Output File", "", "CADUs (*.cadu);;VCDUs (*.vcdu)");
+    } else {
+        _outputFilename = QFileDialog::getSaveFileName(this, "Select Output File", "", "Binary (*.bin)");
+    }
+
     if (_outputFilename.isEmpty()) return;
 
-    setOutputFilename(_outputFilename);
+    outputFilename = _outputFilename;
+    ui->outputFile->setText(outputFilename);
+
+    if (ui->source->currentText() == "WAV") { 
+        ui->startButton->setEnabled(!outputFilename.isEmpty() && !wavFilename.isEmpty());
+    } else if (ui->source->currentText() == "raw") {
+        ui->startButton->setEnabled(!outputFilename.isEmpty() && !rawFilename.isEmpty());
+    } else { // SDR
+        ui->startButton->setEnabled(!outputFilename.isEmpty() && !ui->device->currentText().isEmpty());
+    }
 }
 
 void MainWindow::setOutputFilename(QString filename) {

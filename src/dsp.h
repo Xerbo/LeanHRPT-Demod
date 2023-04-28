@@ -29,6 +29,7 @@
 #include "dsp/clock_recovery.h"
 #include "dsp/binary_slicer.h"
 #include "dsp/binary_slicer2.h"
+#include "dsp/complex_to_char.h"
 #include "util/pipe.hh"
 #include "io/writer.h"
 #include "digital/blocks.h"
@@ -97,13 +98,14 @@ class BiphaseDemodulator : public Demodulator {
         
 };
 
-template<class SymbolHandler, class Deframer>
+template<class SymbolHandler, class Deframer, typename OutputType = uint8_t>
 class PSKDemodulator : public Demodulator {
     public:
         PSKDemodulator(float samp_rate,
                        float sym_rate,
                        size_t order,
                        bool suppress_carrier,
+                       float costas_bw,
                        std::shared_ptr<FileReader> source,
                        std::string output_filename);
         std::vector<complex> &symbols() { return symbol_handler.in; }
@@ -121,7 +123,7 @@ class PSKDemodulator : public Demodulator {
         SymbolSync clock_recovery;
         SymbolHandler symbol_handler;
         Deframer deframer;
-        FileWriter<uint8_t> out;
+        FileWriter<OutputType> out;
 };
 
 Demodulator *make_demod(std::string downlink, double samp_rate, std::shared_ptr<FileReader> file, std::string output);

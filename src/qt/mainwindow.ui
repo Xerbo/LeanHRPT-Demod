@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>LeanHRPT Generic Demod</string>
+   <string>LeanHRPT-Demod</string>
   </property>
   <property name="windowIcon">
    <iconset>

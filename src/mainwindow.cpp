@@ -355,8 +355,10 @@ void MainWindow::on_source_currentTextChanged(const QString &text) {
 
 static QString auto_filename(QString input, QString downlink) {
     QString extension;
-    if (downlink == "MetOp HRPT" || downlink == "FengYun-3B HRPT" || downlink == "FengYun-3C HRPT" || downlink == "Meteor-M N2 LRPT") {
+    if (downlink == "MetOp HRPT" || downlink == "FengYun-3B HRPT" || downlink == "FengYun-3C HRPT") {
         extension = "vcdu";
+    } else if (downlink == "Meteor-M N2 LRPT"){
+        extension = "cadu";
     } else {
         extension = "bin";
     }
@@ -394,7 +396,7 @@ void MainWindow::on_outputFile_clicked() {
     } else if (ui->downlink->currentText() == "FengYun-3C HRPT") {
         _outputFilename = QFileDialog::getSaveFileName(this, "Select Output File", "", "VCDUs (*.vcdu);;CADUs (*.cadu)");
     } else if (ui->downlink->currentText() == "Meteor-M N2 LRPT") {
-        _outputFilename = QFileDialog::getSaveFileName(this, "Select Output File", "", "CADUs (*.cadu);;VCDUs (*.vcdu)");
+        _outputFilename = QFileDialog::getSaveFileName(this, "Select Output File", "", "CADUs (*.cadu)");
     } else {
         _outputFilename = QFileDialog::getSaveFileName(this, "Select Output File", "", "Binary (*.bin)");
     }

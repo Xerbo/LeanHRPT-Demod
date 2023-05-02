@@ -22,6 +22,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QScreen>
+#include <iostream>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     ui = new Ui::MainWindow;
@@ -129,7 +130,7 @@ void MainWindow::on_startButton_clicked() {
         try {
         if (ui->source->currentText() == "raw") {
             file = FileReader::choose_type(ui->rawFormat->currentText().toStdString(), rawFilename.toStdString());
-            samp_rate = ui->sampleRate->value()*1e6;
+            samp_rate = ui->sampleRate->value();
         } else if (ui->source->currentText() == "WAV") {
             file = FileReader::choose_type("wav", wavFilename.toStdString());
             samp_rate = file->rate();
@@ -141,7 +142,7 @@ void MainWindow::on_startButton_clicked() {
                 device = ui->device->currentText().toStdString();
             }
 
-            samp_rate = ui->sdrSampleRate->value()*1e6;
+            samp_rate = ui->sdrSampleRate->value();
             double frequency = ui->frequency->value()*1e6;
             file = std::make_shared<SDRSource>(device);
             file->set_rate(samp_rate);
@@ -378,7 +379,7 @@ void MainWindow::on_wavInput_clicked() {
     ui->startButton->setEnabled(!outputFilename.isEmpty() && !wavFilename.isEmpty());    
 }
 void MainWindow::on_rawInput_clicked() {
-    QString _inputFilename = QFileDialog::getOpenFileName(this, "Select Input File", "", "Baseband (*.bin *.raw *.c32)");
+    QString _inputFilename = QFileDialog::getOpenFileName(this, "Select Input File", "", "Baseband (*.bin *.raw *.c32 *.s8 .u8 *.f16 *.f32)");
     if (_inputFilename.isEmpty()) return;
 
     rawFilename = _inputFilename;

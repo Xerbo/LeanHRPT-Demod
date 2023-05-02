@@ -132,7 +132,7 @@
           <bool>false</bool>
          </property>
          <property name="suffix">
-          <string> sps</string>
+          <string> sym</string>
          </property>
          <property name="maximum">
           <number>999999999</number>
@@ -255,16 +255,19 @@
                  </sizepolicy>
                 </property>
                 <property name="suffix">
-                 <string> msps</string>
+                 <string> sps</string>
+                </property>
+                <property name="decimals">
+                 <number>0</number>
                 </property>
                 <property name="minimum">
                  <double>1.000000000000000</double>
                 </property>
                 <property name="maximum">
-                 <double>10.000000000000000</double>
+                 <double>100000000.000000000000000</double>
                 </property>
                 <property name="value">
-                 <double>3.000000000000000</double>
+                 <double>2000000.000000000000000</double>
                 </property>
                </widget>
               </item>
@@ -396,16 +399,19 @@
                     </sizepolicy>
                    </property>
                    <property name="suffix">
-                    <string> msps</string>
+                    <string> sps</string>
+                   </property>
+                   <property name="decimals">
+                    <number>0</number>
                    </property>
                    <property name="minimum">
                     <double>1.000000000000000</double>
                    </property>
                    <property name="maximum">
-                    <double>10.000000000000000</double>
+                    <double>100000000.000000000000000</double>
                    </property>
                    <property name="value">
-                    <double>3.000000000000000</double>
+                    <double>2000000.000000000000000</double>
                    </property>
                   </widget>
                  </item>

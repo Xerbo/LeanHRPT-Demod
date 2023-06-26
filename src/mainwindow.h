@@ -28,7 +28,7 @@
 #include "dsp.h"
 #include "fftdialog.h"
 
-#define ABOUT_TEXT "<h2>LeanHRPT Demod</h2>\
+#define ABOUT_TEXT "<h2>LeanHRPT-Demod</h2>\
 An easy to use HRPT demodulator<br/>\
 Licensed under GPL-3.0.\
 <p>Version: " VERSION "</p>"
@@ -58,6 +58,7 @@ class MainWindow : public QMainWindow {
         QString rawFilename;
         QString outputFilename;
     private slots:
+        void on_downlink_currentTextChanged(const QString &text);
         void on_startButton_clicked();
 
         void on_wavInput_clicked();

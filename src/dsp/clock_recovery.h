@@ -82,18 +82,21 @@ class SymbolSync : public Block<complex, complex> {
                 d_history.erase(d_history.begin()); // Delete the first element
                 d_history.push_back(out[oo]); // Add to back
 
-                // Early-late TED
+                // Mueller and Muller TED
                 float error;
                 switch (d_order) { 
                     case 2: 
-                        error = (slicer(d_history[0].real()) - slicer(d_history[2].real())) * d_history[1].real();
+                        error = slicer(d_history[1].real()) * d_history[2].real() -
+                                slicer(d_history[2].real()) * d_history[1].real();
                         break;
                     case 4:
-                        error = (slicer(d_history[0].real()) - slicer(d_history[2].real())) * d_history[1].real() +
-                                (slicer(d_history[0].imag()) - slicer(d_history[2].imag())) * d_history[1].imag();
+                        error = (slicer(d_history[1].real()) * d_history[2].real() -
+                                 slicer(d_history[2].real()) * d_history[1].real()) +
+                                (slicer(d_history[1].imag()) * d_history[2].imag() -
+                                 slicer(d_history[2].imag()) * d_history[1].imag());
                         break;
                     default:
-                        throw std::runtime_error("Invalid of unsupported PSK order");
+                        throw std::runtime_error("Invalid or unsupported PSK order");
                 }
 
                 // Adjust sps (frequency)
@@ -116,7 +119,7 @@ class SymbolSync : public Block<complex, complex> {
         }
 
         float slicer(float symbol) {
-            return symbol > 0.0f ? 1.0f : 0.0f;
+            return symbol < 0.0f ? -1.0f : 1.0f;
         }
 
         std::vector<std::complex<float>> ring_buffer;

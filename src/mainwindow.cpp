@@ -22,6 +22,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QScreen>
+#include <iostream>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     ui = new Ui::MainWindow;
@@ -72,6 +73,43 @@ void MainWindow::closeEvent(QCloseEvent *event) {
     }
 }
 
+void MainWindow::on_downlink_currentTextChanged(const QString &text){
+    if (text == "NOAA/Meteor-M HRPT") {
+        ui->symRate->setValue(665400);
+        ui->dcBlock->setChecked(false);
+        ui->symRate->setDisabled(true);
+        ui->dcBlock->setDisabled(true);
+    } else if (text == "MetOp HRPT"){
+        ui->symRate->setValue(2333333);
+        ui->dcBlock->setChecked(false);
+        ui->symRate->setDisabled(true);
+        ui->dcBlock->setDisabled(true);
+    } else if (text == "NOAA GAC"){
+        ui->symRate->setValue(2660000);
+        ui->dcBlock->setChecked(true);
+        ui->symRate->setDisabled(true);
+        ui->dcBlock->setDisabled(true);
+    } else if (text == "FengYun-3B HRPT"){
+        ui->symRate->setValue(2800000);
+        ui->dcBlock->setChecked(false);
+        ui->symRate->setDisabled(true);
+        ui->dcBlock->setDisabled(true);
+    } else if (text == "FengYun-3C HRPT"){
+        ui->symRate->setValue(2600000);
+        ui->dcBlock->setChecked(false);
+        ui->symRate->setDisabled(true);
+        ui->dcBlock->setDisabled(true);
+    } else if (text == "Meteor-M N2 LRPT"){
+        ui->symRate->setValue(72000);
+        ui->dcBlock->setChecked(false);
+        ui->symRate->setDisabled(true);
+        ui->dcBlock->setDisabled(true);
+    } else {
+        ui->symRate->setDisabled(false);
+        ui->dcBlock->setDisabled(false);
+    }
+}
+
 void MainWindow::on_startButton_clicked() {
     if (ui->startButton->text() == "Start") {
         if (QFileInfo(ui->outputFile->text()).exists()) {
@@ -92,7 +130,7 @@ void MainWindow::on_startButton_clicked() {
         try {
         if (ui->source->currentText() == "raw") {
             file = FileReader::choose_type(ui->rawFormat->currentText().toStdString(), rawFilename.toStdString());
-            samp_rate = ui->sampleRate->value()*1e6;
+            samp_rate = ui->sampleRate->value();
         } else if (ui->source->currentText() == "WAV") {
             file = FileReader::choose_type("wav", wavFilename.toStdString());
             samp_rate = file->rate();
@@ -104,7 +142,7 @@ void MainWindow::on_startButton_clicked() {
                 device = ui->device->currentText().toStdString();
             }
 
-            samp_rate = ui->sdrSampleRate->value()*1e6;
+            samp_rate = ui->sdrSampleRate->value();
             double frequency = ui->frequency->value()*1e6;
             file = std::make_shared<SDRSource>(device);
             file->set_rate(samp_rate);
@@ -169,43 +207,84 @@ void MainWindow::on_startButton_clicked() {
         // TODO: use make_demod
         if (ui->downlink->currentText() == "MetOp HRPT") {
             demod = new PSKDemodulator<MetopViterbi, VCDUExtractor>(samp_rate,
-                                                                    2.3333e6,
+                                                                    ui->symRate->value(),
                                                                     4,
                                                                     false,
+                                                                    0.001f,
                                                                     std::move(file),
                                                                     ui->outputFile->text().toStdString());
             ui->constellation->set_lines(true, true);
             ui->constellation->num_points(4096);
-        } else if (ui->downlink->currentText() == "FengYun 3B HRPT") {
+        } else if (ui->downlink->currentText() == "FengYun-3B HRPT") {
             demod = new PSKDemodulator<FengyunViterbi, VCDUExtractor>(samp_rate,
-                                                                      2.8e6,
+                                                                      ui->symRate->value(),
                                                                       4,
                                                                       false,
+                                                                      0.001f,
                                                                       std::move(file),
                                                                       ui->outputFile->text().toStdString());
             ui->constellation->set_lines(true, true);
             ui->constellation->num_points(4096);
-        } else if (ui->downlink->currentText() == "FengYun 3C HRPT") {
+        } else if (ui->downlink->currentText() == "FengYun-3C HRPT") {
             demod = new PSKDemodulator<Fengyun3CViterbi, VCDUExtractor>(samp_rate,
-                                                                      2.6e6,
+                                                                      ui->symRate->value(),
                                                                       4,
                                                                       false,
+                                                                      0.001f,
+                                                                      std::move(file),
+                                                                      ui->outputFile->text().toStdString());
+            ui->constellation->set_lines(true, true);
+            ui->constellation->num_points(4096);
+        } else if (ui->downlink->currentText() == "Meteor-M N2 LRPT") {
+            demod = new PSKDemodulator<CCSDSCorrelator, Passthrough<uint8_t>>(samp_rate,
+                                                                      ui->symRate->value(),
+                                                                      4,
+                                                                      false,
+                                                                      0.005f,
                                                                       std::move(file),
                                                                       ui->outputFile->text().toStdString());
             ui->constellation->set_lines(true, true);
             ui->constellation->num_points(4096);
         } else if (ui->downlink->currentText() == "NOAA GAC") {
             demod = new PSKDemodulator<BinarySlicer, Passthrough<uint8_t>>(samp_rate,
-                                                                      2.661e6,
+                                                                      ui->symRate->value(),
                                                                       2,
                                                                       true,
+                                                                      0.001f,
                                                                       std::move(file),
                                                                       ui->outputFile->text().toStdString());
             ui->constellation->set_lines(false, true);
             ui->constellation->num_points(2048);
+        } else if (ui->downlink->currentText() == "NOAA/Meteor-M HRPT"){
+            demod = new BiphaseDemodulator(samp_rate,
+                                          ui->symRate->value(),
+                                           std::move(file),
+                                           ui->outputFile->text().toStdString());
+            ui->constellation->set_lines(false, true);
+            ui->constellation->num_points(2048);
+        } else if (ui->downlink->currentText() == "Custom BPSK") {
+            demod = new PSKDemodulator<BinarySlicer, Passthrough<uint8_t>>(samp_rate,
+                                                                    ui->symRate->value(),
+                                                                    2,
+                                                                    ui->dcBlock->isChecked(),
+                                                                    0.001f,
+                                                                    std::move(file),
+                                                                    ui->outputFile->text().toStdString());
+            ui->constellation->set_lines(true, true);
+            ui->constellation->num_points(2048);
+        } else if (ui->downlink->currentText() == "Custom QPSK") {
+            demod = new PSKDemodulator<BinarySlicer2, Passthrough<uint8_t>>(samp_rate,
+                                                                    ui->symRate->value(),
+                                                                    4,
+                                                                    ui->dcBlock->isChecked(),
+                                                                    0.001f,
+                                                                    std::move(file),
+                                                                    ui->outputFile->text().toStdString());
+            ui->constellation->set_lines(true, true);
+            ui->constellation->num_points(4096);
         } else {
             demod = new BiphaseDemodulator(samp_rate,
-                                           665.4e3,
+                                           ui->symRate->value(),
                                            std::move(file),
                                            ui->outputFile->text().toStdString());
             ui->constellation->set_lines(false, true);
@@ -277,10 +356,12 @@ void MainWindow::on_source_currentTextChanged(const QString &text) {
 
 static QString auto_filename(QString input, QString downlink) {
     QString extension;
-    if (downlink == "NOAA/Meteor HRPT" || downlink == "NOAA GAC") {
-        extension = "bin";
-    } else {
+    if (downlink == "MetOp HRPT" || downlink == "FengYun-3B HRPT" || downlink == "FengYun-3C HRPT") {
         extension = "vcdu";
+    } else if (downlink == "Meteor-M N2 LRPT"){
+        extension = "cadu";
+    } else {
+        extension = "bin";
     }
 
     QFileInfo fi(input);
@@ -298,7 +379,7 @@ void MainWindow::on_wavInput_clicked() {
     ui->startButton->setEnabled(!outputFilename.isEmpty() && !wavFilename.isEmpty());    
 }
 void MainWindow::on_rawInput_clicked() {
-    QString _inputFilename = QFileDialog::getOpenFileName(this, "Select Input File", "", "Baseband (*.bin *.raw *.c32)");
+    QString _inputFilename = QFileDialog::getOpenFileName(this, "Select Input File", "", "Baseband (*.bin *.raw *.c32 *.s8 .u8 *.f16 *.f32)");
     if (_inputFilename.isEmpty()) return;
 
     rawFilename = _inputFilename;
@@ -309,13 +390,30 @@ void MainWindow::on_rawInput_clicked() {
 }
 void MainWindow::on_outputFile_clicked() {
     QString _outputFilename;
-    if (ui->downlink->currentText() != "NOAA/Meteor HRPT" && ui->downlink->currentText() != "NOAA GAC") {
+    if (ui->downlink->currentText() == "MetOp HRPT") {
         _outputFilename = QFileDialog::getSaveFileName(this, "Select Output File", "", "VCDUs (*.vcdu);;CADUs (*.cadu)");
+    } else if (ui->downlink->currentText() == "FengYun-3B HRPT") {
+        _outputFilename = QFileDialog::getSaveFileName(this, "Select Output File", "", "VCDUs (*.vcdu);;CADUs (*.cadu)");
+    } else if (ui->downlink->currentText() == "FengYun-3C HRPT") {
+        _outputFilename = QFileDialog::getSaveFileName(this, "Select Output File", "", "VCDUs (*.vcdu);;CADUs (*.cadu)");
+    } else if (ui->downlink->currentText() == "Meteor-M N2 LRPT") {
+        _outputFilename = QFileDialog::getSaveFileName(this, "Select Output File", "", "CADUs (*.cadu)");
     } else {
         _outputFilename = QFileDialog::getSaveFileName(this, "Select Output File", "", "Binary (*.bin)");
     }
 
-    setOutputFilename(_outputFilename);
+    if (_outputFilename.isEmpty()) return;
+
+    outputFilename = _outputFilename;
+    ui->outputFile->setText(outputFilename);
+
+    if (ui->source->currentText() == "WAV") { 
+        ui->startButton->setEnabled(!outputFilename.isEmpty() && !wavFilename.isEmpty());
+    } else if (ui->source->currentText() == "raw") {
+        ui->startButton->setEnabled(!outputFilename.isEmpty() && !rawFilename.isEmpty());
+    } else { // SDR
+        ui->startButton->setEnabled(!outputFilename.isEmpty() && !ui->device->currentText().isEmpty());
+    }
 }
 
 void MainWindow::setOutputFilename(QString filename) {
